@@ -4,7 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post - Vida 360º</title>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title id="page-title">Post - Vida 360º</title>
+    
+        <!-- Open Graph Metatags Dinâmicos -->
+        <meta property="og:title" content="" id="og-title">
+        <meta property="og:description" content="" id="og-description">
+        <meta property="og:image" content="" id="og-image">
+        <meta property="og:url" content="" id="og-url">
+        <meta property="og:type" content="website">
+    
+        <!-- Twitter Card Metatags Dinâmicos -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="" id="twitter-title">
+        <meta name="twitter:description" content="" id="twitter-description">
+        <meta name="twitter:image" content="" id="twitter-image">
     <link rel="stylesheet" href="assets/css/style.css">
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
@@ -182,6 +200,50 @@
 
     <!-- Script -->
     <script src="assets/js/script.js"></script>
+    <script>
+        // Informações dos artigos
+        const articles = {
+            "saude-mental": {
+                title: "Como Cuidar da Saúde Mental no Dia a Dia",
+                description: "Descubra práticas simples para manter a saúde mental em equilíbrio.",
+                image: "https://kpedro.github.io/blog-vida-360/assets/images/saude-mental.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=saude-mental"
+            },
+            "produtividade": {
+                title: "5 Passos para Aumentar sua Produtividade",
+                description: "Aprenda a organizar sua rotina e ser mais eficiente no trabalho e na vida pessoal.",
+                image: "https://kpedro.github.io/blog-vida-360/assets/images/produtividade.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=produtividade"
+            },
+            "equilibrio-vida": {
+                title: "Encontrando o Equilíbrio entre Trabalho e Vida Pessoal",
+                description: "Saiba como conciliar suas responsabilidades sem perder o bem-estar.",
+                image: "https://kpedro.github.io/blog-vida-360/assets/images/equilibrio-vida.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=equilibrio-vida"
+            }
+        };
+    
+        // Obtenha o parâmetro da URL
+        const params = new URLSearchParams(window.location.search);
+        const postKey = params.get("post");
+    
+        // Atualize os metadados com base no artigo
+        if (articles[postKey]) {
+            const article = articles[postKey];
+            document.title = article.title;
+            document.getElementById("og-title").content = article.title;
+            document.getElementById("og-description").content = article.description;
+            document.getElementById("og-image").content = article.image;
+            document.getElementById("og-url").content = article.url;
+    
+            document.getElementById("twitter-title").content = article.title;
+            document.getElementById("twitter-description").content = article.description;
+            document.getElementById("twitter-image").content = article.image;
+        } else {
+            console.error("Artigo não encontrado");
+        }
+    </script>
+    
 </body>
 </html>
 
