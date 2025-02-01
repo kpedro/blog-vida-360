@@ -1,6 +1,6 @@
 # O Poder do Marketing de Relacionamento 🤝📈  
 📅 *Publicado em: 31 de janeiro de 2025*  
-✍️ *Por: Marcos Pereira*  
+✍️ *Por: Kadson Pedro*  
 
 ![Marketing de Relacionamento](https://i.postimg.cc/gJn54k91/new-data-services-UO-QYR28h-S0-unsplash.jpg)
 

@@ -1,7 +1,7 @@
 # Como Construir uma Rotina Produtiva 🚀
 
 📅 *Publicado em: 31 de janeiro de 2025*  
-✍️ *Por: João Silva*
+✍️ *Por: Kadson Pedro*
 
 ---
 

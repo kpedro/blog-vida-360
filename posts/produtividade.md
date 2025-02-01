@@ -1,6 +1,6 @@
 # Mentalidade Empreendedora – Como Pensar como um Sucesso 💡🔥  
 📅 *Publicado em: 31 de janeiro de 2025*  
-✍️ *Por: Ana Oliveira*  
+✍️ *Por: Kadson Pedro*  
 
 ![Mentalidade Empreendedora](https://i.postimg.cc/xdshKNZK/mediensturmer-a-Wf7mjww-JJo-unsplash.jpg)
 
