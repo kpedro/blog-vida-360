@@ -1,0 +1,8 @@
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+<Files processar_formulario.php>
+    Order Deny,Allow
+    Deny from all
+</Files>

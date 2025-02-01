@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vida 360º</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Variáveis de Cores */
+        :root {
+            --blue-dark: #003366; /* Azul escuro */
+            --blue-primary: #0052cc; /* Azul primário */
+            --blue-secondary: #007bff; /* Azul médio */
+            --blue-light: #cce4f6; /* Azul claro */
+            --blue-background: #e6f7ff; /* Azul muito claro */
+            --text-color: #ffffff; /* Texto branco */
+        }
+
+        /* Estilos Globais */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--blue-background);
+            color: var(--blue-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            padding: 25px 0; /* Aumentei a espessura do cabeçalho */
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header .logo {
+            font-size: 2rem; /* Aumentei o tamanho do texto */
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--blue-light);
+        }
+
+        main .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        #home {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #posts-container {
+            background-color: var(--blue-light);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #posts-container h2 {
+            text-align: center;
+            color: var(--blue-primary);
+            margin-bottom: 20px;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .post {
+            background-color: var(--blue-background);
+            border: 1px solid var(--blue-secondary);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .post-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .post h3 {
+            color: var(--blue-primary);
+            font-size: 1.2rem;
+            padding: 10px;
+        }
+
+        .post p {
+            padding: 0 10px 10px;
+            color: var(--blue-secondary);
+        }
+
+        .read-more {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--blue-secondary);
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 0 0 10px 10px;
+            transition: background-color 0.3s;
+        }
+
+        .read-more:hover {
+            background-color: var(--blue-primary);
+        }
+
+        footer {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="logo">Vida 360º</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="produtos.html">Produtos</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li><a href="politica.html">Política</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="home">
+            <h2>Bem-vindo ao Blog "Vida 360º"</h2>
+            <p>Explore conteúdos exclusivos sobre <strong>saúde, bem-estar, produtividade, mentalidade e equilíbrio</strong> para uma vida mais plena.</p>
+        </section>
+
+        <section id="posts-container">
+            <h2>Últimos Posts</h2>
+            <div class="posts-grid">
+                <article class="post">
+                    <img src="assets/images/saude-mental.jpg" alt="Saúde Mental" class="post-image">
+                    <h3>Como Cuidar da Saúde Mental no Dia a Dia</h3>
+                    <p>Descubra práticas simples para manter a saúde mental em equilíbrio.</p>
+                    <a href="post.html?post=saude-mental" class="read-more">Leia mais...</a>
+                </article>
+                <article class="post">
+                    <img src="assets/images/produtividade.jpg" alt="Produtividade" class="post-image">
+                    <h3>5 Passos para Aumentar sua Produtividade</h3>
+                    <p>Aprenda a organizar sua rotina e ser mais eficiente no trabalho e na vida pessoal.</p>
+                    <a href="post.html?post=produtividade" class="read-more">Leia mais...</a>
+                </article>
+                <article class="post">
+                    <img src="assets/images/equilibrio-vida.jpg" alt="Equilíbrio na Vida" class="post-image">
+                    <h3>Encontrando o Equilíbrio entre Trabalho e Vida Pessoal</h3>
+                    <p>Saiba como conciliar suas responsabilidades sem perder o bem-estar.</p>
+                    <a href="post.html?post=equilibrio-vida" class="read-more">Leia mais...</a>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>

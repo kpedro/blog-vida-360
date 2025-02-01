@@ -1,0 +1,360 @@
+/* Estilos Gerais */
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #e6f7ff; /* Azul muito claro */
+    color: #003366; /* Azul escuro */
+}
+
+/* Container Centralizado */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Cabeçalho */
+header {
+    background: #003366; /* Azul escuro */
+    padding: 20px 0;
+}
+
+header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffffff; /* Branco */
+}
+
+/* Menu de Navegação */
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #ffffff; /* Branco */
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    color: #cce4f6; /* Azul claro */
+}
+
+/* Sessões do Blog */
+main {
+    padding: 40px 0;
+    text-align: center;
+}
+
+/* Grid de Posts */
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    justify-content: center;
+    align-items: start;
+}
+
+/* Estiliza os Posts na Página Principal */
+.post {
+    background: #ffffff; /* Branco */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.post img.post-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* Botão Leia Mais */
+.read-more {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #0052cc; /* Azul primário */
+    color: #ffffff; /* Branco */
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.read-more:hover {
+    background-color: #007bff; /* Azul médio */
+    color: #ffffff; /* Branco */
+}
+
+/* Estilo do Conteúdo do Post */
+#post-content {
+    background: #ffffff; /* Branco */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: justify;
+    line-height: 1.8;
+    font-size: 16px;
+}
+
+/* Títulos do Post */
+#post-content h1, #post-content h2, #post-content h3 {
+    margin-top: 20px;
+    color: #0052cc; /* Azul primário */
+}
+
+/* Links */
+#post-content a {
+    color: #007bff; /* Azul médio */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#post-content a:hover {
+    color: #0052cc; /* Azul primário */
+    text-decoration: underline;
+}
+
+/* Imagens */
+#post-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 20px auto;
+}
+
+/* Seção de Comentários */
+#comments-section {
+    background: #ffffff; /* Branco */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+#comments-section h3 {
+    margin-top: 0;
+    color: #0052cc; /* Azul primário */
+}
+
+/* Formulário de Comentários */
+#comment-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#comment-form label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#comment-form input,
+#comment-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#comment-form button {
+    margin-top: 10px;
+    padding: 10px;
+    background: #007bff; /* Azul médio */
+    color: #ffffff; /* Branco */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#comment-form button:hover {
+    background: #0052cc; /* Azul primário */
+}
+
+/* Comentários */
+#comments-container {
+    margin-top: 20px;
+}
+
+.comment {
+    background: #e6f7ff; /* Azul muito claro */
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Rodapé */
+footer {
+    background: #003366; /* Azul escuro */
+    text-align: center;
+    padding: 20px;
+    color: #ffffff; /* Branco */
+    margin-top: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    header .container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav ul {
+        flex-direction: column;
+        padding-top: 10px;
+    }
+
+    nav ul li {
+        margin-bottom: 10px;
+    }
+
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* Seção de Produtos */
+.products-section {
+    background-color: #cce4f6; /* Azul claro */
+    padding: 40px 20px;
+    border-radius: 10px;
+}
+
+.products-section h1 {
+    color: #0052cc; /* Azul primário */
+    margin-bottom: 30px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    justify-content: center;
+}
+
+.product-card {
+    background-color: #ffffff; /* Branco */
+    border: 2px solid #0052cc; /* Azul primário */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.product-card h2 {
+    color: #0052cc; /* Azul primário */
+    margin: 15px 0;
+    font-size: 1.2rem;
+}
+
+.product-card p {
+    color: #333333; /* Texto escuro */
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.product-card .button {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff; /* Azul médio */
+    color: #ffffff; /* Branco */
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.product-card .button:hover {
+    background-color: #0052cc; /* Azul primário */
+}
+/* Estilos para a página de contato */
+.contact-section {
+    background-color: #cce4f6; /* Azul claro */
+    padding: 40px 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 600px;
+    margin: 40px auto; /* Centraliza o formulário */
+}
+
+.contact-section h1 {
+    color: #003366; /* Azul escuro */
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaçamento entre os campos */
+}
+
+.contact-form label {
+    text-align: left;
+    font-weight: bold;
+    color: #003366;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #0052cc; /* Azul primário */
+    border-radius: 5px;
+    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contact-form textarea {
+    resize: vertical; /* Permite redimensionar verticalmente */
+}
+
+.contact-form button {
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #0052cc; /* Azul primário */
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.contact-form button:hover {
+    background-color: #007bff; /* Azul médio */
+}

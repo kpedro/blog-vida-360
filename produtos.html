@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Vida 360º</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue-dark: #003366; /* Azul escuro */
+            --blue-primary: #0052cc; /* Azul primário */
+            --blue-secondary: #007bff; /* Azul médio */
+            --blue-light: #cce4f6; /* Azul claro */
+            --blue-background: #e6f7ff; /* Azul muito claro */
+            --text-color: #ffffff; /* Texto branco */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--blue-background);
+            color: var(--blue-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            padding: 25px 0;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header .logo {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--blue-light);
+        }
+
+        main .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .products-section {
+            background-color: var(--blue-light);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .products-section h1 {
+            color: var(--blue-primary);
+            text-align: center;
+        }
+
+        .products-section p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background-color: var(--blue-background);
+            border: 1px solid var(--blue-secondary);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .product-card h2 {
+            color: var(--blue-primary);
+            margin: 10px 0;
+        }
+
+        .product-card p {
+            color: var(--blue-secondary);
+            margin: 10px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: var(--blue-secondary);
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: var(--blue-primary);
+        }
+
+        footer {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <div class="container">
+            <div class="logo">Vida 360º</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="produtos.html">Produtos</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li><a href="politica.html">Política</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        <section class="products-section">
+            <h1>Nossos Produtos</h1>
+            <p>Conheça alguns dos nossos produtos que podem transformar a sua rotina e trazer resultados incríveis.</p>
+
+            <!-- Grade de Produtos -->
+            <div class="products-grid">
+                <!-- Produto 1 -->
+                <div class="product-card">
+                    <img src="assets/images/produto1.png" alt="Produto 1">
+                    <h2>Daily+ Bem-Estar D45</h2>
+                    <p>Inclui: Nutrilite™ Daily Plus e Ômega 3 Plus. Ideal para fortalecer o sistema imunológico e a saúde cardiovascular.</p>
+                    <a href="https://www.amway.com.br/pt/Daily%2B1-BEM-ESTAR-D45/p/326994/60338539204" class="button">Saiba Mais</a>
+                </div>
+
+              <!-- Produto 2 -->
+              <div class="product-card">
+                <img src="https://i.postimg.cc/C5K0SJRb/AMWAY-Nutrilite-Daily-1-PDP-Portugues-480x480px-Imunidade.png" alt="Imagem do Produto 2">
+                <h2>Daily+ Imunidade D45</h2>
+                <p>Inclui: Nutrilite™ Daily Plus e Acerola C Mastigável. Perfeito para reforçar o sistema imunológico</p>
+                <a href="https://www.amway.com.br/pt/Daily-%2B1-IMUNIDADE-D45/p/326995/60338539204" class="button">Saiba Mais</a>
+            </div>
+
+            <!-- Produto 3 -->
+            <div class="product-card">
+                <img src="https://i.postimg.cc/kMj9frHs/AMWAY-Nutrilite-Daily-1-PDP-Portugues-480x480px-Beleza.png" alt="Imagem do Produto 3">
+                <h2>Daily+ Beleza D45</h2>
+                <p>Inclui: Nutrilite™ Daily Plus e Vitamina E. Para promover uma pele saudável e radiante.</p>
+                <a href="https://www.amway.com.br/pt/Daily%2B1-BELEZA-D45/p/326996/60338539204" class="button">Saiba Mais</a>
+            </div>
+
+            <!-- Produto 4 -->
+            <div class="product-card">
+                <img src="https://i.postimg.cc/9X1XKwDG/AMWAY-Nutrilite-Daily-1-PDP-Portugues-480x480px-Brilho.png" alt="Imagem do Produto 4">
+                <h2>Daily+ Brilho D45</h2>
+                <p>Inclui: Nutrilite™ Daily Plus e Artistry Sérum Vitamina C + HA3. Realce sua pele com brilho e vitalidade.</p>
+                <a href="https://www.amway.com.br/pt/Daily-%2B-1-Brilho-D45/p/323874/60338539204" class="button">Saiba Mais</a>
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>

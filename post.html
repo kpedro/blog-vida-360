@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post - Vida 360º</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --blue-dark: #003366; /* Azul escuro */
+            --blue-primary: #0052cc; /* Azul primário */
+            --blue-secondary: #007bff; /* Azul médio */
+            --blue-light: #cce4f6; /* Azul claro */
+            --blue-background: #e6f7ff; /* Azul muito claro */
+            --text-color: #ffffff; /* Texto branco */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--blue-background);
+            color: var(--blue-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            padding: 25px 0;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header .logo {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--blue-light);
+        }
+
+        main .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        #post-content {
+            background-color: var(--blue-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .comment-section {
+            background-color: var(--blue-light);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .comment-section h2 {
+            color: var(--blue-primary);
+        }
+
+        #comment-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        #comment-form input, #comment-form textarea {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid var(--blue-secondary);
+            border-radius: 5px;
+        }
+
+        #comment-form button {
+            background-color: var(--blue-secondary);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #comment-form button:hover {
+            background-color: var(--blue-primary);
+        }
+
+        #comments {
+            margin-top: 20px;
+        }
+
+        #comments h3 {
+            color: var(--blue-primary);
+        }
+
+        footer {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <div class="container">
+            <div class="logo">Vida 360º</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="produtos.html">Produtos</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li><a href="politica.html">Política</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        <!-- Área do Post -->
+        <div id="post-content">
+            Carregando post...
+        </div>
+
+        <!-- Seção de Comentários -->
+        <section class="comment-section">
+            <h2>Deixe seu comentário</h2>
+            <form id="comment-form">
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" placeholder="Digite seu nome" required>
+
+                <label for="comment">Comentário:</label>
+                <textarea id="comment" name="comment" rows="5" placeholder="Digite seu comentário" required></textarea>
+
+                <button type="submit">Enviar Comentário</button>
+            </form>
+
+            <!-- Lista de Comentários -->
+            <div id="comments">
+                <h3>Comentários:</h3>
+                <p>Ainda não há comentários. Seja o primeiro a comentar!</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Script -->
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
+

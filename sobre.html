@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre - Vida 360º</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue-dark: #003366; /* Azul escuro */
+            --blue-primary: #0052cc; /* Azul primário */
+            --blue-secondary: #007bff; /* Azul médio */
+            --blue-light: #cce4f6; /* Azul claro */
+            --blue-background: #e6f7ff; /* Azul muito claro */
+            --text-color: #ffffff; /* Texto branco */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--blue-background);
+            color: var(--blue-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            padding: 25px 0;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header .logo {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--blue-light);
+        }
+
+        main .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .about-section {
+            background-color: var(--blue-light);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .about-section h1 {
+            color: var(--blue-primary);
+            text-align: center;
+        }
+
+        .about-section h2 {
+            color: var(--blue-primary);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .about-section p {
+            text-align: justify;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .about-section ul {
+            margin: 15px 0;
+            padding-left: 20px;
+            list-style: disc;
+            list-style-position: inside; /* Corrige o espaçamento entre os pontos e o texto */
+        }
+
+        footer {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <div class="container">
+            <div class="logo">Vida 360º</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="produtos.html">Produtos</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li><a href="politica.html">Política</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        <section class="about-section">
+            <h1>Sobre Nós</h1>
+            <p>
+                Bem-vindo ao <strong>Vida 360º</strong>! Nosso blog é dedicado a trazer conteúdos que inspirem e capacitem nossos leitores a alcançar seus objetivos, sejam eles pessoais ou profissionais.
+            </p>
+
+            <h2>🌟 Nossa Missão</h2>
+            <p>
+                Nossa missão é ajudar pessoas a descobrirem ferramentas, estratégias e inspirações para uma vida mais equilibrada, produtiva e significativa. Valorizamos o poder do conhecimento e acreditamos que ele é o primeiro passo para transformar vidas.
+            </p>
+
+            <h2>💡 Nosso Propósito</h2>
+            <p>
+                Queremos ser uma fonte confiável de aprendizado e motivação nas áreas de:
+            </p>
+            <ul>
+                <li>Empreendedorismo</li>
+                <li>Saúde e Bem-estar</li>
+                <li>Marketing de Relacionamento</li>
+                <li>Mentalidade e Produtividade</li>
+            </ul>
+            <p>
+                Nosso propósito é compartilhar ideias e ferramentas práticas que possam ser aplicadas no dia a dia, ajudando nossos leitores a criarem a vida que desejam.
+            </p>
+
+            <h2>🌍 Nossa Comunidade</h2>
+            <p>
+                Acreditamos que juntos podemos ir mais longe. Por isso, convidamos você a fazer parte da nossa comunidade, compartilhando suas ideias, experiências e feedback. Aqui, sua voz é importante!
+            </p>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>
