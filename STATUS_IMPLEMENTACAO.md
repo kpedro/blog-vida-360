@@ -52,6 +52,15 @@
    - CTAs estratégicos
    - Responsivo
 
+### **✅ Concluído (Adicional):**
+
+7. **✅ Integração HTML**
+   - [x] Scripts Supabase e Leads incluídos no `index.html`
+   - [x] CSS de leads incluído
+   - [x] Formulário de captura no topo da página
+   - [x] Configuração de credenciais via script
+   - [x] Documentação de configuração criada
+
 ### **🔄 Em Progresso:**
 
 1. **🔄 Integração Resend**
@@ -62,11 +71,11 @@
 
 ### **⏳ Pendente:**
 
-1. **⏳ Atualizar HTML**
-   - [ ] Incluir scripts Supabase e Leads no `index.html`
-   - [ ] Incluir CSS de leads
-   - [ ] Adicionar formulários de captura nos posts
-   - [ ] Adicionar CTA sticky no topo
+1. **⏳ Configuração Final**
+   - [ ] Configurar credenciais Supabase no `index.html`
+   - [ ] Testar captura de leads
+   - [ ] Adicionar formulários nos posts individuais
+   - [ ] Adicionar CTA sticky no topo (opcional)
 
 2. **⏳ Configuração**
    - [ ] Criar projeto no Supabase
