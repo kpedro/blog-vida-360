@@ -12,17 +12,22 @@ O **Vida 360º** é um blog voltado para compartilhar conteúdos exclusivos sobr
 
 ## 🚀 **Como Abrir no Cursor**
 
-### **Método 1: Abrir Pasta Diretamente** ⚡
+> **⚠️ Importante:** O Blog Vida 360 é um **projeto totalmente independente**. Ele não faz parte de nenhum outro projeto. Você pode abri-lo sozinho ou junto com outros projetos através de um workspace.
+
+### **Método 1: Abrir Pasta Diretamente (Recomendado)** ⚡
+**Este é o método mais simples e direto:**
 1. Abra o Cursor
 2. **File → Open Folder...**
 3. Navegue até: `C:\Users\Kadson\blog-vida-360`
-4. Pronto! ✅
+4. Pronto! ✅ O blog está aberto como projeto independente.
 
-### **Método 2: Usar Workspace (Recomendado)** 🎯
+### **Método 2: Usar Workspace (Opcional)** 🎯
+**Se você quiser ver o blog junto com outros projetos:**
 1. Abra o Cursor
 2. **File → Open Workspace from File...**
 3. Selecione: `C:\Users\Kadson\app-pedagoflow\ABRIR_WORKSPACE_DOIS_PROJETOS.code-workspace`
-4. Você verá o Blog junto com todos os outros projetos! ✅
+   - *Nota: Este arquivo é apenas um workspace que agrupa vários projetos independentes. O blog continua sendo um projeto separado.*
+4. Você verá o Blog junto com outros projetos independentes! ✅
 
 ### **Método 3: Visualizar no Navegador** 🌐
 - **Opção A:** Dê duplo clique em `ABRIR_BLOG.bat`
@@ -59,6 +64,8 @@ O **Vida 360º** é um blog voltado para compartilhar conteúdos exclusivos sobr
 ---
 
 ## 📁 **Estrutura do Projeto**
+
+> **Localização:** `C:\Users\Kadson\blog-vida-360` (projeto independente)
 
 ```
 blog-vida-360/
