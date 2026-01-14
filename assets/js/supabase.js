@@ -8,8 +8,9 @@
 
 class SupabaseClient {
   constructor() {
-    this.supabaseUrl = import.meta.env.VITE_SUPABASE_URL || window.VITE_SUPABASE_URL;
-    this.supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || window.VITE_SUPABASE_ANON_KEY;
+    // Usar apenas window.* pois estamos em script normal (não módulo ES6)
+    this.supabaseUrl = window.VITE_SUPABASE_URL;
+    this.supabaseKey = window.VITE_SUPABASE_ANON_KEY;
     
     if (!this.supabaseUrl || !this.supabaseKey) {
       console.warn('⚠️ Supabase credentials não configuradas');
