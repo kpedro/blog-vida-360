@@ -12,15 +12,22 @@ class LeadCapture {
   getSupabaseClient() {
     // Se já existe, usar
     if (window.supabaseClient && window.supabaseClient.client) {
+      console.log('✅ Usando Supabase Client existente');
       return window.supabaseClient;
     }
     
     // Tentar inicializar se a função existir
     if (typeof initSupabase === 'function') {
+      console.log('🔄 Tentando inicializar Supabase Client...');
       const client = initSupabase();
       if (client && client.client) {
+        console.log('✅ Supabase Client inicializado com sucesso');
         return client;
+      } else {
+        console.warn('⚠️ Supabase Client inicializado mas sem cliente válido');
       }
+    } else {
+      console.warn('⚠️ Função initSupabase não encontrada');
     }
     
     console.warn('⚠️ Supabase Client não disponível. Usando fallback local.');
@@ -71,46 +78,77 @@ class LeadCapture {
     }
 
     try {
-      // Verificar se email já existe
-      if (this.supabase) {
-        const { exists } = await this.supabase.checkEmailExists(email);
-        
-        if (exists) {
-          this.showMessage(form, 'Este email já está cadastrado! Obrigado! 🎉', 'success');
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-          }
-          return;
-        }
-
-        // Criar novo lead
-        const result = await this.supabase.createLead(email, nome, [], origem);
-        
-        if (result.success) {
-          // Inscrever na newsletter
-          await this.supabase.subscribeToNewsletter(result.data.id, origem);
-          
-          // Registrar evento
-          await this.supabase.trackEvent('form_submit', window.location.pathname, {
-            tipo: 'newsletter',
-            origem
-          });
-
-          // Enviar email de boas-vindas (via API)
-          await this.sendWelcomeEmail(email, nome);
-
-          this.showMessage(form, '🎉 Cadastro realizado com sucesso! Verifique seu email.', 'success');
-          form.reset();
-        } else {
-          throw new Error(result.error || 'Erro ao cadastrar');
-        }
-      } else {
-        // Fallback: salvar no localStorage (temporário)
+      // Verificar se Supabase está disponível
+      if (!this.supabase || !this.supabase.client) {
+        console.warn('⚠️ Supabase não disponível, usando fallback localStorage');
         this.saveLeadLocal(email, nome, origem);
-        this.showMessage(form, '🎉 Cadastro realizado! Em breve você receberá nosso conteúdo.', 'success');
+        this.showMessage(form, '✨ Cadastro realizado! Em breve você receberá nosso conteúdo.', 'success');
         form.reset();
+        return;
       }
+
+      console.log('🔍 Verificando se email já existe...', email);
+      
+      // Verificar se email já existe
+      const emailCheck = await this.supabase.checkEmailExists(email);
+      console.log('📧 Resultado verificação email:', emailCheck);
+      
+      if (emailCheck.exists) {
+        this.showMessage(form, 'Este email já está cadastrado! Obrigado! 🎉', 'success');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+        return;
+      }
+
+      console.log('➕ Criando novo lead...', { email, nome, origem });
+      
+      // Criar novo lead
+      const result = await this.supabase.createLead(email, nome, [], origem);
+      console.log('📊 Resultado createLead:', result);
+      
+      if (!result.success) {
+        console.error('❌ Erro ao criar lead:', result.error);
+        throw new Error(result.error || 'Erro ao cadastrar');
+      }
+
+      if (!result.data || !result.data.id) {
+        console.error('❌ Lead criado mas sem dados retornados:', result);
+        throw new Error('Lead criado mas dados não retornados');
+      }
+
+      console.log('✅ Lead criado com sucesso! ID:', result.data.id);
+
+      // Inscrever na newsletter
+      try {
+        const newsletterResult = await this.supabase.subscribeToNewsletter(result.data.id, origem);
+        console.log('📬 Resultado newsletter:', newsletterResult);
+      } catch (err) {
+        console.warn('⚠️ Erro ao inscrever na newsletter (não crítico):', err);
+      }
+      
+      // Registrar evento
+      try {
+        await this.supabase.trackEvent('form_submit', window.location.pathname, {
+          tipo: 'newsletter',
+          origem
+        });
+        console.log('📈 Evento registrado');
+      } catch (err) {
+        console.warn('⚠️ Erro ao registrar evento (não crítico):', err);
+      }
+
+      // Enviar email de boas-vindas (via API)
+      try {
+        await this.sendWelcomeEmail(email, nome);
+        console.log('📧 Email de boas-vindas enviado');
+      } catch (err) {
+        console.warn('⚠️ Erro ao enviar email (não crítico):', err);
+      }
+
+      this.showMessage(form, '🎉 Cadastro realizado com sucesso! Verifique seu email.', 'success');
+      form.reset();
     } catch (error) {
       console.error('Erro ao processar formulário:', error);
       this.showMessage(form, 'Ops! Algo deu errado. Tente novamente.', 'error');

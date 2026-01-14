@@ -340,11 +340,23 @@
     <script>
         // Aguardar DOM e Supabase JS carregarem
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔍 Verificando Supabase...');
+            console.log('   - window.supabase existe?', typeof window.supabase !== 'undefined');
+            console.log('   - window.VITE_SUPABASE_URL:', window.VITE_SUPABASE_URL ? 'Configurado' : 'NÃO CONFIGURADO');
+            console.log('   - window.VITE_SUPABASE_ANON_KEY:', window.VITE_SUPABASE_ANON_KEY ? 'Configurado' : 'NÃO CONFIGURADO');
+            console.log('   - initSupabase existe?', typeof initSupabase !== 'undefined');
+            
             if (typeof initSupabase === 'function') {
                 window.supabaseClient = initSupabase();
-                console.log('✅ Supabase Client inicializado:', window.supabaseClient && window.supabaseClient.client ? 'OK' : 'ERRO');
+                if (window.supabaseClient && window.supabaseClient.client) {
+                    console.log('✅ Supabase Client inicializado com sucesso!');
+                    console.log('   - Cliente disponível:', !!window.supabaseClient.client);
+                } else {
+                    console.error('❌ Supabase Client NÃO inicializado corretamente!');
+                    console.error('   - window.supabaseClient:', window.supabaseClient);
+                }
             } else {
-                console.warn('⚠️ initSupabase não encontrado');
+                console.error('❌ Função initSupabase não encontrada!');
             }
         });
     </script>

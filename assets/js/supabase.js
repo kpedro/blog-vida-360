@@ -36,6 +36,13 @@ class SupabaseClient {
    */
   async createLead(email, nome = null, interesses = [], origem = 'website') {
     try {
+      if (!this.client) {
+        console.error('❌ Supabase client não disponível');
+        return { success: false, error: 'Cliente Supabase não inicializado' };
+      }
+
+      console.log('📤 Enviando INSERT para blog360_leads:', { email, nome, origem });
+      
       const { data, error } = await this.client
         .from('blog360_leads')
         .insert({
@@ -49,11 +56,20 @@ class SupabaseClient {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro do Supabase:', error);
+        console.error('   Código:', error.code);
+        console.error('   Mensagem:', error.message);
+        console.error('   Detalhes:', error.details);
+        console.error('   Hint:', error.hint);
+        throw error;
+      }
+
+      console.log('✅ Lead inserido com sucesso:', data);
       return { success: true, data };
     } catch (error) {
-      console.error('Erro ao criar lead:', error);
-      return { success: false, error: error.message };
+      console.error('❌ Erro ao criar lead:', error);
+      return { success: false, error: error.message || 'Erro desconhecido' };
     }
   }
 
@@ -62,6 +78,11 @@ class SupabaseClient {
    */
   async checkEmailExists(email) {
     try {
+      if (!this.client) {
+        console.warn('⚠️ Supabase client não disponível para verificar email');
+        return { exists: false, data: null };
+      }
+
       const { data, error } = await this.client
         .from('blog360_leads')
         .select('id, email')
@@ -70,12 +91,13 @@ class SupabaseClient {
 
       // Se não encontrar, retorna null (não erro)
       if (error && error.code !== 'PGRST116') {
+        console.error('❌ Erro ao verificar email:', error);
         throw error;
       }
       
       return { exists: !!data, data };
     } catch (error) {
-      console.error('Erro ao verificar email:', error);
+      console.error('❌ Erro ao verificar email:', error);
       return { exists: false, error: error.message };
     }
   }
