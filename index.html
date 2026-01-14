@@ -3,10 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vida 360º</title>
+    <title>Vida 360º - Blog de Saúde, Bem-estar e Produtividade</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Blog Vida 360º - Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio para uma vida mais plena e equilibrada.">
+    <meta name="keywords" content="saúde, bem-estar, produtividade, mentalidade, equilíbrio, vida plena, desenvolvimento pessoal">
+    <meta name="author" content="Kadson Pedro">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://kpedro.github.io/blog-vida-360/">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Vida 360º - Blog de Saúde, Bem-estar e Produtividade">
+    <meta property="og:description" content="Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio.">
+    <meta property="og:image" content="https://kpedro.github.io/blog-vida-360/assets/images/logo-blog.png">
+    <meta property="og:url" content="https://kpedro.github.io/blog-vida-360/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vida 360º - Blog de Saúde, Bem-estar e Produtividade">
+    <meta name="twitter:description" content="Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio.">
+    <meta name="twitter:image" content="https://kpedro.github.io/blog-vida-360/assets/images/logo-blog.png">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed - Vida 360º" href="feed.xml">
+    <link rel="icon" type="image/png" href="assets/images/logo-blog.png">
     <style>
         /* Variáveis de Cores */
         :root {
@@ -151,12 +173,12 @@
 </head>
 <body>
 
-    <header>
+    <header role="banner">
         <div class="container">
-            <div class="logo">Vida 360º</div>
-            <nav>
+            <div class="logo" role="heading" aria-level="1">Vida 360º</div>
+            <nav role="navigation" aria-label="Menu principal">
                 <ul>
-                    <li><a href="index.html">Início</a></li>
+                    <li><a href="index.html" aria-current="page">Início</a></li>
                     <li><a href="sobre.html">Sobre</a></li>
                     <li><a href="produtos.html">Produtos</a></li>
                     <li><a href="contato.html">Contato</a></li>
@@ -170,36 +192,85 @@
         <section id="home">
             <h2>Bem-vindo ao Blog "Vida 360º"</h2>
             <p>Explore conteúdos exclusivos sobre <strong>saúde, bem-estar, produtividade, mentalidade e equilíbrio</strong> para uma vida mais plena.</p>
+            
+            <!-- Barra de Busca -->
+            <div id="search-container" style="margin: 30px auto; max-width: 600px;">
+                <input 
+                    type="search" 
+                    id="search-input" 
+                    placeholder="🔍 Buscar posts..." 
+                    style="width: 100%; padding: 15px; font-size: 1rem; border: 2px solid var(--blue-secondary); border-radius: 10px; box-sizing: border-box;"
+                >
+                <div id="search-results" style="display: none; margin-top: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+            </div>
         </section>
 
         <section id="posts-container">
             <h2>Últimos Posts</h2>
             <div class="posts-grid">
                 <article class="post">
-                    <img src="assets/images/saude-mental.jpg" alt="Saúde Mental" class="post-image">
+                    <img src="assets/images/saude-mental.jpg" alt="Saúde Mental" class="post-image" loading="lazy">
                     <h3>Como Cuidar da Saúde Mental no Dia a Dia</h3>
                     <p>Descubra práticas simples para manter a saúde mental em equilíbrio.</p>
-                    <a href="post.html?post=saude-mental" class="read-more">Leia mais...</a>
+                    <a href="post.html?post=saude-mental" class="read-more" aria-label="Ler artigo sobre saúde mental">Leia mais...</a>
                 </article>
                 <article class="post">
-                    <img src="assets/images/produtividade.jpg" alt="Produtividade" class="post-image">
-                    <h3>5 Passos para Aumentar sua Produtividade</h3>
-                    <p>Aprenda a organizar sua rotina e ser mais eficiente no trabalho e na vida pessoal.</p>
-                    <a href="post.html?post=produtividade" class="read-more">Leia mais...</a>
+                    <img src="assets/images/produtividade.jpg" alt="Produtividade" class="post-image" loading="lazy">
+                    <h3>7 Hábitos de Pessoas Altamente Produtivas</h3>
+                    <p>Aprenda os hábitos que pessoas produtivas praticam diariamente para alcançar resultados extraordinários.</p>
+                    <a href="post.html?post=habitos-produtivos" class="read-more" aria-label="Ler artigo sobre hábitos produtivos">Leia mais...</a>
                 </article>
                 <article class="post">
-                    <img src="assets/images/equilibrio-vida.jpg" alt="Equilíbrio na Vida" class="post-image">
+                    <img src="assets/images/equilibrio-vida.jpg" alt="Equilíbrio na Vida" class="post-image" loading="lazy">
                     <h3>Encontrando o Equilíbrio entre Trabalho e Vida Pessoal</h3>
                     <p>Saiba como conciliar suas responsabilidades sem perder o bem-estar.</p>
-                    <a href="post.html?post=equilibrio-vida" class="read-more">Leia mais...</a>
+                    <a href="post.html?post=equilibrio-vida" class="read-more" aria-label="Ler artigo sobre equilíbrio">Leia mais...</a>
+                </article>
+                <article class="post">
+                    <img src="https://i.postimg.cc/xdshKNZK/mediensturmer-a-Wf7mjww-JJo-unsplash.jpg" alt="Mentalidade Empreendedora" class="post-image" loading="lazy">
+                    <h3>Mentalidade Empreendedora – Como Pensar como um Sucesso</h3>
+                    <p>Descubra como cultivar uma mentalidade voltada para o crescimento e transformar sua trajetória.</p>
+                    <a href="post.html?post=mentalidade-empreendedora" class="read-more" aria-label="Ler artigo sobre mentalidade empreendedora">Leia mais...</a>
+                </article>
+                <article class="post">
+                    <img src="https://i.postimg.cc/gJn54k91/new-data-services-UO-QYR28h-S0-unsplash.jpg" alt="Marketing de Relacionamento" class="post-image" loading="lazy">
+                    <h3>O Poder do Marketing de Relacionamento</h3>
+                    <p>Aprenda como construir relações sólidas que geram resultados duradouros no seu negócio.</p>
+                    <a href="post.html?post=marketing-relacionamento" class="read-more" aria-label="Ler artigo sobre marketing de relacionamento">Leia mais...</a>
                 </article>
             </div>
         </section>
     </main>
 
-    <footer>
+    <footer role="contentinfo">
         <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">
+            <a href="feed.xml" style="color: var(--blue-light); text-decoration: none;">📡 RSS Feed</a> | 
+            <a href="sitemap.xml" style="color: var(--blue-light); text-decoration: none;">🗺️ Sitemap</a>
+        </p>
     </footer>
 
+    <!-- Scripts -->
+    <script src="assets/js/performance.js"></script>
+    <script src="assets/js/search.js"></script>
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "Vida 360º",
+      "description": "Blog sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio",
+      "url": "https://kpedro.github.io/blog-vida-360/",
+      "author": {
+        "@type": "Person",
+        "name": "Kadson Pedro"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Vida 360º"
+      }
+    }
+    </script>
 </body>
 </html>

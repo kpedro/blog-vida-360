@@ -1,11 +1,39 @@
+/* Variáveis CSS Globais */
+:root {
+    --blue-dark: #003366;
+    --blue-primary: #0052cc;
+    --blue-secondary: #007bff;
+    --blue-light: #cce4f6;
+    --blue-background: #e6f7ff;
+    --text-color: #ffffff;
+    --text-dark: #003366;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 8px 12px rgba(0, 0, 0, 0.2);
+    --transition: all 0.3s ease;
+}
+
 /* Estilos Gerais */
 body {
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #e6f7ff; /* Azul muito claro */
-    color: #003366; /* Azul escuro */
+    background-color: var(--blue-background);
+    color: var(--text-dark);
+    scroll-behavior: smooth;
+}
+
+/* Screen Reader Only */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }
 
 /* Container Centralizado */
@@ -17,8 +45,12 @@ body {
 
 /* Cabeçalho */
 header {
-    background: #003366; /* Azul escuro */
+    background: var(--blue-dark);
     padding: 20px 0;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 header .container {
@@ -73,11 +105,29 @@ main {
 
 /* Estiliza os Posts na Página Principal */
 .post {
-    background: #ffffff; /* Branco */
+    background: #ffffff;
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.post:hover::before {
+    left: 100%;
 }
 
 .post img.post-image {
@@ -214,24 +264,222 @@ footer {
     margin-top: 20px;
 }
 
-/* Responsividade */
+/* Acessibilidade */
+*:focus {
+    outline: 2px solid var(--blue-secondary);
+    outline-offset: 2px;
+}
+
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--blue-dark);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 100;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Animações Suaves */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.post {
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Loading State */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--blue-primary);
+    font-size: 1.2rem;
+}
+
+.loading::after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* Error State */
+.error-message {
+    background: #ffebee;
+    color: #c62828;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #c62828;
+}
+
+/* Success Message */
+.success-message {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 4px solid #2e7d32;
+}
+
+/* Comentários Melhorados */
+.comment {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 4px solid var(--blue-secondary);
+    transition: transform 0.2s;
+}
+
+.comment:hover {
+    transform: translateX(5px);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.comment-date {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Busca */
+.search-results-list {
+    list-style: none;
+    padding: 0;
+}
+
+.search-results-list li {
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    transition: background 0.2s;
+}
+
+.search-results-list li:hover {
+    background: #e6f7ff;
+}
+
+.search-results-list a {
+    text-decoration: none;
+    color: var(--blue-dark);
+    display: block;
+}
+
+.search-results-list .category {
+    display: inline-block;
+    background: var(--blue-light);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
+.no-results {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Responsividade Melhorada */
 @media (max-width: 768px) {
     header .container {
         flex-direction: column;
         text-align: center;
+        gap: 15px;
     }
 
     nav ul {
         flex-direction: column;
         padding-top: 10px;
+        gap: 10px;
     }
 
     nav ul li {
-        margin-bottom: 10px;
+        margin: 0;
     }
 
     .posts-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-section {
+        margin: 20px auto;
+        padding: 20px 15px;
+    }
+
+    main .container {
+        padding: 0 15px;
+    }
+
+    #post-content {
+        padding: 15px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    header .logo {
+        font-size: 1.5rem;
+    }
+
+    nav ul li a {
+        font-size: 0.9rem;
+    }
+
+    .post h3 {
+        font-size: 1.1rem;
+    }
+
+    #search-input {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    header, footer, nav, #search-container, .comment-section {
+        display: none;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+
+    #post-content {
+        box-shadow: none;
+        border: none;
     }
 }
 /* Seção de Produtos */

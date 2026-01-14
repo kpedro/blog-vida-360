@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Vida 360º - Blog de Saúde, Bem-estar e Produtividade</title>
+        <link>https://kpedro.github.io/blog-vida-360/</link>
+        <description>Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio para uma vida mais plena.</description>
+        <language>pt-BR</language>
+        <lastBuildDate>Mon, 13 Jan 2025 19:00:00 -0300</lastBuildDate>
+        <atom:link href="https://kpedro.github.io/blog-vida-360/feed.xml" rel="self" type="application/rss+xml"/>
+        
+        <item>
+            <title>Como Cuidar da Saúde Mental no Dia a Dia</title>
+            <link>https://kpedro.github.io/blog-vida-360/post.html?post=saude-mental</link>
+            <description>Descubra práticas simples para manter a saúde mental em equilíbrio.</description>
+            <pubDate>Mon, 13 Jan 2025 10:00:00 -0300</pubDate>
+            <guid>https://kpedro.github.io/blog-vida-360/post.html?post=saude-mental</guid>
+        </item>
+        
+        <item>
+            <title>7 Hábitos de Pessoas Altamente Produtivas</title>
+            <link>https://kpedro.github.io/blog-vida-360/post.html?post=habitos-produtivos</link>
+            <description>Aprenda os hábitos que pessoas produtivas praticam diariamente para alcançar resultados extraordinários.</description>
+            <pubDate>Mon, 25 Jan 2025 10:00:00 -0300</pubDate>
+            <guid>https://kpedro.github.io/blog-vida-360/post.html?post=habitos-produtivos</guid>
+        </item>
+        
+        <item>
+            <title>Encontrando o Equilíbrio entre Trabalho e Vida Pessoal</title>
+            <link>https://kpedro.github.io/blog-vida-360/post.html?post=equilibrio-vida</link>
+            <description>Saiba como conciliar suas responsabilidades sem perder o bem-estar.</description>
+            <pubDate>Mon, 20 Jan 2025 10:00:00 -0300</pubDate>
+            <guid>https://kpedro.github.io/blog-vida-360/post.html?post=equilibrio-vida</guid>
+        </item>
+        
+        <item>
+            <title>Mentalidade Empreendedora – Como Pensar como um Sucesso</title>
+            <link>https://kpedro.github.io/blog-vida-360/post.html?post=mentalidade-empreendedora</link>
+            <description>Descubra como cultivar uma mentalidade voltada para o crescimento e transformar sua trajetória.</description>
+            <pubDate>Wed, 15 Jan 2025 10:00:00 -0300</pubDate>
+            <guid>https://kpedro.github.io/blog-vida-360/post.html?post=mentalidade-empreendedora</guid>
+        </item>
+        
+        <item>
+            <title>O Poder do Marketing de Relacionamento</title>
+            <link>https://kpedro.github.io/blog-vida-360/post.html?post=marketing-relacionamento</link>
+            <description>Aprenda como construir relações sólidas que geram resultados duradouros no seu negócio.</description>
+            <pubDate>Mon, 20 Jan 2025 10:00:00 -0300</pubDate>
+            <guid>https://kpedro.github.io/blog-vida-360/post.html?post=marketing-relacionamento</guid>
+        </item>
+        
+    </channel>
+</rss>

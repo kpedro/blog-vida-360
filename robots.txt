@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://kpedro.github.io/blog-vida-360/sitemap.xml
+
+# Bloquear arquivos desnecessários
+Disallow: /posts/
+Disallow: /*.md$
