@@ -93,54 +93,58 @@ class LeadCapture {
       const emailCheck = await this.supabase.checkEmailExists(email);
       console.log('📧 Resultado verificação email:', emailCheck);
       
+      let leadId = null;
+      
       if (emailCheck.exists) {
-        this.showMessage(form, 'Este email já está cadastrado! Obrigado! 🎉', 'success');
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
+        console.log('📧 Email já existe, usando lead existente');
+        leadId = emailCheck.data.id;
+        this.showMessage(form, 'Este email já está cadastrado! Enviando email de boas-vindas... 🎉', 'success');
+      } else {
+        console.log('➕ Criando novo lead...', { email, nome, origem });
+        
+        // Criar novo lead
+        const result = await this.supabase.createLead(email, nome, [], origem);
+        console.log('📊 Resultado createLead:', result);
+        
+        if (!result.success) {
+          console.error('❌ Erro ao criar lead:', result.error);
+          throw new Error(result.error || 'Erro ao cadastrar');
         }
-        return;
+
+        if (!result.data || !result.data.id) {
+          console.error('❌ Lead criado mas sem dados retornados:', result);
+          throw new Error('Lead criado mas dados não retornados');
+        }
+
+        console.log('✅ Lead criado com sucesso! ID:', result.data.id);
+        leadId = result.data.id;
+
+        // Inscrever na newsletter (apenas para novos leads)
+        try {
+          const newsletterResult = await this.supabase.subscribeToNewsletter(leadId, origem);
+          console.log('📬 Resultado newsletter:', newsletterResult);
+        } catch (err) {
+          console.warn('⚠️ Erro ao inscrever na newsletter (não crítico):', err);
+        }
       }
 
-      console.log('➕ Criando novo lead...', { email, nome, origem });
-      
-      // Criar novo lead
-      const result = await this.supabase.createLead(email, nome, [], origem);
-      console.log('📊 Resultado createLead:', result);
-      
-      if (!result.success) {
-        console.error('❌ Erro ao criar lead:', result.error);
-        throw new Error(result.error || 'Erro ao cadastrar');
-      }
-
-      if (!result.data || !result.data.id) {
-        console.error('❌ Lead criado mas sem dados retornados:', result);
-        throw new Error('Lead criado mas dados não retornados');
-      }
-
-      console.log('✅ Lead criado com sucesso! ID:', result.data.id);
-
-      // Inscrever na newsletter
-      try {
-        const newsletterResult = await this.supabase.subscribeToNewsletter(result.data.id, origem);
-        console.log('📬 Resultado newsletter:', newsletterResult);
-      } catch (err) {
-        console.warn('⚠️ Erro ao inscrever na newsletter (não crítico):', err);
-      }
-      
-      // Registrar evento
+      // Registrar evento (para novos e existentes)
       try {
         await this.supabase.trackEvent('form_submit', window.location.pathname, {
           tipo: 'newsletter',
-          origem
+          origem,
+          lead_existente: emailCheck.exists
         });
         console.log('📈 Evento registrado');
       } catch (err) {
         console.warn('⚠️ Erro ao registrar evento (não crítico):', err);
       }
 
-      // Enviar email de boas-vindas (via API)
+      // Enviar email de boas-vindas (via API) - SEMPRE, mesmo se lead já existe
       console.log('🔄 Iniciando envio de email de boas-vindas...');
+      console.log('   - Lead ID:', leadId);
+      console.log('   - Email já existia?', emailCheck.exists);
+      
       try {
         await this.sendWelcomeEmail(email, nome);
         console.log('✅ Processo de envio de email concluído');
