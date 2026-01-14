@@ -316,6 +316,7 @@ class LeadCapture {
       const apiUrl = this.getApiUrl();
       
       console.log('📧 Enviando email de boas-vindas para:', email);
+      console.log('   - API URL:', `${apiUrl}/api/send-email`);
       
       // Chamar API do Vercel para enviar email via Resend
       const response = await fetch(`${apiUrl}/api/send-email`, {
@@ -330,16 +331,28 @@ class LeadCapture {
         })
       });
 
+      console.log('   - Status da resposta:', response.status);
+      console.log('   - Response OK?', response.ok);
+
       const data = await response.json();
+      console.log('   - Dados da resposta:', data);
 
       if (!response.ok) {
         console.error('❌ Erro ao enviar email:', data);
+        console.error('   - Status:', response.status);
+        console.error('   - Erro:', data.error);
+        console.error('   - Detalhes:', data.details);
         throw new Error(data.error || 'Erro ao enviar email');
       }
 
-      console.log('✅ Email de boas-vindas enviado com sucesso!', data.messageId);
+      console.log('✅ Email de boas-vindas enviado com sucesso!');
+      console.log('   - Message ID:', data.messageId);
+      console.log('   - Mensagem:', data.message);
     } catch (error) {
       console.error('⚠️ Erro ao enviar email de boas-vindas:', error);
+      console.error('   - Tipo do erro:', error.name);
+      console.error('   - Mensagem:', error.message);
+      console.error('   - Stack:', error.stack);
       // Não bloquear o fluxo se o email falhar
       // O lead já foi salvo no Supabase, o email é opcional
     }
