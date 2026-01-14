@@ -140,11 +140,14 @@ class LeadCapture {
       }
 
       // Enviar email de boas-vindas (via API)
+      console.log('🔄 Iniciando envio de email de boas-vindas...');
       try {
         await this.sendWelcomeEmail(email, nome);
-        console.log('📧 Email de boas-vindas enviado');
+        console.log('✅ Processo de envio de email concluído');
       } catch (err) {
-        console.warn('⚠️ Erro ao enviar email (não crítico):', err);
+        console.error('❌ Erro ao enviar email de boas-vindas:', err);
+        console.error('   - Erro completo:', err);
+        // Não bloquear o fluxo - email é opcional
       }
 
       this.showMessage(form, '🎉 Cadastro realizado com sucesso! Verifique seu email.', 'success');
@@ -311,12 +314,15 @@ class LeadCapture {
   }
 
   async sendWelcomeEmail(email, nome) {
+    console.log('📧 [sendWelcomeEmail] Iniciando...', { email, nome });
+    
     try {
       // Determinar URL da API baseado no ambiente
       const apiUrl = this.getApiUrl();
       
       console.log('📧 Enviando email de boas-vindas para:', email);
       console.log('   - API URL:', `${apiUrl}/api/send-email`);
+      console.log('   - URL completa:', window.location.href);
       
       // Chamar API do Vercel para enviar email via Resend
       const response = await fetch(`${apiUrl}/api/send-email`, {
