@@ -34,7 +34,7 @@ class SupabaseClient {
   async createLead(email, nome = null, interesses = [], origem = 'website') {
     try {
       const { data, error } = await this.client
-        .from('leads')
+        .from('blog360_leads')
         .insert({
           email,
           nome,
@@ -77,7 +77,7 @@ class SupabaseClient {
   async updateLeadScore(leadId, score) {
     try {
       const { data, error } = await this.client
-        .from('leads')
+        .from('blog360_leads')
         .update({ score })
         .eq('id', leadId)
         .select()
@@ -127,7 +127,7 @@ class SupabaseClient {
   async getPostBySlug(slug) {
     try {
       const { data, error } = await this.client
-        .from('posts')
+        .from('blog360_posts')
         .select('*')
         .eq('slug', slug)
         .eq('publicado', true)
@@ -179,7 +179,7 @@ class SupabaseClient {
   async getAffiliateLinks(categoria = null, destacado = false) {
     try {
       let query = this.client
-        .from('affiliate_links')
+        .from('blog360_affiliate_links')
         .select('*')
         .eq('ativo', true)
         .order('clicks', { ascending: false });
@@ -208,14 +208,14 @@ class SupabaseClient {
   async trackAffiliateClick(linkId) {
     try {
       const { data: link } = await this.client
-        .from('affiliate_links')
+        .from('blog360_affiliate_links')
         .select('clicks')
         .eq('id', linkId)
         .single();
 
       if (link) {
         await this.client
-          .from('affiliate_links')
+          .from('blog360_affiliate_links')
           .update({ clicks: link.clicks + 1 })
           .eq('id', linkId);
       }
@@ -242,7 +242,7 @@ class SupabaseClient {
       const sessionId = this.getSessionId();
       
       const { data, error } = await this.client
-        .from('analytics')
+        .from('blog360_analytics')
         .insert({
           evento,
           pagina: pagina || window.location.pathname,
@@ -280,7 +280,7 @@ class SupabaseClient {
   async subscribeToNewsletter(leadId, fonte = 'form') {
     try {
       const { data, error } = await this.client
-        .from('newsletter_subscriptions')
+        .from('blog360_newsletter_subscriptions')
         .insert({
           lead_id: leadId,
           status: 'active',

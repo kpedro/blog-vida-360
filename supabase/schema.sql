@@ -1,13 +1,15 @@
 -- ============================================
 -- Schema Supabase - Blog Vida 360º
 -- ============================================
--- Este arquivo contém todas as tabelas necessárias
+-- ⚠️ IMPORTANTE: Este schema usa prefixo "blog360_" para evitar conflitos
+-- com outros projetos no mesmo Supabase
 -- Execute no SQL Editor do Supabase
+-- ============================================
 
 -- ============================================
--- 1. TABELA: leads
+-- 1. TABELA: blog360_leads
 -- ============================================
-CREATE TABLE IF NOT EXISTS leads (
+CREATE TABLE IF NOT EXISTS public.blog360_leads (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email TEXT UNIQUE NOT NULL,
   nome TEXT,
@@ -20,14 +22,14 @@ CREATE TABLE IF NOT EXISTS leads (
 );
 
 -- Índices para performance
-CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email);
-CREATE INDEX IF NOT EXISTS idx_leads_ativo ON leads(ativo);
-CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at);
+CREATE INDEX IF NOT EXISTS idx_blog360_leads_email ON public.blog360_leads(email);
+CREATE INDEX IF NOT EXISTS idx_blog360_leads_ativo ON public.blog360_leads(ativo);
+CREATE INDEX IF NOT EXISTS idx_blog360_leads_created_at ON public.blog360_leads(created_at);
 
 -- ============================================
--- 2. TABELA: posts
+-- 2. TABELA: blog360_posts
 -- ============================================
-CREATE TABLE IF NOT EXISTS posts (
+CREATE TABLE IF NOT EXISTS public.blog360_posts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   slug TEXT UNIQUE NOT NULL,
   titulo TEXT NOT NULL,
@@ -48,15 +50,15 @@ CREATE TABLE IF NOT EXISTS posts (
 );
 
 -- Índices
-CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
-CREATE INDEX IF NOT EXISTS idx_posts_publicado ON posts(publicado);
-CREATE INDEX IF NOT EXISTS idx_posts_categoria ON posts(categoria);
-CREATE INDEX IF NOT EXISTS idx_posts_published_at ON posts(published_at);
+CREATE INDEX IF NOT EXISTS idx_blog360_posts_slug ON public.blog360_posts(slug);
+CREATE INDEX IF NOT EXISTS idx_blog360_posts_publicado ON public.blog360_posts(publicado);
+CREATE INDEX IF NOT EXISTS idx_blog360_posts_categoria ON public.blog360_posts(categoria);
+CREATE INDEX IF NOT EXISTS idx_blog360_posts_published_at ON public.blog360_posts(published_at);
 
 -- ============================================
--- 3. TABELA: affiliate_links
+-- 3. TABELA: blog360_affiliate_links
 -- ============================================
-CREATE TABLE IF NOT EXISTS affiliate_links (
+CREATE TABLE IF NOT EXISTS public.blog360_affiliate_links (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   url TEXT NOT NULL,
   produto_nome TEXT NOT NULL,
@@ -75,14 +77,14 @@ CREATE TABLE IF NOT EXISTS affiliate_links (
 );
 
 -- Índices
-CREATE INDEX IF NOT EXISTS idx_affiliate_links_ativo ON affiliate_links(ativo);
-CREATE INDEX IF NOT EXISTS idx_affiliate_links_categoria ON affiliate_links(categoria);
-CREATE INDEX IF NOT EXISTS idx_affiliate_links_destacado ON affiliate_links(destacado);
+CREATE INDEX IF NOT EXISTS idx_blog360_affiliate_links_ativo ON public.blog360_affiliate_links(ativo);
+CREATE INDEX IF NOT EXISTS idx_blog360_affiliate_links_categoria ON public.blog360_affiliate_links(categoria);
+CREATE INDEX IF NOT EXISTS idx_blog360_affiliate_links_destacado ON public.blog360_affiliate_links(destacado);
 
 -- ============================================
--- 4. TABELA: email_campaigns
+-- 4. TABELA: blog360_email_campaigns
 -- ============================================
-CREATE TABLE IF NOT EXISTS email_campaigns (
+CREATE TABLE IF NOT EXISTS public.blog360_email_campaigns (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   nome TEXT NOT NULL,
   tipo TEXT NOT NULL, -- 'newsletter', 'nurturing', 'promocional', 're-engajamento'
@@ -101,13 +103,13 @@ CREATE TABLE IF NOT EXISTS email_campaigns (
 );
 
 -- Índices
-CREATE INDEX IF NOT EXISTS idx_email_campaigns_tipo ON email_campaigns(tipo);
-CREATE INDEX IF NOT EXISTS idx_email_campaigns_enviado_em ON email_campaigns(enviado_em);
+CREATE INDEX IF NOT EXISTS idx_blog360_email_campaigns_tipo ON public.blog360_email_campaigns(tipo);
+CREATE INDEX IF NOT EXISTS idx_blog360_email_campaigns_enviado_em ON public.blog360_email_campaigns(enviado_em);
 
 -- ============================================
--- 5. TABELA: analytics
+-- 5. TABELA: blog360_analytics
 -- ============================================
-CREATE TABLE IF NOT EXISTS analytics (
+CREATE TABLE IF NOT EXISTS public.blog360_analytics (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   evento TEXT NOT NULL, -- 'page_view', 'click', 'form_submit', 'email_open', 'email_click'
   pagina TEXT,
@@ -118,17 +120,17 @@ CREATE TABLE IF NOT EXISTS analytics (
 );
 
 -- Índices para queries rápidas
-CREATE INDEX IF NOT EXISTS idx_analytics_evento ON analytics(evento);
-CREATE INDEX IF NOT EXISTS idx_analytics_pagina ON analytics(pagina);
-CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics(created_at);
-CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics(user_id);
+CREATE INDEX IF NOT EXISTS idx_blog360_analytics_evento ON public.blog360_analytics(evento);
+CREATE INDEX IF NOT EXISTS idx_blog360_analytics_pagina ON public.blog360_analytics(pagina);
+CREATE INDEX IF NOT EXISTS idx_blog360_analytics_created_at ON public.blog360_analytics(created_at);
+CREATE INDEX IF NOT EXISTS idx_blog360_analytics_user_id ON public.blog360_analytics(user_id);
 
 -- ============================================
--- 6. TABELA: newsletter_subscriptions
+-- 6. TABELA: blog360_newsletter_subscriptions
 -- ============================================
-CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
+CREATE TABLE IF NOT EXISTS public.blog360_newsletter_subscriptions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
+  lead_id UUID REFERENCES public.blog360_leads(id) ON DELETE CASCADE,
   status TEXT DEFAULT 'active', -- 'active', 'unsubscribed', 'bounced'
   fonte TEXT, -- 'form_topo', 'form_meio', 'popup', etc.
   unsubscribed_at TIMESTAMP WITH TIME ZONE,
@@ -136,91 +138,174 @@ CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
 );
 
 -- Índices
-CREATE INDEX IF NOT EXISTS idx_newsletter_lead_id ON newsletter_subscriptions(lead_id);
-CREATE INDEX IF NOT EXISTS idx_newsletter_status ON newsletter_subscriptions(status);
+CREATE INDEX IF NOT EXISTS idx_blog360_newsletter_lead_id ON public.blog360_newsletter_subscriptions(lead_id);
+CREATE INDEX IF NOT EXISTS idx_blog360_newsletter_status ON public.blog360_newsletter_subscriptions(status);
 
 -- ============================================
 -- 7. FUNÇÕES: Atualizar updated_at automaticamente
 -- ============================================
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
+-- Verificar se função já existe antes de criar
+DO $$ 
 BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ language 'plpgsql';
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_proc 
+    WHERE proname = 'blog360_update_updated_at_column'
+  ) THEN
+    CREATE FUNCTION public.blog360_update_updated_at_column()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      NEW.updated_at = NOW();
+      RETURN NEW;
+    END;
+    $$ language 'plpgsql';
+  END IF;
+END $$;
 
--- Triggers para updated_at
-CREATE TRIGGER update_leads_updated_at BEFORE UPDATE ON leads
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Triggers para updated_at (DROP IF EXISTS para evitar erros)
+DROP TRIGGER IF EXISTS update_blog360_leads_updated_at ON public.blog360_leads;
+CREATE TRIGGER update_blog360_leads_updated_at 
+  BEFORE UPDATE ON public.blog360_leads
+  FOR EACH ROW EXECUTE FUNCTION public.blog360_update_updated_at_column();
 
-CREATE TRIGGER update_posts_updated_at BEFORE UPDATE ON posts
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS update_blog360_posts_updated_at ON public.blog360_posts;
+CREATE TRIGGER update_blog360_posts_updated_at 
+  BEFORE UPDATE ON public.blog360_posts
+  FOR EACH ROW EXECUTE FUNCTION public.blog360_update_updated_at_column();
 
-CREATE TRIGGER update_affiliate_links_updated_at BEFORE UPDATE ON affiliate_links
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS update_blog360_affiliate_links_updated_at ON public.blog360_affiliate_links;
+CREATE TRIGGER update_blog360_affiliate_links_updated_at 
+  BEFORE UPDATE ON public.blog360_affiliate_links
+  FOR EACH ROW EXECUTE FUNCTION public.blog360_update_updated_at_column();
 
-CREATE TRIGGER update_email_campaigns_updated_at BEFORE UPDATE ON email_campaigns
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS update_blog360_email_campaigns_updated_at ON public.blog360_email_campaigns;
+CREATE TRIGGER update_blog360_email_campaigns_updated_at 
+  BEFORE UPDATE ON public.blog360_email_campaigns
+  FOR EACH ROW EXECUTE FUNCTION public.blog360_update_updated_at_column();
 
 -- ============================================
 -- 8. RLS (Row Level Security)
 -- ============================================
--- Habilitar RLS em todas as tabelas
-ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
-ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE affiliate_links ENABLE ROW LEVEL SECURITY;
-ALTER TABLE email_campaigns ENABLE ROW LEVEL SECURITY;
-ALTER TABLE analytics ENABLE ROW LEVEL SECURITY;
-ALTER TABLE newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
+-- Habilitar RLS apenas se ainda não estiver habilitado (não afeta outras tabelas)
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables 
+    WHERE schemaname = 'public' 
+    AND tablename = 'blog360_leads'
+    AND rowsecurity = true
+  ) THEN
+    ALTER TABLE public.blog360_leads ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
 
--- Políticas: Permitir leitura pública de posts publicados
-CREATE POLICY "Posts públicos são visíveis a todos"
-  ON posts FOR SELECT
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables 
+    WHERE schemaname = 'public' 
+    AND tablename = 'blog360_posts'
+    AND rowsecurity = true
+  ) THEN
+    ALTER TABLE public.blog360_posts ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
+
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables 
+    WHERE schemaname = 'public' 
+    AND tablename = 'blog360_affiliate_links'
+    AND rowsecurity = true
+  ) THEN
+    ALTER TABLE public.blog360_affiliate_links ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
+
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables 
+    WHERE schemaname = 'public' 
+    AND tablename = 'blog360_email_campaigns'
+    AND rowsecurity = true
+  ) THEN
+    ALTER TABLE public.blog360_email_campaigns ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
+
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables 
+    WHERE schemaname = 'public' 
+    AND tablename = 'blog360_analytics'
+    AND rowsecurity = true
+  ) THEN
+    ALTER TABLE public.blog360_analytics ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
+
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables 
+    WHERE schemaname = 'public' 
+    AND tablename = 'blog360_newsletter_subscriptions'
+    AND rowsecurity = true
+  ) THEN
+    ALTER TABLE public.blog360_newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
+
+-- Políticas: DROP IF EXISTS antes de criar (evita conflitos)
+DROP POLICY IF EXISTS "Blog360: Posts públicos são visíveis a todos" ON public.blog360_posts;
+CREATE POLICY "Blog360: Posts públicos são visíveis a todos"
+  ON public.blog360_posts FOR SELECT
   USING (publicado = true);
 
--- Políticas: Permitir leitura pública de links ativos
-CREATE POLICY "Links ativos são visíveis a todos"
-  ON affiliate_links FOR SELECT
+DROP POLICY IF EXISTS "Blog360: Links ativos são visíveis a todos" ON public.blog360_affiliate_links;
+CREATE POLICY "Blog360: Links ativos são visíveis a todos"
+  ON public.blog360_affiliate_links FOR SELECT
   USING (ativo = true);
 
--- Políticas: Permitir inserção de leads (qualquer um pode se inscrever)
-CREATE POLICY "Qualquer um pode criar lead"
-  ON leads FOR INSERT
+DROP POLICY IF EXISTS "Blog360: Qualquer um pode criar lead" ON public.blog360_leads;
+CREATE POLICY "Blog360: Qualquer um pode criar lead"
+  ON public.blog360_leads FOR INSERT
   WITH CHECK (true);
 
--- Políticas: Permitir inserção de analytics
-CREATE POLICY "Qualquer um pode registrar analytics"
-  ON analytics FOR INSERT
+DROP POLICY IF EXISTS "Blog360: Qualquer um pode registrar analytics" ON public.blog360_analytics;
+CREATE POLICY "Blog360: Qualquer um pode registrar analytics"
+  ON public.blog360_analytics FOR INSERT
   WITH CHECK (true);
 
--- Políticas: Permitir inserção de newsletter subscriptions
-CREATE POLICY "Qualquer um pode se inscrever na newsletter"
-  ON newsletter_subscriptions FOR INSERT
+DROP POLICY IF EXISTS "Blog360: Qualquer um pode se inscrever na newsletter" ON public.blog360_newsletter_subscriptions;
+CREATE POLICY "Blog360: Qualquer um pode se inscrever na newsletter"
+  ON public.blog360_newsletter_subscriptions FOR INSERT
   WITH CHECK (true);
 
 -- ============================================
--- 9. VIEWS ÚTEIS
+-- 9. VIEWS ÚTEIS (com prefixo blog360_)
 -- ============================================
 -- View: Estatísticas de leads
-CREATE OR REPLACE VIEW vw_lead_stats AS
+CREATE OR REPLACE VIEW public.vw_blog360_lead_stats AS
 SELECT 
   COUNT(*) as total_leads,
   COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days') as leads_30d,
   COUNT(*) FILTER (WHERE ativo = true) as leads_ativos,
   AVG(score) as score_medio
-FROM leads;
+FROM public.blog360_leads;
 
 -- View: Estatísticas de posts
-CREATE OR REPLACE VIEW vw_post_stats AS
+CREATE OR REPLACE VIEW public.vw_blog360_post_stats AS
 SELECT 
   COUNT(*) FILTER (WHERE publicado = true) as posts_publicados,
   SUM(views) as total_views,
   AVG(views) as media_views
-FROM posts;
+FROM public.blog360_posts;
 
 -- View: Top produtos (afiliados)
-CREATE OR REPLACE VIEW vw_top_products AS
+CREATE OR REPLACE VIEW public.vw_blog360_top_products AS
 SELECT 
   produto_nome,
   categoria,
@@ -231,7 +316,7 @@ SELECT
     ELSE 0 
   END as taxa_conversao,
   receita_total
-FROM affiliate_links
+FROM public.blog360_affiliate_links
 WHERE ativo = true
 ORDER BY clicks DESC
 LIMIT 10;
@@ -239,3 +324,6 @@ LIMIT 10;
 -- ============================================
 -- FIM DO SCHEMA
 -- ============================================
+-- ✅ Todas as tabelas, funções, triggers e views usam prefixo "blog360_"
+-- ✅ Nenhuma alteração em tabelas existentes de outros projetos
+-- ✅ Seguro para executar em Supabase compartilhado
