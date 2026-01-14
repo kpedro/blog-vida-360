@@ -1,38 +1,21 @@
 // ============================================
 // API Route - Enviar Email via Resend
-// Vercel Edge Function
+// Vercel Serverless Function
 // ============================================
 
-export const config = {
-  runtime: 'edge',
-};
-
-export default async function handler(req) {
+export default async function handler(req, res) {
   // Apenas aceitar POST
   if (req.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ error: 'Método não permitido' }),
-      { 
-        status: 405,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return res.status(405).json({ error: 'Método não permitido' });
   }
 
   try {
     // Obter dados do body
-    const body = await req.json();
-    const { to, nome, tipo = 'welcome' } = body;
+    const { to, nome, tipo = 'welcome' } = req.body;
 
     // Validar email
     if (!to || !to.includes('@')) {
-      return new Response(
-        JSON.stringify({ error: 'Email inválido' }),
-        { 
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+      return res.status(400).json({ error: 'Email inválido' });
     }
 
     // Obter API key do Resend
@@ -40,13 +23,7 @@ export default async function handler(req) {
     
     if (!RESEND_API_KEY) {
       console.error('❌ RESEND_API_KEY não configurada');
-      return new Response(
-        JSON.stringify({ error: 'Configuração de email não disponível' }),
-        { 
-          status: 500,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+      return res.status(500).json({ error: 'Configuração de email não disponível' });
     }
 
     // Email de remetente (configurar no Vercel)
@@ -74,38 +51,26 @@ export default async function handler(req) {
 
     if (!response.ok) {
       console.error('❌ Erro ao enviar email:', data);
-      return new Response(
-        JSON.stringify({ error: 'Erro ao enviar email', details: data }),
-        { 
-          status: response.status,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+      return res.status(response.status).json({ 
+        error: 'Erro ao enviar email', 
+        details: data 
+      });
     }
 
     console.log('✅ Email enviado com sucesso:', data.id);
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        messageId: data.id,
-        message: 'Email enviado com sucesso'
-      }),
-      { 
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return res.status(200).json({ 
+      success: true, 
+      messageId: data.id,
+      message: 'Email enviado com sucesso'
+    });
 
   } catch (error) {
     console.error('❌ Erro na API:', error);
-    return new Response(
-      JSON.stringify({ error: 'Erro interno do servidor', details: error.message }),
-      { 
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    return res.status(500).json({ 
+      error: 'Erro interno do servidor', 
+      details: error.message 
+    });
   }
 }
 
