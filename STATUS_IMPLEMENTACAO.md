@@ -61,13 +61,17 @@
    - [x] Configuração de credenciais via script
    - [x] Documentação de configuração criada
 
-### **🔄 Em Progresso:**
+### **✅ Concluído (Resend):**
 
-1. **🔄 Integração Resend**
-   - [ ] Configurar conta Resend
-   - [ ] Criar template de email de boas-vindas
-   - [ ] API endpoint para envio de emails
-   - [ ] Webhook para tracking
+8. **✅ Integração Resend**
+   - [x] API endpoint criado (`api/send-email.js`)
+   - [x] Template de email de boas-vindas HTML responsivo
+   - [x] Integração com código JavaScript
+   - [x] Configuração Vercel (`vercel.json`)
+   - [x] Documentação completa (`CONFIGURAR_RESEND.md`)
+   - [ ] ⚠️ **Pendente:** Configurar variáveis de ambiente no Vercel
+   - [ ] ⚠️ **Pendente:** Obter API key do Resend
+   - [ ] ⚠️ **Pendente:** Fazer deploy e testar
 
 ### **⏳ Pendente:**
 
@@ -104,6 +108,16 @@
 
 ### **Configuração:**
 - ✅ `ENV_EXAMPLE.txt` - Exemplo de variáveis de ambiente
+- ✅ `vercel.json` - Configuração do Vercel para API routes
+
+### **API/Backend:**
+- ✅ `api/send-email.js` - API endpoint para envio de emails via Resend
+
+### **Documentação Adicional:**
+- ✅ `CONFIGURAR_RESEND.md` - Guia completo de configuração do Resend
+- ✅ `CONFIGURAR_SUPABASE.md` - Guia de configuração do Supabase
+- ✅ `CORRIGIR_RLS_AGORA.md` - Guia para corrigir políticas RLS
+- ✅ `DEBUG_FORMULARIO.md` - Guia de debug do formulário
 
 ---
 
@@ -137,12 +151,12 @@
 
 ## 📊 **Progresso Geral**
 
-**Fase 1:** 70% completo
+**Fase 1:** 95% completo
 - ✅ Design: 100%
 - ✅ Supabase: 100%
-- ✅ Captura de Leads: 90%
-- ⏳ Resend: 0%
-- ⏳ Integração HTML: 0%
+- ✅ Captura de Leads: 100%
+- ✅ Resend: 90% (código pronto, falta configurar no Vercel)
+- ✅ Integração HTML: 100%
 
 **Próxima Fase:** Finalizar Fase 1 → Iniciar Fase 2
 

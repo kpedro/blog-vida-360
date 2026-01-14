@@ -312,8 +312,13 @@ class LeadCapture {
 
   async sendWelcomeEmail(email, nome) {
     try {
+      // Determinar URL da API baseado no ambiente
+      const apiUrl = this.getApiUrl();
+      
+      console.log('📧 Enviando email de boas-vindas para:', email);
+      
       // Chamar API do Vercel para enviar email via Resend
-      const response = await fetch('/api/send-email', {
+      const response = await fetch(`${apiUrl}/api/send-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -325,13 +330,31 @@ class LeadCapture {
         })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Erro ao enviar email');
+        console.error('❌ Erro ao enviar email:', data);
+        throw new Error(data.error || 'Erro ao enviar email');
       }
+
+      console.log('✅ Email de boas-vindas enviado com sucesso!', data.messageId);
     } catch (error) {
-      console.error('Erro ao enviar email de boas-vindas:', error);
+      console.error('⚠️ Erro ao enviar email de boas-vindas:', error);
       // Não bloquear o fluxo se o email falhar
+      // O lead já foi salvo no Supabase, o email é opcional
     }
+  }
+
+  getApiUrl() {
+    // Se estiver em produção (Vercel), usar a URL do domínio
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      // Retornar a URL base do site
+      return window.location.origin;
+    }
+    
+    // Em desenvolvimento local, usar URL do Vercel (se configurada)
+    // Ou retornar vazio para desabilitar em dev
+    return window.location.origin;
   }
 
   saveLeadLocal(email, nome, origem) {
