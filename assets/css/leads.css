@@ -1,0 +1,309 @@
+/* ============================================
+   Estilos - Sistema de Captura de Leads
+   Blog Vida 360º
+   ============================================ */
+
+/* ============================================
+   FORMULÁRIOS DE NEWSLETTER
+   ============================================ */
+
+.newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.newsletter-form input[type="email"],
+.newsletter-form input[name="nome"] {
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
+    font-size: var(--font-size-base);
+    font-family: var(--font-family);
+    background-color: var(--white);
+    color: var(--gray-900);
+    transition: var(--transition);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.newsletter-form input[type="email"]:focus,
+.newsletter-form input[name="nome"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.newsletter-form button[type="submit"] {
+    padding: 0.875rem 1.5rem;
+    background-color: var(--accent);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font-family);
+}
+
+.newsletter-form button[type="submit"]:hover:not(:disabled) {
+    background-color: var(--accent-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.newsletter-form button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Mensagens do Formulário */
+.form-message {
+    padding: var(--spacing-sm);
+    border-radius: var(--radius);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+    animation: slideDown 0.3s ease;
+}
+
+.form-message-success {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(39, 174, 96, 0.2);
+}
+
+.form-message-error {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   POP-UP DE NEWSLETTER
+   ============================================ */
+
+.newsletter-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.newsletter-popup.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.popup-content {
+    position: relative;
+    background-color: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    max-width: 500px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    animation: popupSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+@keyframes popupSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.popup-close {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    line-height: 1;
+}
+
+.popup-close:hover {
+    background-color: var(--gray-100);
+    color: var(--gray-900);
+}
+
+.popup-content h2 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary);
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+}
+
+.popup-content > p {
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.popup-privacy {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    margin-top: var(--spacing-sm);
+    text-align: center;
+}
+
+/* ============================================
+   CTAs ESTRATÉGICOS
+   ============================================ */
+
+.cta-newsletter {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: var(--white);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    margin: var(--spacing-xl) 0;
+    box-shadow: var(--shadow-md);
+}
+
+.cta-newsletter h3 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-xl);
+}
+
+.cta-newsletter p {
+    margin-bottom: var(--spacing-md);
+    opacity: 0.9;
+}
+
+.cta-newsletter .newsletter-form {
+    max-width: 100%;
+}
+
+.cta-newsletter .newsletter-form input[type="email"] {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* CTA Sticky (Topo após scroll) */
+.cta-sticky {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    right: 0;
+    background-color: var(--white);
+    padding: var(--spacing-sm) var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    z-index: 999;
+    display: none;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.cta-sticky.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.cta-sticky .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+}
+
+.cta-sticky p {
+    margin: 0;
+    font-weight: 500;
+    color: var(--gray-900);
+}
+
+.cta-sticky .newsletter-form {
+    flex-direction: row;
+    max-width: 400px;
+    margin: 0;
+}
+
+.cta-sticky .newsletter-form input[type="email"] {
+    flex: 1;
+}
+
+.cta-sticky .newsletter-form button {
+    white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVIDADE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .popup-content {
+        padding: var(--spacing-lg);
+        width: 95%;
+    }
+
+    .cta-sticky .container {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .cta-sticky .newsletter-form {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .cta-newsletter {
+        padding: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .popup-content h2 {
+        font-size: var(--font-size-xl);
+    }
+
+    .newsletter-form {
+        gap: var(--spacing-xs);
+    }
+}

@@ -1,0 +1,30 @@
+# ============================================
+# Variáveis de Ambiente - Blog Vida 360º
+# ============================================
+# Copie este arquivo para .env e preencha com suas credenciais
+
+# Supabase
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-chave-anon-aqui
+
+# Resend (Email Marketing)
+VITE_RESEND_API_KEY=re_sua-chave-aqui
+VITE_RESEND_FROM_EMAIL=noreply@seudominio.com
+VITE_RESEND_FROM_NAME=Vida 360º
+
+# APIs de IA (Opcional - para análise de conteúdo)
+VITE_GEMINI_API_KEY=sua-chave-gemini
+VITE_OPENAI_API_KEY=sua-chave-openai
+VITE_ANTHROPIC_API_KEY=sua-chave-anthropic
+VITE_PERPLEXITY_API_KEY=sua-chave-perplexity
+
+# Stripe (Futuro - Produtos Próprios)
+VITE_STRIPE_PUBLIC_KEY=pk_test_sua-chave-publica
+VITE_STRIPE_SECRET_KEY=sk_test_sua-chave-secreta
+
+# Analytics (Opcional)
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# URLs
+VITE_SITE_URL=https://kpedro.github.io/blog-vida-360
+VITE_API_URL=https://seu-projeto.vercel.app/api
