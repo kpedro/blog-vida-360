@@ -13,14 +13,17 @@ class SupabaseClient {
     
     if (!this.supabaseUrl || !this.supabaseKey) {
       console.warn('⚠️ Supabase credentials não configuradas');
-      return null;
+      this.client = null;
+      return;
     }
 
     // Se usando via CDN, window.supabase já existe
     if (window.supabase) {
       this.client = window.supabase.createClient(this.supabaseUrl, this.supabaseKey);
+      console.log('✅ Supabase Client criado com sucesso');
     } else {
       console.warn('⚠️ Supabase JS não carregado. Adicione o script no HTML.');
+      this.client = null;
     }
   }
 
@@ -60,13 +63,19 @@ class SupabaseClient {
   async checkEmailExists(email) {
     try {
       const { data, error } = await this.client
-        .from('leads')
+        .from('blog360_leads')
         .select('id, email')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
+      // Se não encontrar, retorna null (não erro)
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+      
       return { exists: !!data, data };
     } catch (error) {
+      console.error('Erro ao verificar email:', error);
       return { exists: false, error: error.message };
     }
   }
@@ -154,14 +163,14 @@ class SupabaseClient {
     } catch (error) {
       // Fallback: atualizar manualmente
       const { data: post } = await this.client
-        .from('posts')
+        .from('blog360_posts')
         .select('views')
         .eq('id', postId)
         .single();
 
       if (post) {
         await this.client
-          .from('posts')
+          .from('blog360_posts')
           .update({ views: post.views + 1 })
           .eq('id', postId);
       }

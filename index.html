@@ -326,36 +326,32 @@
     <!-- Supabase JS (via CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Configuração Supabase (substitua pelas suas credenciais) -->
+    <!-- Configuração Supabase -->
     <script>
         // ⚠️ IMPORTANTE: Configure suas credenciais do Supabase aqui
-        // Ou use variáveis de ambiente se estiver usando build tool
         window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
         window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
-        
-        // Inicializar Supabase se as credenciais estiverem configuradas
-        if (window.supabase && window.VITE_SUPABASE_URL && window.VITE_SUPABASE_ANON_KEY && 
-            window.VITE_SUPABASE_URL !== 'https://seu-projeto.supabase.co') {
-            window.supabaseClient = window.supabase.createClient(
-                window.VITE_SUPABASE_URL,
-                window.VITE_SUPABASE_ANON_KEY
-            );
-        }
     </script>
     
     <!-- Scripts do Blog -->
     <script src="assets/js/supabase.js"></script>
+    
+    <!-- Inicializar Supabase Client ANTES do leads.js -->
+    <script>
+        // Aguardar DOM e Supabase JS carregarem
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initSupabase === 'function') {
+                window.supabaseClient = initSupabase();
+                console.log('✅ Supabase Client inicializado:', window.supabaseClient && window.supabaseClient.client ? 'OK' : 'ERRO');
+            } else {
+                console.warn('⚠️ initSupabase não encontrado');
+            }
+        });
+    </script>
+    
     <script src="assets/js/leads.js"></script>
     <script src="assets/js/performance.js"></script>
     <script src="assets/js/search.js"></script>
-    
-    <!-- Inicializar Supabase Client -->
-    <script>
-        // Inicializar após carregar scripts
-        if (typeof initSupabase === 'function') {
-            window.supabaseClient = initSupabase();
-        }
-    </script>
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">

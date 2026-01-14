@@ -4,8 +4,27 @@
 
 class LeadCapture {
   constructor() {
-    this.supabase = window.supabaseClient || null;
+    // Tentar obter o cliente Supabase
+    this.supabase = this.getSupabaseClient();
     this.init();
+  }
+
+  getSupabaseClient() {
+    // Se já existe, usar
+    if (window.supabaseClient && window.supabaseClient.client) {
+      return window.supabaseClient;
+    }
+    
+    // Tentar inicializar se a função existir
+    if (typeof initSupabase === 'function') {
+      const client = initSupabase();
+      if (client && client.client) {
+        return client;
+      }
+    }
+    
+    console.warn('⚠️ Supabase Client não disponível. Usando fallback local.');
+    return null;
   }
 
   init() {
@@ -215,7 +234,7 @@ class LeadCapture {
 
     // Registrar scroll máximo ao sair da página
     window.addEventListener('beforeunload', () => {
-      if (this.supabase) {
+      if (this.supabase && this.supabase.client) {
         this.supabase.trackEvent('scroll', window.location.pathname, {
           max_scroll: maxScroll,
           scroll_percent: (maxScroll / (document.documentElement.scrollHeight - window.innerHeight)) * 100
