@@ -25,6 +25,7 @@
     <meta name="twitter:description" content="Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio.">
     <meta name="twitter:image" content="https://kpedro.github.io/blog-vida-360/assets/images/logo-blog.png">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/leads.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="alternate" type="application/rss+xml" title="RSS Feed - Vida 360º" href="feed.xml">
@@ -193,6 +194,22 @@
             <h2>Bem-vindo ao Blog "Vida 360º"</h2>
             <p>Explore conteúdos exclusivos sobre <strong>saúde, bem-estar, produtividade, mentalidade e equilíbrio</strong> para uma vida mais plena.</p>
             
+            <!-- CTA Newsletter - Topo -->
+            <div class="cta-newsletter" style="margin: 30px 0;">
+                <h3>📧 Receba Conteúdo Exclusivo!</h3>
+                <p>Cadastre-se e receba nosso <strong>Guia Completo de Bem-Estar</strong> grátis!</p>
+                <form class="newsletter-form" data-origem="form_topo">
+                    <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="Seu melhor email" 
+                        required
+                        aria-label="Email para newsletter"
+                    >
+                    <button type="submit">Quero Receber Grátis</button>
+                </form>
+            </div>
+            
             <!-- Barra de Busca -->
             <div id="search-container" style="margin: 30px auto; max-width: 600px;">
                 <input 
@@ -251,8 +268,39 @@
     </footer>
 
     <!-- Scripts -->
+    <!-- Supabase JS (via CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Configuração Supabase (substitua pelas suas credenciais) -->
+    <script>
+        // ⚠️ IMPORTANTE: Configure suas credenciais do Supabase aqui
+        // Ou use variáveis de ambiente se estiver usando build tool
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://seu-projeto.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'sua-chave-anon-aqui';
+        
+        // Inicializar Supabase se as credenciais estiverem configuradas
+        if (window.supabase && window.VITE_SUPABASE_URL && window.VITE_SUPABASE_ANON_KEY && 
+            window.VITE_SUPABASE_URL !== 'https://seu-projeto.supabase.co') {
+            window.supabaseClient = window.supabase.createClient(
+                window.VITE_SUPABASE_URL,
+                window.VITE_SUPABASE_ANON_KEY
+            );
+        }
+    </script>
+    
+    <!-- Scripts do Blog -->
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/leads.js"></script>
     <script src="assets/js/performance.js"></script>
     <script src="assets/js/search.js"></script>
+    
+    <!-- Inicializar Supabase Client -->
+    <script>
+        // Inicializar após carregar scripts
+        if (typeof initSupabase === 'function') {
+            window.supabaseClient = initSupabase();
+        }
+    </script>
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
