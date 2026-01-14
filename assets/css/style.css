@@ -1,26 +1,83 @@
-/* Variáveis CSS Globais */
+/* ============================================
+   Variáveis CSS - Design Minimalista e Profissional
+   Blog Vida 360º - Nova Paleta
+   ============================================ */
 :root {
-    --blue-dark: #003366;
-    --blue-primary: #0052cc;
-    --blue-secondary: #007bff;
-    --blue-light: #cce4f6;
-    --blue-background: #e6f7ff;
-    --text-color: #ffffff;
-    --text-dark: #003366;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Cores Principais - Minimalista e Sofisticado */
+    --primary: #2C3E50;        /* Azul acinzentado escuro */
+    --primary-light: #34495E;  /* Azul acinzentado médio */
+    --accent: #E74C3C;         /* Vermelho coral (CTAs) */
+    --accent-light: #EC7063;   /* Vermelho coral claro */
+    
+    /* Neutros */
+    --white: #FFFFFF;
+    --gray-50: #FAFAFA;        /* Background principal */
+    --gray-100: #F5F5F5;       /* Background secundário */
+    --gray-200: #EEEEEE;       /* Bordas */
+    --gray-300: #E0E0E0;       /* Divisores */
+    --gray-600: #757575;       /* Texto secundário */
+    --gray-900: #212121;       /* Texto principal */
+    
+    /* Sucesso/Confiança */
+    --success: #27AE60;        /* Verde sucesso */
+    --info: #3498DB;           /* Azul informação */
+    
+    /* Sombras - Sutis e Elegantes */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
+    
+    /* Transições */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease;
+    
+    /* Espaçamento */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* Tipografia */
+    --font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-size-base: 1rem;
+    --font-size-sm: 0.875rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.375rem;
+    --radius: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    
+    /* Cores Antigas (compatibilidade) */
+    --blue-dark: #2C3E50;
+    --blue-primary: #2C3E50;
+    --blue-secondary: #3498DB;
+    --blue-light: #ECF0F1;
+    --blue-background: #FAFAFA;
+    --text-color: #FFFFFF;
+    --text-dark: #212121;
     --shadow-hover: 0 8px 12px rgba(0, 0, 0, 0.2);
-    --transition: all 0.3s ease;
 }
 
-/* Estilos Gerais */
+/* ============================================
+   Estilos Gerais - Minimalista e Profissional
+   ============================================ */
 body {
-    font-family: 'Poppins', sans-serif;
-    line-height: 1.6;
+    font-family: var(--font-family);
+    line-height: 1.7;
     margin: 0;
     padding: 0;
-    background-color: var(--blue-background);
-    color: var(--text-dark);
+    background-color: var(--gray-50);
+    color: var(--gray-900);
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Screen Reader Only */
@@ -43,14 +100,17 @@ body {
     margin: 0 auto;
 }
 
-/* Cabeçalho */
+/* ============================================
+   Cabeçalho - Minimalista
+   ============================================ */
 header {
-    background: var(--blue-dark);
-    padding: 20px 0;
-    box-shadow: var(--shadow);
+    background: var(--white);
+    padding: var(--spacing-md) 0;
+    box-shadow: var(--shadow-sm);
     position: sticky;
     top: 0;
     z-index: 1000;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 header .container {
@@ -60,9 +120,10 @@ header .container {
 }
 
 .logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #ffffff; /* Branco */
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.02em;
 }
 
 /* Menu de Navegação */
@@ -79,13 +140,16 @@ nav ul li {
 
 nav ul li a {
     text-decoration: none;
-    color: #ffffff; /* Branco */
-    font-weight: 600;
-    transition: 0.3s;
+    color: var(--gray-900);
+    font-weight: 500;
+    transition: var(--transition);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius);
 }
 
 nav ul li a:hover {
-    color: #cce4f6; /* Azul claro */
+    color: var(--accent);
+    background-color: var(--gray-50);
 }
 
 /* Sessões do Blog */
