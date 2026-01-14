@@ -144,22 +144,14 @@ CREATE INDEX IF NOT EXISTS idx_blog360_newsletter_status ON public.blog360_newsl
 -- ============================================
 -- 7. FUNÇÕES: Atualizar updated_at automaticamente
 -- ============================================
--- Verificar se função já existe antes de criar
-DO $$ 
+-- Criar ou substituir função (idempotente)
+CREATE OR REPLACE FUNCTION public.blog360_update_updated_at_column()
+RETURNS TRIGGER AS $$
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_proc 
-    WHERE proname = 'blog360_update_updated_at_column'
-  ) THEN
-    CREATE FUNCTION public.blog360_update_updated_at_column()
-    RETURNS TRIGGER AS $$
-    BEGIN
-      NEW.updated_at = NOW();
-      RETURN NEW;
-    END;
-    $$ language 'plpgsql';
-  END IF;
-END $$;
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
 
 -- Triggers para updated_at (DROP IF EXISTS para evitar erros)
 DROP TRIGGER IF EXISTS update_blog360_leads_updated_at ON public.blog360_leads;
@@ -185,78 +177,13 @@ CREATE TRIGGER update_blog360_email_campaigns_updated_at
 -- ============================================
 -- 8. RLS (Row Level Security)
 -- ============================================
--- Habilitar RLS apenas se ainda não estiver habilitado (não afeta outras tabelas)
-DO $$ 
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_tables 
-    WHERE schemaname = 'public' 
-    AND tablename = 'blog360_leads'
-    AND rowsecurity = true
-  ) THEN
-    ALTER TABLE public.blog360_leads ENABLE ROW LEVEL SECURITY;
-  END IF;
-END $$;
-
-DO $$ 
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_tables 
-    WHERE schemaname = 'public' 
-    AND tablename = 'blog360_posts'
-    AND rowsecurity = true
-  ) THEN
-    ALTER TABLE public.blog360_posts ENABLE ROW LEVEL SECURITY;
-  END IF;
-END $$;
-
-DO $$ 
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_tables 
-    WHERE schemaname = 'public' 
-    AND tablename = 'blog360_affiliate_links'
-    AND rowsecurity = true
-  ) THEN
-    ALTER TABLE public.blog360_affiliate_links ENABLE ROW LEVEL SECURITY;
-  END IF;
-END $$;
-
-DO $$ 
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_tables 
-    WHERE schemaname = 'public' 
-    AND tablename = 'blog360_email_campaigns'
-    AND rowsecurity = true
-  ) THEN
-    ALTER TABLE public.blog360_email_campaigns ENABLE ROW LEVEL SECURITY;
-  END IF;
-END $$;
-
-DO $$ 
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_tables 
-    WHERE schemaname = 'public' 
-    AND tablename = 'blog360_analytics'
-    AND rowsecurity = true
-  ) THEN
-    ALTER TABLE public.blog360_analytics ENABLE ROW LEVEL SECURITY;
-  END IF;
-END $$;
-
-DO $$ 
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_tables 
-    WHERE schemaname = 'public' 
-    AND tablename = 'blog360_newsletter_subscriptions'
-    AND rowsecurity = true
-  ) THEN
-    ALTER TABLE public.blog360_newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
-  END IF;
-END $$;
+-- Habilitar RLS em todas as tabelas (idempotente - pode executar múltiplas vezes)
+ALTER TABLE public.blog360_leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blog360_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blog360_affiliate_links ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blog360_email_campaigns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blog360_analytics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blog360_newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- Políticas: DROP IF EXISTS antes de criar (evita conflitos)
 DROP POLICY IF EXISTS "Blog360: Posts públicos são visíveis a todos" ON public.blog360_posts;
