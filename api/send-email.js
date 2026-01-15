@@ -125,7 +125,7 @@ function getWelcomeEmailTemplate(nome) {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding: 20px 0;">
-                    <a href="https://kpedro.github.io/blog-vida-360/" style="display: inline-block; background-color: #E74C3C; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 6px; font-weight: 600; font-size: 16px;">Explorar Conteúdos</a>
+                    <a href="https://blog-vida-360.vercel.app/" style="display: inline-block; background-color: #E74C3C; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 6px; font-weight: 600; font-size: 16px;">Explorar Conteúdos</a>
                   </td>
                 </tr>
               </table>

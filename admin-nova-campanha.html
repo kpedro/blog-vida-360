@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Campanha - Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F5F7FA;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .admin-header h1 {
+            font-size: 24px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #2C3E50;
+        }
+        
+        .btn-secondary:hover {
+            background: #ECF0F1;
+        }
+        
+        .btn-primary {
+            background: #E74C3C;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #C0392B;
+        }
+        
+        .btn-success {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .campaign-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .campaign-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2C3E50;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ECF0F1;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498DB;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .email-editor {
+            border: 2px solid #ECF0F1;
+            border-radius: 4px;
+            min-height: 400px;
+            padding: 20px;
+        }
+        
+        .email-preview {
+            background: #F8F9FA;
+            padding: 2rem;
+            border-radius: 4px;
+            margin-top: 2rem;
+        }
+        
+        .email-preview h3 {
+            margin-bottom: 1rem;
+            color: #2C3E50;
+        }
+        
+        .preview-box {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stats-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .stat-item .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2C3E50;
+        }
+        
+        .stat-item .label {
+            font-size: 12px;
+            color: #7F8C8D;
+            margin-top: 5px;
+        }
+        
+        .template-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .template-card {
+            border: 2px solid #ECF0F1;
+            border-radius: 4px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .template-card:hover {
+            border-color: #3498DB;
+            background: #F8F9FA;
+        }
+        
+        .template-card.selected {
+            border-color: #E74C3C;
+            background: #FDF6F5;
+        }
+        
+        .toolbar {
+            background: #F8F9FA;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .toolbar button {
+            padding: 8px 12px;
+            border: 1px solid #DEE2E6;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .toolbar button:hover {
+            background: #E9ECEF;
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <h1>📧 Nova Campanha de Email</h1>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="window.location.href='admin-dashboard.html'">← Voltar</button>
+            <button class="btn btn-primary" onclick="saveCampaignDraft()">💾 Salvar Rascunho</button>
+            <button class="btn btn-success" onclick="sendCampaign()">📨 Enviar Campanha</button>
+        </div>
+    </header>
+    
+    <div class="campaign-container">
+        <div class="campaign-card">
+            <h2 style="margin-bottom: 1.5rem;">📋 Informações da Campanha</h2>
+            
+            <div class="form-group">
+                <label for="campaign-name">Nome da Campanha (interno) *</label>
+                <input type="text" id="campaign-name" placeholder="Ex: Newsletter Janeiro 2026" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="campaign-subject">Assunto do Email *</label>
+                    <input type="text" id="campaign-subject" placeholder="Ex: 5 Dicas para Melhorar sua Produtividade" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="campaign-preheader">Pré-header (texto de preview)</label>
+                    <input type="text" id="campaign-preheader" placeholder="Texto que aparece após o assunto">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sender-name">Nome do Remetente</label>
+                    <input type="text" id="sender-name" value="Vida 360º" placeholder="Nome que aparece no email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sender-email">Email do Remetente</label>
+                    <input type="email" id="sender-email" value="contato@vida360.com" placeholder="email@exemplo.com">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="campaign-segment">Segmento de Envio *</label>
+                <select id="campaign-segment" required>
+                    <option value="all">Todos os Inscritos</option>
+                    <option value="active">Apenas Ativos (últimos 30 dias)</option>
+                    <option value="new">Novos Inscritos (últimos 7 dias)</option>
+                    <option value="engaged">Mais Engajados</option>
+                    <option value="custom">Segmento Personalizado</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="campaign-card">
+            <h2 style="margin-bottom: 1.5rem;">🎨 Template do Email</h2>
+            
+            <div class="template-selector">
+                <div class="template-card selected" onclick="selectTemplate('newsletter')">
+                    <div style="font-size: 40px; margin-bottom: 10px;">📰</div>
+                    <strong>Newsletter</strong>
+                    <p style="font-size: 12px; color: #7F8C8D; margin-top: 5px;">Formato clássico de newsletter</p>
+                </div>
+                
+                <div class="template-card" onclick="selectTemplate('promocional')">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🎁</div>
+                    <strong>Promocional</strong>
+                    <p style="font-size: 12px; color: #7F8C8D; margin-top: 5px;">Para ofertas e promoções</p>
+                </div>
+                
+                <div class="template-card" onclick="selectTemplate('educacional')">
+                    <div style="font-size: 40px; margin-bottom: 10px;">📚</div>
+                    <strong>Educacional</strong>
+                    <p style="font-size: 12px; color: #7F8C8D; margin-top: 5px;">Conteúdo educativo</p>
+                </div>
+                
+                <div class="template-card" onclick="selectTemplate('anuncio')">
+                    <div style="font-size: 40px; margin-bottom: 10px;">📢</div>
+                    <strong>Anúncio</strong>
+                    <p style="font-size: 12px; color: #7F8C8D; margin-top: 5px;">Novidades e atualizações</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="campaign-card">
+            <h2 style="margin-bottom: 1.5rem;">✍️ Conteúdo do Email</h2>
+            
+            <div class="toolbar">
+                <button onclick="insertVariable('{{nome}}')">👤 Nome</button>
+                <button onclick="insertVariable('{{email}}')">📧 Email</button>
+                <button onclick="insertButton()">🔘 Botão CTA</button>
+                <button onclick="insertDivider()">➖ Divisor</button>
+                <button onclick="insertImage()">🖼️ Imagem</button>
+            </div>
+            
+            <div class="form-group">
+                <div id="email-editor" contenteditable="true" class="email-editor">
+                    <h2>Olá, {{nome}}!</h2>
+                    <p>Comece a escrever o conteúdo do seu email aqui...</p>
+                    <p>Use as variáveis para personalizar: {{nome}}, {{email}}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="campaign-card">
+            <h2 style="margin-bottom: 1.5rem;">📊 Estatísticas Estimadas</h2>
+            
+            <div class="stats-preview">
+                <div class="stat-item">
+                    <div class="number" id="estimated-recipients">0</div>
+                    <div class="label">Destinatários</div>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="number" id="estimated-opens">0%</div>
+                    <div class="label">Taxa de Abertura Estimada</div>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="number" id="estimated-clicks">0%</div>
+                    <div class="label">Taxa de Cliques Estimada</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="email-preview">
+            <h3>👁️ Preview do Email</h3>
+            <div class="preview-box" id="email-preview">
+                <div style="border-bottom: 2px solid #ECF0F1; padding-bottom: 10px; margin-bottom: 20px;">
+                    <strong>De:</strong> <span id="preview-sender">Vida 360º</span><br>
+                    <strong>Assunto:</strong> <span id="preview-subject">Assunto do email</span><br>
+                    <strong>Pré-header:</strong> <span id="preview-preheader" style="color: #7F8C8D;">Preview text</span>
+                </div>
+                <div id="preview-content">
+                    Conteúdo do email aparecerá aqui...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/campanha.js"></script>
+</body>
+</html>

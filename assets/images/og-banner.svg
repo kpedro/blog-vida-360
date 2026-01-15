@@ -1,0 +1,64 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo gradiente -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2C3E50;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#34495E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2C3E50;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fundo -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Círculos decorativos -->
+  <circle cx="1100" cy="100" r="200" fill="#E74C3C" opacity="0.1"/>
+  <circle cx="100" cy="530" r="150" fill="#3498DB" opacity="0.1"/>
+  <circle cx="600" cy="315" r="100" fill="none" stroke="#E74C3C" stroke-width="3" opacity="0.2"/>
+  
+  <!-- Logo/Título Principal -->
+  <text x="600" y="220" font-family="Arial, sans-serif" font-size="72" font-weight="700" fill="#ECF0F1" text-anchor="middle">
+    Vida 360º
+  </text>
+  
+  <!-- Tagline -->
+  <text x="600" y="285" font-family="Arial, sans-serif" font-size="36" font-weight="400" fill="#ECF0F1" text-anchor="middle">
+    Transforme sua vida com 
+  </text>
+  <text x="600" y="330" font-family="Arial, sans-serif" font-size="36" font-weight="600" fill="#E74C3C" text-anchor="middle">
+    bem-estar completo
+  </text>
+  
+  <!-- Descrição -->
+  <text x="600" y="390" font-family="Arial, sans-serif" font-size="24" font-weight="300" fill="#ECF0F1" opacity="0.9" text-anchor="middle">
+    Dicas práticas sobre saúde, produtividade, mentalidade e equilíbrio
+  </text>
+  <text x="600" y="420" font-family="Arial, sans-serif" font-size="24" font-weight="300" fill="#ECF0F1" opacity="0.9" text-anchor="middle">
+    para uma vida mais plena
+  </text>
+  
+  <!-- Ícones e tópicos -->
+  <g transform="translate(200, 490)">
+    <!-- Saúde -->
+    <text x="0" y="0" font-size="28">💚</text>
+    <text x="40" y="0" font-family="Arial, sans-serif" font-size="20" fill="#ECF0F1">Saúde</text>
+  </g>
+  
+  <g transform="translate(410, 490)">
+    <!-- Produtividade -->
+    <text x="0" y="0" font-size="28">⚡</text>
+    <text x="40" y="0" font-family="Arial, sans-serif" font-size="20" fill="#ECF0F1">Produtividade</text>
+  </g>
+  
+  <g transform="translate(670, 490)">
+    <!-- Mentalidade -->
+    <text x="0" y="0" font-size="28">🧠</text>
+    <text x="40" y="0" font-family="Arial, sans-serif" font-size="20" fill="#ECF0F1">Mentalidade</text>
+  </g>
+  
+  <g transform="translate(900, 490)">
+    <!-- Equilíbrio -->
+    <text x="0" y="0" font-size="28">⚖️</text>
+    <text x="40" y="0" font-family="Arial, sans-serif" font-size="20" fill="#ECF0F1">Equilíbrio</text>
+  </g>
+</svg>

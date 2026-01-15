@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner OG - Vida 360º</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .og-banner {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 50%, #2C3E50 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Elementos decorativos */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+        
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            background: #E74C3C;
+            top: -100px;
+            right: -100px;
+        }
+        
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            background: #3498DB;
+            bottom: -80px;
+            left: -80px;
+        }
+        
+        .circle-3 {
+            width: 200px;
+            height: 200px;
+            border: 3px solid #E74C3C;
+            background: transparent;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.2;
+        }
+        
+        /* Conteúdo */
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 0 60px;
+        }
+        
+        .logo {
+            font-size: 72px;
+            font-weight: 700;
+            color: #ECF0F1;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .tagline {
+            font-size: 36px;
+            color: #ECF0F1;
+            margin-bottom: 30px;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+        
+        .highlight {
+            color: #E74C3C;
+            font-weight: 600;
+        }
+        
+        .description {
+            font-size: 24px;
+            color: rgba(236, 240, 241, 0.9);
+            max-width: 800px;
+            line-height: 1.5;
+        }
+        
+        .topics {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .topic {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            color: #ECF0F1;
+        }
+        
+        .topic-icon {
+            font-size: 28px;
+        }
+    </style>
+</head>
+<body>
+    <div class="og-banner">
+        <!-- Elementos decorativos -->
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+        
+        <!-- Conteúdo -->
+        <div class="content">
+            <div class="logo">Vida 360º</div>
+            <div class="tagline">
+                Transforme sua vida com <span class="highlight">bem-estar completo</span>
+            </div>
+            <div class="description">
+                Dicas práticas sobre saúde, produtividade, mentalidade e equilíbrio para uma vida mais plena
+            </div>
+            <div class="topics">
+                <div class="topic">
+                    <span class="topic-icon">💚</span>
+                    <span>Saúde</span>
+                </div>
+                <div class="topic">
+                    <span class="topic-icon">⚡</span>
+                    <span>Produtividade</span>
+                </div>
+                <div class="topic">
+                    <span class="topic-icon">🧠</span>
+                    <span>Mentalidade</span>
+                </div>
+                <div class="topic">
+                    <span class="topic-icon">⚖️</span>
+                    <span>Equilíbrio</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Instruções -->
+    <div style="padding: 40px; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
+        <h2 style="color: #2C3E50; margin-bottom: 20px;">📸 Como Capturar o Banner</h2>
+        
+        <ol style="line-height: 2; color: #34495E;">
+            <li><strong>Abra este arquivo no navegador</strong></li>
+            <li><strong>Zoom 100%</strong> (Ctrl + 0 ou Cmd + 0)</li>
+            <li><strong>F12</strong> para abrir DevTools</li>
+            <li>Clique nos <strong>3 pontinhos</strong> no DevTools</li>
+            <li>Selecione <strong>"Capture screenshot"</strong></li>
+            <li>Ou use extensão de screenshot (ex: FireShot, Awesome Screenshot)</li>
+            <li>Salve como <strong>og-banner.jpg</strong> ou <strong>og-banner.png</strong></li>
+            <li>Coloque em <code>assets/images/</code></li>
+        </ol>
+        
+        <h3 style="color: #2C3E50; margin: 30px 0 15px 0;">Dimensões do Banner:</h3>
+        <ul style="line-height: 2; color: #34495E;">
+            <li><strong>1200x630px</strong> - Padrão Open Graph (Facebook, LinkedIn, WhatsApp)</li>
+            <li><strong>Formato:</strong> JPG ou PNG</li>
+            <li><strong>Peso máximo:</strong> 1-2 MB</li>
+        </ul>
+        
+        <h3 style="color: #2C3E50; margin: 30px 0 15px 0;">Alternativa: Usar Canva</h3>
+        <p style="line-height: 1.8; color: #34495E;">
+            Se preferir criar no Canva:
+        </p>
+        <ol style="line-height: 2; color: #34495E; margin-top: 15px;">
+            <li>Acesse <a href="https://www.canva.com" target="_blank">Canva.com</a></li>
+            <li>Pesquise "Facebook Post" ou crie tamanho customizado <strong>1200x630px</strong></li>
+            <li>Use as cores: <code>#2C3E50</code> (azul escuro), <code>#E74C3C</code> (vermelho)</li>
+            <li>Adicione o texto acima</li>
+            <li>Baixe como PNG ou JPG</li>
+        </ol>
+    </div>
+</body>
+</html>

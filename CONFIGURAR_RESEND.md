@@ -67,10 +67,12 @@ Para emails não irem para spam:
 
 #### **Variável 2: RESEND_FROM_EMAIL**
 - **Name:** `RESEND_FROM_EMAIL`
-- **Value:** Seu email de remetente
-  - Com domínio verificado: `noreply@seudominio.com`
-  - Sem domínio: `onboarding@resend.dev`
+- **Value:** Seu email de remetente usando o domínio verificado
+  - **Para pedagoflow.com:** `noreply@pedagoflow.com` (ou `blog@pedagoflow.com`, `newsletter@pedagoflow.com`)
+  - Sem domínio verificado: `onboarding@resend.dev`
 - **Environments:** Production, Preview, Development
+
+**⚠️ IMPORTANTE:** Use um email do domínio que está verificado no Resend. Se você tem `pedagoflow.com` verificado, use `@pedagoflow.com`.
 
 ---
 

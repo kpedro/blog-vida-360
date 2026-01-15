@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Vida 360º</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F5F7FA;
+        }
+        
+        /* Header */
+        .admin-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .admin-header h1 {
+            font-size: 24px;
+        }
+        
+        .admin-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-logout {
+            background: #E74C3C;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-logout:hover {
+            background: #C0392B;
+        }
+        
+        /* Navigation */
+        .admin-nav {
+            background: white;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .admin-nav ul {
+            list-style: none;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .admin-nav li {
+            flex: 1;
+        }
+        
+        .admin-nav a {
+            display: block;
+            padding: 1rem;
+            text-decoration: none;
+            color: #2C3E50;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .admin-nav a:hover,
+        .admin-nav a.active {
+            color: #E74C3C;
+            border-bottom-color: #E74C3C;
+            background: #FDF6F5;
+        }
+        
+        /* Container */
+        .admin-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        /* Tabs Content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #7F8C8D;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2C3E50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .growth {
+            font-size: 14px;
+            color: #27AE60;
+        }
+        
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #ECF0F1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h2 {
+            color: #2C3E50;
+            font-size: 20px;
+        }
+        
+        .btn-primary {
+            background: #E74C3C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: #C0392B;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #F5F7FA;
+        }
+        
+        th {
+            text-align: left;
+            padding: 12px 20px;
+            color: #7F8C8D;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ECF0F1;
+            color: #2C3E50;
+        }
+        
+        tbody tr:hover {
+            background: #F9FAFB;
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge.published {
+            background: #D5F4E6;
+            color: #27AE60;
+        }
+        
+        .badge.draft {
+            background: #FFF3CD;
+            color: #F39C12;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .btn-icon:hover {
+            background: #ECF0F1;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #7F8C8D;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7F8C8D;
+        }
+        
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <h1>🎛️ Painel Administrativo</h1>
+        <div class="user-info">
+            <span id="user-email">Carregando...</span>
+            <button class="btn-logout" onclick="logout()">Sair</button>
+        </div>
+    </header>
+    
+    <!-- Navigation -->
+    <nav class="admin-nav">
+        <ul>
+            <li><a href="#" class="nav-link active" data-tab="visao-geral">📊 Visão Geral</a></li>
+            <li><a href="#" class="nav-link" data-tab="inscritos">👥 Inscritos</a></li>
+            <li><a href="#" class="nav-link" data-tab="postagens">📝 Postagens</a></li>
+            <li><a href="#" class="nav-link" data-tab="campanhas">📧 Campanhas</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Container -->
+    <div class="admin-container">
+        <!-- Tab: Visão Geral -->
+        <div id="tab-visao-geral" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total de Inscritos</h3>
+                    <div class="number" id="stat-total-leads">-</div>
+                    <div class="growth">+0 esta semana</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Postagens Publicadas</h3>
+                    <div class="number" id="stat-total-posts">-</div>
+                    <div class="growth">Ativas</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Campanhas Enviadas</h3>
+                    <div class="number" id="stat-total-campaigns">-</div>
+                    <div class="growth">Este mês</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Taxa de Abertura</h3>
+                    <div class="number" id="stat-open-rate">-%</div>
+                    <div class="growth">Média geral</div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>📈 Últimos Inscritos</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Nome</th>
+                            <th>Data</th>
+                            <th>Origem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-leads">
+                        <tr>
+                            <td colspan="4" class="loading">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Tab: Inscritos -->
+        <div id="tab-inscritos" class="tab-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>👥 Todos os Inscritos</h2>
+                    <button class="btn-primary" onclick="exportLeads()">📥 Exportar CSV</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Nome</th>
+                            <th>Data de Cadastro</th>
+                            <th>Origem</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-leads">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Tab: Postagens -->
+        <div id="tab-postagens" class="tab-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>📝 Gerenciar Postagens</h2>
+                    <button class="btn-primary" onclick="window.location.href='admin-editor-artigo.html'">+ Novo Artigo</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Categoria</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-posts">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Tab: Campanhas -->
+        <div id="tab-campanhas" class="tab-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>📧 Campanhas de Email</h2>
+                    <button class="btn-primary" onclick="window.location.href='admin-nova-campanha.html'">+ Nova Campanha</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome da Campanha</th>
+                            <th>Assunto</th>
+                            <th>Enviados</th>
+                            <th>Aberturas</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-campaigns">
+                        <tr>
+                            <td colspan="6" class="loading">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>
