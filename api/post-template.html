@@ -304,9 +304,10 @@
 
     <!-- Conteúdo Principal -->
     <main class="container">
-        <!-- Título e autor do artigo (preenchidos pelo JS) -->
+        <!-- Título, autor e data de publicação (preenchidos pelo JS) -->
         <h1 id="article-title" class="article-title" style="display:none; margin-bottom: 0.25rem;"></h1>
-        <p id="article-byline" class="article-byline" style="display:none; margin-top: 0; margin-bottom: 1.5rem; font-size: 0.95rem; color: var(--blue-primary);"></p>
+        <p id="article-byline" class="article-byline" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.95rem; color: var(--blue-primary);"></p>
+        <p id="article-meta" class="article-meta" style="display:none; margin-top: 0; margin-bottom: 1.5rem; font-size: 0.875rem; color: #666;"></p>
         <!-- Área do Post -->
         <div id="post-content">
             Carregando post...
@@ -460,12 +461,32 @@
                     titleEl.textContent = titulo;
                     titleEl.style.display = '';
                 }
-                // Exibir autor (por autor)
+                // Exibir autor (Por autor)
                 var authorEl = document.getElementById('article-byline');
                 var autor = (p.autor || p.author || '').trim();
                 if (authorEl) {
                     authorEl.textContent = autor ? 'Por ' + autor : '';
                     authorEl.style.display = autor ? '' : 'none';
+                }
+                // Exibir data e horário de publicação (e local se existir)
+                var metaEl = document.getElementById('article-meta');
+                if (metaEl) {
+                    var dataPub = p.published_at || p.created_at;
+                    var localStr = (p.local || p.location || '').trim();
+                    var parts = [];
+                    if (dataPub) {
+                        try {
+                            var d = new Date(dataPub);
+                            var dataFmt = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                            var horaFmt = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                            parts.push('Publicado em ' + dataFmt + ' às ' + horaFmt);
+                        } catch (e) {
+                            parts.push('Publicado em ' + String(dataPub).slice(0, 10));
+                        }
+                    }
+                    if (localStr) parts.push('em ' + localStr);
+                    metaEl.textContent = parts.join(' ');
+                    metaEl.style.display = parts.length ? '' : 'none';
                 }
                 var el = document.getElementById('post-content');
                 if (el) el.innerHTML = p.conteudo || p.content || '<p>Conteúdo indisponível.</p>';
