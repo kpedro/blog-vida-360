@@ -171,6 +171,15 @@
             border-radius: 10px;
             margin-bottom: 30px;
         }
+        /* Evitar flash do código antes de renderizar */
+        #post-content.post-content-loading {
+            opacity: 0;
+            min-height: 60px;
+        }
+        #post-content.post-content-ready {
+            opacity: 1;
+            transition: opacity 0.15s ease-out;
+        }
         
         /* Botões de Compartilhamento */
         .share-buttons {
@@ -308,8 +317,8 @@
         <h1 id="article-title" class="article-title" style="display:none; margin-bottom: 0.25rem;"></h1>
         <p id="article-byline" class="article-byline" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.95rem; color: var(--blue-primary);"></p>
         <p id="article-meta" class="article-meta" style="display:none; margin-top: 0; margin-bottom: 1.5rem; font-size: 0.875rem; color: #666;"></p>
-        <!-- Área do Post -->
-        <div id="post-content">
+        <!-- Área do Post (oculta até o conteúdo estar renderizado para não mostrar código) -->
+        <div id="post-content" class="post-content-loading">
             Carregando post...
         </div>
         
@@ -489,7 +498,19 @@
                     metaEl.style.display = parts.length ? '' : 'none';
                 }
                 var el = document.getElementById('post-content');
-                if (el) el.innerHTML = p.conteudo || p.content || '<p>Conteúdo indisponível.</p>';
+                if (el) {
+                    var raw = (p.conteudo || p.content || '').trim() || '<p>Conteúdo indisponível.</p>';
+                    var html = raw;
+                    if (typeof marked !== 'undefined' && raw && !/^\s*</.test(raw)) {
+                        try { html = marked.parse(raw); } catch (e) { }
+                    }
+                    el.innerHTML = html;
+                    el.classList.remove('post-content-loading');
+                    el.classList.add('post-content-ready');
+                    requestAnimationFrame(function() {
+                        el.style.opacity = '1';
+                    });
+                }
                 
                 // Mostrar botões de compartilhamento
                 var shareButtons = document.getElementById('share-buttons');
