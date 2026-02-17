@@ -1,0 +1,19 @@
+---
+description: Fazer commit (e push) sempre que houver mudanças no projeto
+alwaysApply: true
+---
+
+# Commit após alterações
+
+Sempre que forem feitas alterações em arquivos do repositório (blog-vida-360):
+
+1. **Ao finalizar as mudanças**, executar:
+   - `git add` nos arquivos alterados
+   - `git commit -m "mensagem clara e objetiva"`
+   - `git push`
+
+2. **Mensagem de commit**: em português, resumindo o que foi feito (ex.: "Adiciona link Ver blog no painel admin", "Corrige cache das páginas admin no Vercel").
+
+3. **Não commitar**: arquivos sensíveis (.env, chaves), node_modules, arquivos gerados temporários ou que o usuário pedir para não versionar.
+
+4. No Windows/PowerShell usar `;` em vez de `&&` para encadear comandos (ex.: `git add .; git status`).

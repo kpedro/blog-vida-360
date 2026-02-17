@@ -1,23 +1,14 @@
 {
   "version": 2,
   "headers": [
-    {
-      "source": "/assets/images/(.*).png",
-      "headers": [{ "key": "Content-Type", "value": "image/png" }]
-    }
+    {"source": "/assets/images/(.*).png", "headers": [{"key": "Content-Type", "value": "image/png"}]},
+    {"source": "/admin-dashboard.html", "headers": [{"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}]},
+    {"source": "/admin-editor-artigo.html", "headers": [{"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}]},
+    {"source": "/admin-nova-campanha.html", "headers": [{"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}]}
   ],
   "routes": [
-    {
-      "src": "/post.html",
-      "dest": "/api/dynamic-post"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    {"src": "/post.html", "dest": "/api/dynamic-post"},
+    {"src": "/api/(.*)", "dest": "/api/$1"},
+    {"src": "/(.*)", "dest": "/$1"}
   ]
 }
