@@ -1,5 +1,6 @@
 // Editor de Artigos - JavaScript
 let currentPostId = null;
+let editorMode = 'html'; // 'html' ou 'markdown'
 
 document.addEventListener('DOMContentLoaded', async () => {
     await checkAuthentication();
@@ -41,12 +42,33 @@ function initEditor() {
         calculateSEOScore();
     });
     
-    // Contador de palavras do conteúdo
+    // Contador de palavras do conteúdo HTML
     document.getElementById('editor-content').addEventListener('input', () => {
         const text = document.getElementById('editor-content').innerText;
         const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
         document.getElementById('content-count').textContent = words;
         calculateSEOScore();
+    });
+    
+    // Contador de palavras do conteúdo Markdown
+    document.getElementById('markdown-editor').addEventListener('input', () => {
+        const text = document.getElementById('markdown-editor').value;
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        document.getElementById('content-count').textContent = words;
+        calculateSEOScore();
+    });
+    
+    // Detectar Markdown ao colar no editor HTML
+    document.getElementById('editor-content').addEventListener('paste', (e) => {
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+        if (isMarkdown(pastedText)) {
+            e.preventDefault();
+            if (confirm('Parece que você colou Markdown. Deseja converter para HTML automaticamente?')) {
+                convertMarkdownToHtml(pastedText);
+            } else {
+                document.execCommand('insertText', false, pastedText);
+            }
+        }
     });
     
     // Preview da imagem
@@ -94,7 +116,22 @@ async function loadPost(postId) {
         document.getElementById('post-excerpt').value = data.resumo || data.excerpt || '';
         document.getElementById('post-tags').value = Array.isArray(data.tags) ? data.tags.join(', ') : (data.tags || '');
         document.getElementById('image-url').value = data.imagem_destaque || data.image_url || '';
-        document.getElementById('editor-content').innerHTML = data.conteudo || data.content || '';
+        
+        // Carregar conteúdo (tentar Markdown primeiro, depois HTML)
+        const content = data.conteudo || data.content || '';
+        if (content && window.marked) {
+            // Tentar detectar se é Markdown
+            if (isMarkdown(content)) {
+                document.getElementById('markdown-editor').value = content;
+                if (editorMode === 'html') {
+                    toggleEditorMode(); // Mudar para modo Markdown
+                }
+            } else {
+                document.getElementById('editor-content').innerHTML = content;
+            }
+        } else {
+            document.getElementById('editor-content').innerHTML = content;
+        }
         
         updatePreview();
         calculateSEOScore();
@@ -149,6 +186,193 @@ function handleImageUpload(event) {
     }
 }
 
+// Alternar entre modo HTML e Markdown
+function toggleEditorMode() {
+    const htmlEditor = document.getElementById('editor-content');
+    const markdownEditor = document.getElementById('markdown-editor');
+    const modeSwitch = document.getElementById('btn-mode-switch');
+    const markdownActions = document.getElementById('markdown-actions');
+    const markdownHint = document.getElementById('markdown-hint');
+    const toolbarButtons = ['btn-bold', 'btn-italic', 'btn-underline', 'btn-h2', 'btn-h3', 'btn-link', 'btn-image'];
+    
+    if (editorMode === 'html') {
+        // Mudar para Markdown
+        editorMode = 'markdown';
+        htmlEditor.style.display = 'none';
+        markdownEditor.style.display = 'block';
+        markdownActions.style.display = 'block';
+        markdownHint.style.display = 'inline';
+        modeSwitch.textContent = '🌐 HTML';
+        modeSwitch.title = 'Alternar para modo HTML';
+        
+        // Desabilitar botões da toolbar (exceto upload)
+        toolbarButtons.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) btn.disabled = true;
+        });
+        
+        // Converter HTML atual para Markdown se houver conteúdo
+        if (htmlEditor.innerHTML.trim()) {
+            const htmlContent = htmlEditor.innerHTML;
+            markdownEditor.value = convertHtmlToMarkdown(htmlContent);
+        }
+        markdownEditor.focus();
+    } else {
+        // Mudar para HTML
+        editorMode = 'html';
+        htmlEditor.style.display = 'block';
+        markdownEditor.style.display = 'none';
+        markdownActions.style.display = 'none';
+        markdownHint.style.display = 'none';
+        modeSwitch.textContent = '📝 Markdown';
+        modeSwitch.title = 'Alternar para modo Markdown';
+        
+        // Habilitar botões da toolbar
+        toolbarButtons.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) btn.disabled = false;
+        });
+        
+        // Converter Markdown atual para HTML se houver conteúdo
+        if (markdownEditor.value.trim()) {
+            const markdownContent = markdownEditor.value;
+            htmlEditor.innerHTML = convertMarkdownToHtml(markdownContent, false);
+        }
+        htmlEditor.focus();
+    }
+}
+
+// Verificar se texto é Markdown
+function isMarkdown(text) {
+    if (!text || text.length < 10) return false;
+    
+    const markdownPatterns = [
+        /^#{1,6}\s+/m,                    // Headers (# ## ###)
+        /\*\*.*?\*\*/,                    // Bold **text**
+        /\*.*?\*/,                        // Italic *text*
+        /\[.*?\]\(.*?\)/,                 // Links [text](url)
+        /!\[.*?\]\(.*?\)/,                // Images ![alt](url)
+        /^[-*+]\s+/m,                     // Unordered lists
+        /^\d+\.\s+/m,                     // Ordered lists
+        /^```[\s\S]*?```/m,               // Code blocks
+        /`[^`]+`/,                        // Inline code
+        /^>\s+/m                          // Blockquotes
+    ];
+    
+    return markdownPatterns.some(pattern => pattern.test(text));
+}
+
+// Converter Markdown para HTML
+function convertMarkdownToHtml(markdownText = null, updateEditor = true) {
+    if (!window.marked) {
+        alert('Biblioteca Marked.js não carregada. Recarregue a página.');
+        return;
+    }
+    
+    const markdown = markdownText || document.getElementById('markdown-editor').value;
+    if (!markdown.trim()) {
+        alert('Nenhum conteúdo Markdown para converter.');
+        return;
+    }
+    
+    try {
+        // Configurar marked para converter corretamente
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+        
+        const html = marked.parse(markdown);
+        
+        if (updateEditor) {
+            document.getElementById('editor-content').innerHTML = html;
+            document.getElementById('markdown-editor').value = '';
+            toggleEditorMode(); // Voltar para modo HTML
+            alert('✅ Markdown convertido para HTML com sucesso!');
+        }
+        
+        return html;
+    } catch (error) {
+        console.error('Erro ao converter Markdown:', error);
+        alert('Erro ao converter Markdown: ' + error.message);
+        return null;
+    }
+}
+
+// Converter HTML para Markdown (conversão básica)
+function convertHtmlToMarkdown(htmlText = null) {
+    const html = htmlText || document.getElementById('editor-content').innerHTML;
+    if (!html.trim()) {
+        alert('Nenhum conteúdo HTML para converter.');
+        return '';
+    }
+    
+    let markdown = html;
+    
+    // Converter headers
+    markdown = markdown.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n\n');
+    markdown = markdown.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n\n');
+    markdown = markdown.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n\n');
+    markdown = markdown.replace(/<h4[^>]*>(.*?)<\/h4>/gi, '#### $1\n\n');
+    markdown = markdown.replace(/<h5[^>]*>(.*?)<\/h5>/gi, '##### $1\n\n');
+    markdown = markdown.replace(/<h6[^>]*>(.*?)<\/h6>/gi, '###### $1\n\n');
+    
+    // Converter negrito e itálico
+    markdown = markdown.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+    markdown = markdown.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+    markdown = markdown.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+    markdown = markdown.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+    
+    // Converter links
+    markdown = markdown.replace(/<a[^>]*href=["']([^"']*)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+    
+    // Converter imagens
+    markdown = markdown.replace(/<img[^>]*src=["']([^"']*)["'][^>]*alt=["']([^"']*)["'][^>]*>/gi, '![$2]($1)');
+    markdown = markdown.replace(/<img[^>]*src=["']([^"']*)["'][^>]*>/gi, '![]($1)');
+    
+    // Converter listas não ordenadas
+    markdown = markdown.replace(/<ul[^>]*>/gi, '');
+    markdown = markdown.replace(/<\/ul>/gi, '\n');
+    markdown = markdown.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n');
+    
+    // Converter listas ordenadas (processar cada <ol> separadamente)
+    const olMatches = markdown.match(/<ol[^>]*>[\s\S]*?<\/ol>/gi);
+    if (olMatches) {
+        olMatches.forEach(ol => {
+            let olIndex = 1;
+            const convertedOl = ol.replace(/<li[^>]*>(.*?)<\/li>/gi, (match, content) => {
+                return `${olIndex++}. ${content.trim()}\n`;
+            }).replace(/<ol[^>]*>/gi, '').replace(/<\/ol>/gi, '\n');
+            markdown = markdown.replace(ol, convertedOl);
+        });
+    }
+    
+    // Converter parágrafos
+    markdown = markdown.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
+    
+    // Converter quebras de linha
+    markdown = markdown.replace(/<br[^>]*>/gi, '\n');
+    
+    // Remover tags HTML restantes
+    markdown = markdown.replace(/<[^>]+>/g, '');
+    
+    // Decodificar entidades HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = markdown;
+    markdown = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Limpar espaços extras
+    markdown = markdown.replace(/\n{3,}/g, '\n\n').trim();
+    
+    if (!htmlText) {
+        document.getElementById('markdown-editor').value = markdown;
+        toggleEditorMode(); // Mudar para modo Markdown
+        alert('✅ HTML convertido para Markdown!');
+    }
+    
+    return markdown;
+}
+
 // Atualizar preview
 function updatePreview() {
     const title = document.getElementById('post-title').value || 'Título do seu artigo';
@@ -172,7 +396,15 @@ function calculateSEOScore() {
     
     const title = document.getElementById('post-title').value;
     const excerpt = document.getElementById('post-excerpt').value;
-    const content = document.getElementById('editor-content').innerText;
+    
+    // Obter conteúdo baseado no modo atual
+    let content = '';
+    if (editorMode === 'markdown') {
+        content = document.getElementById('markdown-editor').value;
+    } else {
+        content = document.getElementById('editor-content').innerText;
+    }
+    
     const words = content.trim().split(/\s+/).filter(w => w.length > 0).length;
     
     // Título (0-25 pontos)
@@ -245,7 +477,19 @@ async function savePost(status) {
         const excerpt = document.getElementById('post-excerpt').value.trim();
         const tagsStr = document.getElementById('post-tags').value.trim();
         const imageUrl = document.getElementById('image-url').value.trim();
-        const contentHtml = document.getElementById('editor-content').innerHTML;
+        
+        // Obter conteúdo baseado no modo atual
+        let contentHtml = '';
+        if (editorMode === 'markdown') {
+            const markdownContent = document.getElementById('markdown-editor').value;
+            if (markdownContent.trim() && window.marked) {
+                contentHtml = marked.parse(markdownContent);
+            } else {
+                contentHtml = document.getElementById('editor-content').innerHTML;
+            }
+        } else {
+            contentHtml = document.getElementById('editor-content').innerHTML;
+        }
         
         if (!title || !category || !excerpt) {
             alert('Por favor, preencha todos os campos obrigatórios (Título, Categoria e Resumo)');
