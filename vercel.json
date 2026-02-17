@@ -1,13 +1,15 @@
 {
   "version": 2,
-  "routes": [
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/assets/images/(.*).png",
+      "headers": [
+        { "key": "Content-Type", "value": "image/png" }
+      ]
     }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
