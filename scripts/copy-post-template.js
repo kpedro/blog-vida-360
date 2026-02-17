@@ -2,12 +2,18 @@
  * Gera api/post-template.html a partir de post.html com placeholders para meta tags.
  * Usado pela API dynamic-post para injetar og:image, og:title etc. por artigo.
  * Executado no build: npm run build
+ * No Vercel, post.html está em .vercelignore (não é deployado), então usamos o template já commitado.
  */
 const fs = require('fs');
 const path = require('path');
 
 const postPath = path.join(__dirname, '../post.html');
 const outPath = path.join(__dirname, '../api/post-template.html');
+
+if (!fs.existsSync(postPath)) {
+  console.log('⏭️ post.html não encontrado (ex.: no Vercel). Usando api/post-template.html já existente.');
+  process.exit(0);
+}
 
 let html = fs.readFileSync(postPath, 'utf8');
 
