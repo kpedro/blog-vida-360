@@ -1,0 +1,11 @@
+{
+  "name": "blog-vida-360",
+  "version": "1.0.0",
+  "description": "Blog Vida 360º",
+  "scripts": {
+    "generate-og-png": "node scripts/generate-og-png.js"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.2"
+  }
+}
