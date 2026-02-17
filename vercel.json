@@ -6,11 +6,18 @@
       "headers": [{ "key": "Content-Type", "value": "image/png" }]
     }
   ],
-  "rewrites": [
-    { "source": "/post.html", "destination": "/api/dynamic-post" }
-  ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/$1" }
+    {
+      "src": "/post.html",
+      "dest": "/api/dynamic-post"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
   ]
 }

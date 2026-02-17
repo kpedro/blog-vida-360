@@ -30,8 +30,7 @@ function escapeHtml(s) {
 }
 
 async function fetchPost(slug) {
-  const orFilter = '(status.eq.published,publicado.eq.true)';
-  const url = `${SUPABASE_URL}/rest/v1/blog360_posts?slug=eq.${encodeURIComponent(slug)}&select=titulo,resumo,imagem_destaque,slug&or=${encodeURIComponent(orFilter)}&limit=1`;
+  const url = `${SUPABASE_URL}/rest/v1/blog360_posts?slug=eq.${encodeURIComponent(slug)}&select=titulo,resumo,imagem_destaque,slug,status,publicado,published_at&limit=1`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
@@ -42,7 +41,10 @@ async function fetchPost(slug) {
   });
   if (!res.ok) return null;
   const data = await res.json();
-  return Array.isArray(data) && data.length ? data[0] : null;
+  const row = Array.isArray(data) && data.length ? data[0] : null;
+  if (!row) return null;
+  const isPublished = row.status === 'published' || row.publicado === true || row.published_at;
+  return isPublished ? row : null;
 }
 
 function applyMeta(html, meta) {
