@@ -476,8 +476,8 @@
         
         function shareWhatsApp(e) {
             e.preventDefault();
-            const { text, url } = getCurrentPostInfo();
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+            const { text } = getCurrentPostInfo();
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
             window.open(whatsappUrl, '_blank', 'width=600,height=400');
         }
         
