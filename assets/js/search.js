@@ -1,102 +1,106 @@
-// Sistema de Busca de Posts
-class SearchSystem {
-    constructor() {
-        this.posts = [];
-        this.init();
+// Sistema de Busca de Posts (usa artigos do Supabase)
+(function() {
+    var posts = [];
+    var searchResultsEl = null;
+
+    function getSearchResultsEl() {
+        return document.getElementById('search-results');
     }
 
-    async init() {
-        await this.loadPosts();
-        this.setupSearch();
-    }
-
-    // Carregar lista de posts
-    async loadPosts() {
-        const postsList = [
-            { key: 'saude-mental', title: 'Como Cuidar da Saúde Mental no Dia a Dia', category: 'Saúde' },
-            { key: 'produtividade', title: '5 Passos para Aumentar sua Produtividade', category: 'Produtividade' },
-            { key: 'equilibrio-vida', title: 'Encontrando o Equilíbrio entre Trabalho e Vida Pessoal', category: 'Bem-estar' }
-        ];
-
-        // Carregar conteúdo dos posts para busca
-        for (const post of postsList) {
-            try {
-                const response = await fetch(`posts/${post.key}.md`);
-                if (response.ok) {
-                    const content = await response.text();
-                    post.content = content;
-                    this.posts.push(post);
+    function loadPostsFromSupabase() {
+        return new Promise(function(resolve) {
+            function tryLoad(attempts) {
+                var client = window.supabaseClient;
+                if (client && client.getPosts) {
+                    client.getPosts(100, 0).then(function(r) {
+                        if (r.success && r.data && r.data.length) {
+                            posts = r.data;
+                        }
+                        resolve();
+                    }).catch(function() { resolve(); });
+                    return;
                 }
-            } catch (error) {
-                console.error(`Erro ao carregar post ${post.key}:`, error);
+                if (attempts >= 25) {
+                    resolve();
+                    return;
+                }
+                setTimeout(function() { tryLoad(attempts + 1); }, 200);
             }
-        }
-    }
-
-    // Configurar busca
-    setupSearch() {
-        const searchInput = document.getElementById('search-input');
-        const searchResults = document.getElementById('search-results');
-
-        if (!searchInput) return;
-
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim().toLowerCase();
-            this.search(query, searchResults);
-        });
-
-        // Buscar ao pressionar Enter
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const query = searchInput.value.trim().toLowerCase();
-                this.search(query, searchResults);
-            }
+            tryLoad(0);
         });
     }
 
-    // Realizar busca
-    search(query, resultsContainer) {
-        if (!resultsContainer) return;
-
-        if (!query || query.length < 2) {
-            resultsContainer.innerHTML = '';
-            resultsContainer.style.display = 'none';
+    function search(query, container) {
+        if (!container) return;
+        query = (query || '').trim().toLowerCase();
+        if (query.length < 2) {
+            container.innerHTML = '';
+            container.style.display = 'none';
             return;
         }
 
-        const results = this.posts.filter(post => {
-            const searchText = `${post.title} ${post.category} ${post.content || ''}`.toLowerCase();
-            return searchText.includes(query);
+        var results = posts.filter(function(post) {
+            var titulo = (post.titulo || post.title || '').toLowerCase();
+            var resumo = (post.resumo || post.excerpt || '').toLowerCase();
+            var categoria = (post.categoria || '').toLowerCase();
+            var text = titulo + ' ' + resumo + ' ' + categoria;
+            return text.indexOf(query) !== -1;
         });
 
         if (results.length === 0) {
-            resultsContainer.innerHTML = '<p class="no-results">Nenhum resultado encontrado.</p>';
-            resultsContainer.style.display = 'block';
+            container.innerHTML = '<p class="no-results" style="margin:0;color:#666;">Nenhum resultado encontrado.</p>';
+            container.style.display = 'block';
             return;
         }
 
-        let html = '<h3>Resultados da Busca:</h3><ul class="search-results-list">';
-        results.forEach(post => {
-            html += `
-                <li>
-                    <a href="post.html?post=${post.key}">
-                        <strong>${post.title}</strong>
-                        <span class="category">${post.category}</span>
-                    </a>
-                </li>
-            `;
+        var html = '<h3 style="margin:0 0 12px 0;font-size:1.1rem;">Resultados da Busca:</h3><ul class="search-results-list" style="list-style:none;padding:0;margin:0;">';
+        results.forEach(function(post) {
+            var slug = post.slug || '';
+            var titulo = (post.titulo || post.title || 'Artigo').trim();
+            var cat = (post.categoria || '').trim();
+            html += '<li style="margin-bottom:10px;"><a href="post.html?post=' + encodeURIComponent(slug) + '" style="color:var(--blue-primary);text-decoration:none;">' +
+                '<strong>' + escapeHtml(titulo) + '</strong>' +
+                (cat ? ' <span style="color:#888;font-size:0.9em;">(' + escapeHtml(cat) + ')</span>' : '') +
+                '</a></li>';
         });
         html += '</ul>';
-
-        resultsContainer.innerHTML = html;
-        resultsContainer.style.display = 'block';
+        container.innerHTML = html;
+        container.style.display = 'block';
     }
-}
 
-// Inicializar busca na página inicial
-if (document.getElementById('search-input')) {
-    document.addEventListener('DOMContentLoaded', () => {
-        new SearchSystem();
-    });
-}
+    function escapeHtml(s) {
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+    }
+
+    function setupSearch() {
+        var searchInput = document.getElementById('search-input');
+        searchResultsEl = getSearchResultsEl();
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(e) {
+            search(e.target.value.trim(), getSearchResultsEl());
+        });
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                search(searchInput.value.trim(), getSearchResultsEl());
+            }
+        });
+    }
+
+    function init() {
+        loadPostsFromSupabase().then(function() {
+            setupSearch();
+        });
+    }
+
+    if (document.getElementById('search-input')) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    }
+})();
