@@ -4,144 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Vida 360º</title>
-    
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 400px;
-            width: 100%;
-        }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .logo h1 {
-            color: #2C3E50;
-            font-size: 32px;
-            margin-bottom: 5px;
-        }
-        
-        .logo p {
-            color: #7F8C8D;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            color: #2C3E50;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ECF0F1;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: #E74C3C;
-        }
-        
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: #E74C3C;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .btn-login:hover {
-            background: #C0392B;
-        }
-        
-        .btn-login:disabled {
-            background: #BDC3C7;
-            cursor: not-allowed;
-        }
-        
-        .message {
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-        }
-        
-        .message.error {
-            background: #FADBD8;
-            color: #C0392B;
-            border: 1px solid #E74C3C;
-        }
-        
-        .message.success {
-            background: #D5F4E6;
-            color: #27AE60;
-            border: 1px solid #27AE60;
-        }
-        
-        .footer-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .footer-link a {
-            color: #3498DB;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .footer-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .loading.active {
-            display: block;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; width: 100%; }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { color: #2C3E50; font-size: 32px; margin-bottom: 5px; }
+        .logo p { color: #7F8C8D; font-size: 14px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: #2C3E50; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px 15px; border: 2px solid #ECF0F1; border-radius: 6px; font-size: 14px; transition: border-color 0.3s; }
+        .form-group input:focus { outline: none; border-color: #E74C3C; }
+        .btn-login { width: 100%; padding: 14px; background: #E74C3C; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+        .btn-login:hover { background: #C0392B; }
+        .btn-login:disabled { background: #BDC3C7; cursor: not-allowed; }
+        .message { padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; display: none; }
+        .message.error { background: #FADBD8; color: #C0392B; border: 1px solid #E74C3C; }
+        .message.success { background: #D5F4E6; color: #27AE60; border: 1px solid #27AE60; }
+        .footer-link { text-align: center; margin-top: 20px; }
+        .footer-link a { color: #3498DB; text-decoration: none; font-size: 14px; }
+        .footer-link a:hover { text-decoration: underline; }
+        .loading { display: none; text-align: center; margin-top: 15px; }
+        .loading.active { display: block; }
     </style>
 </head>
 <body>
@@ -150,130 +35,175 @@
             <h1>🔐 Vida 360º</h1>
             <p>Painel Administrativo</p>
         </div>
-        
         <div id="message" class="message"></div>
-        
         <form id="login-form">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    placeholder="seu@email.com"
-                    required
-                >
+                <input type="email" id="email" name="email" placeholder="seu@email.com" required>
             </div>
-            
             <div class="form-group">
                 <label for="password">Senha</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    placeholder="••••••••"
-                    required
-                >
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+                <div style="margin-top: 8px; font-size: 13px;">
+                    <a href="#" id="link-esqueci-senha" style="color: #3498DB;">Esqueci minha senha</a>
+                </div>
             </div>
-            
-            <button type="submit" class="btn-login" id="btn-submit">
-                Entrar
-            </button>
-            
+            <button type="submit" class="btn-login" id="btn-submit">Entrar</button>
             <div class="loading" id="loading">
                 <p style="color: #7F8C8D;">Entrando...</p>
             </div>
         </form>
-        
+        <p style="margin-top: 16px; font-size: 12px; color: #7F8C8D; text-align: center;">Após o cadastro, confirme seu email (clique no link que enviamos) antes de entrar.</p>
         <div class="footer-link">
+            <a href="admin-signup.html">Não tem uma conta? Cadastre-se</a>
+            <span style="color: #BDC3C7; margin: 0 10px;">|</span>
             <a href="index.html">← Voltar ao Blog</a>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
     <script src="assets/js/supabase.js"></script>
     <script>
+        // Aguardar Supabase CDN carregar antes de inicializar
+        function initializeSupabaseLogin() {
+            if (typeof window.supabase === 'undefined') {
+                console.warn('⚠️ Aguardando Supabase CDN carregar...');
+                setTimeout(initializeSupabaseLogin, 100);
+                return;
+            }
+            
+            if (typeof initSupabase === 'function') {
+                window.supabaseClient = initSupabase();
+                if (window.supabaseClient) {
+                    console.log('✅ Supabase inicializado para login');
+                } else {
+                    console.error('❌ Falha ao inicializar Supabase no login');
+                }
+            } else {
+                console.error('❌ Função initSupabase não encontrada');
+                // Tentar novamente após 1 segundo
+                setTimeout(initializeSupabaseLogin, 1000);
+            }
+        }
+        
+        // Inicializar quando DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeSupabaseLogin);
+        } else {
+            initializeSupabaseLogin();
+        }
         const loginForm = document.getElementById('login-form');
         const messageDiv = document.getElementById('message');
         const btnSubmit = document.getElementById('btn-submit');
         const loading = document.getElementById('loading');
-        
-        // Verificar se já está logado
+        // Usar window.supabaseClient diretamente (já inicializado pelo supabase.js)
+
+        function getDashboardUrl() {
+            return window.location.origin + window.location.pathname.replace('admin-login.html', 'admin-dashboard.html');
+        }
+
         async function checkAuth() {
-            const supabase = window.supabaseClient;
-            if (!supabase) {
-                console.error('Supabase não inicializado');
+            // Aguardar Supabase estar pronto
+            let attempts = 0;
+            while ((!window.supabaseClient || !window.supabaseClient.auth) && attempts < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.supabaseClient || !window.supabaseClient.auth) {
+                console.error('❌ Supabase não inicializado após espera');
                 return;
             }
             
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session) {
-                // Já está logado, redirecionar para admin
-                window.location.href = 'admin-dashboard.html';
+            try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                if (session) {
+                    console.log('✅ Sessão encontrada, redirecionando...');
+                    window.location.replace(getDashboardUrl());
+                }
+            } catch (error) {
+                console.error('❌ Erro ao verificar sessão:', error);
             }
         }
-        
-        checkAuth();
-        
-        // Handle login
+
+        // Aguardar um pouco antes de verificar autenticação
+        setTimeout(checkAuth, 500);
+
+        // Mensagem se veio do dashboard por sessão inválida
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('reason') === 'session') {
+            showMessage('Sessão não encontrada ou expirada. Faça login novamente.', 'error');
+        }
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
-            // Validação básica
-            if (!email || !password) {
-                showMessage('Por favor, preencha todos os campos', 'error');
-                return;
-            }
-            
-            // Mostrar loading
+
+            if (!email || !password) { showMessage('Por favor, preencha todos os campos', 'error'); return; }
+
             btnSubmit.disabled = true;
             loading.classList.add('active');
             hideMessage();
-            
+
             try {
-                const supabase = window.supabaseClient;
-                
-                if (!supabase) {
-                    throw new Error('Supabase não inicializado');
+                // Aguardar Supabase estar pronto
+                let attempts = 0;
+                while ((!window.supabaseClient || !window.supabaseClient.auth) && attempts < 20) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
                 }
                 
-                // Fazer login
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
+                if (!window.supabaseClient || !window.supabaseClient.auth) {
+                    throw new Error('Supabase não configurado. Verifique as credenciais do projeto e recarregue a página.');
+                }
+                
+                console.log('🔐 Tentando fazer login com:', email);
+                console.log('🔍 Supabase URL:', window.VITE_SUPABASE_URL);
+                console.log('🔍 Supabase Key configurada:', !!window.VITE_SUPABASE_ANON_KEY);
+                
+                const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
                 
                 if (error) {
+                    console.error('❌ Erro do Supabase:', error);
                     throw error;
                 }
                 
+                console.log('✅ Login bem-sucedido. Dados:', data);
+                
                 if (data.session) {
-                    showMessage('Login realizado com sucesso! Redirecionando...', 'success');
+                    console.log('✅ Sessão criada:', data.session.user.email);
                     
-                    // Redirecionar para o dashboard
-                    setTimeout(() => {
-                        window.location.href = 'admin-dashboard.html';
-                    }, 1000);
+                    // Verificar se a sessão está realmente persistida
+                    const { data: { session: verifySession } } = await window.supabaseClient.auth.getSession();
+                    if (!verifySession) {
+                        console.warn('⚠️ Sessão não encontrada após login. Tentando novamente...');
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        const { data: { session: retrySession } } = await window.supabaseClient.auth.getSession();
+                        if (!retrySession) {
+                            throw new Error('Sessão não foi persistida. Tente novamente.');
+                        }
+                    }
+                    
+                    showMessage('Login realizado com sucesso! Redirecionando...', 'success');
+                    // Garantir que a sessão está persistida antes de redirecionar
+                    const dashboardUrl = getDashboardUrl();
+                    console.log('🔄 Redirecionando para:', dashboardUrl);
+                    setTimeout(() => { window.location.replace(dashboardUrl); }, 1000);
                 } else {
                     throw new Error('Falha ao criar sessão');
                 }
-                
             } catch (error) {
-                console.error('Erro no login:', error);
-                
+                console.error('❌ Erro no login:', error);
                 let errorMessage = 'Erro ao fazer login. Verifique suas credenciais.';
-                
-                if (error.message.includes('Invalid login credentials')) {
-                    errorMessage = 'Email ou senha incorretos.';
-                } else if (error.message.includes('Email not confirmed')) {
-                    errorMessage = 'Por favor, confirme seu email antes de fazer login.';
-                }
-                
+                if (error.message && error.message.includes('Invalid login credentials')) { errorMessage = 'Email ou senha incorretos. Use "Esqueci minha senha" para definir uma nova.'; }
+                else if (error.message && error.message.includes('Email not confirmed')) { errorMessage = 'Confirme seu email antes de entrar. Abra o link que enviamos para o seu email ou use "Esqueci minha senha" para redefinir.'; }
+                else if (error.message) { errorMessage = error.message; }
                 showMessage(errorMessage, 'error');
+            } finally {
                 btnSubmit.disabled = false;
                 loading.classList.remove('active');
             }
@@ -281,13 +211,38 @@
         
         function showMessage(text, type) {
             messageDiv.textContent = text;
-            messageDiv.className = `message ${type}`;
+            messageDiv.className = "message " + type;
             messageDiv.style.display = 'block';
         }
         
         function hideMessage() {
             messageDiv.style.display = 'none';
         }
+
+        // Esqueci minha senha: envia email de redefinição
+        document.getElementById('link-esqueci-senha').addEventListener('click', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                showMessage('Digite seu email acima e clique em "Esqueci minha senha" de novo.', 'error');
+                return;
+            }
+            if (!window.supabaseClient || !window.supabaseClient.auth) {
+                showMessage('Supabase não está configurado.', 'error');
+                return;
+            }
+            hideMessage();
+            try {
+                const { data, error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + window.location.pathname.replace('admin-login.html', '') + 'admin-login.html'
+                });
+                if (error) throw error;
+                showMessage('Email enviado! Verifique ' + email + ' e use o link para criar uma nova senha.', 'success');
+            } catch (err) {
+                console.error(err);
+                showMessage(err.message || 'Erro ao enviar email. Tente de novo.', 'error');
+            }
+        });
     </script>
 </body>
 </html>
