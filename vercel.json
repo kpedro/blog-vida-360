@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
   "headers": [
     {"source": "/assets/images/(.*).png", "headers": [{"key": "Content-Type", "value": "image/png"}]},
     {"source": "/admin-dashboard.html", "headers": [{"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}]},
