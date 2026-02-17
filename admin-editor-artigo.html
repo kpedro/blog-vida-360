@@ -84,7 +84,10 @@
 <body>
     <header class="editor-header">
         <h1>✏️ Editor de Artigo</h1>
-        <a href="admin-dashboard.html">← Voltar ao painel</a>
+        <div style="display: flex; gap: 1rem;">
+            <a href="index.html">Ver blog</a>
+            <a href="admin-dashboard.html">← Voltar ao painel</a>
+        </div>
     </header>
 
     <div class="editor-container">
@@ -157,8 +160,9 @@
                     <input type="text" id="post-tags" name="tags" placeholder="bem-estar, produtividade, hábitos">
                 </div>
                 <div class="form-group">
-                    <label for="image-url">URL da imagem de destaque</label>
-                    <input type="url" id="image-url" name="image_url" placeholder="https://...">
+                    <label for="image-url">🖼️ Imagem de destaque (para o artigo e redes sociais)</label>
+                    <input type="url" id="image-url" name="image_url" placeholder="https://exemplo.com/imagem.jpg">
+                    <div class="char-count" style="margin-top:6px;">Cole aqui a URL de uma imagem. Ela aparece no card do artigo e quando alguém compartilha o link (Facebook, WhatsApp, etc.). Tamanho sugerido: 1200×630 px.</div>
                     <img id="image-preview" alt="Preview" src="">
                 </div>
                 

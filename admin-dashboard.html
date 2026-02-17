@@ -55,6 +55,19 @@
             background: #C0392B;
         }
         
+        .link-blog {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 4px;
+        }
+        .link-blog:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        
         /* Navigation */
         .admin-nav {
             background: white;
@@ -269,6 +282,7 @@
     <header class="admin-header">
         <h1>🎛️ Painel Administrativo</h1>
         <div class="user-info">
+            <a href="index.html" class="link-blog">Ver blog</a>
             <span id="user-email">Carregando...</span>
             <button class="btn-logout" onclick="logout()">Sair</button>
         </div>
