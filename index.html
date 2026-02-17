@@ -285,7 +285,10 @@
         </section>
 
         <section id="posts-container">
-            <h2>Últimos Posts</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">📚 Últimos Artigos</h2>
+                <a href="artigos.html" style="background-color: var(--blue-secondary); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.backgroundColor='var(--blue-primary)'" onmouseout="this.style.backgroundColor='var(--blue-secondary)'">Ver Todos os Artigos →</a>
+            </div>
             <div class="posts-grid" id="posts-grid">
                 <!-- Posts estáticos (fallback); substituídos por JS se houver posts no Supabase -->
                 <article class="post">
@@ -408,7 +411,7 @@
                 }
                 
                 console.log('✅ Cliente Supabase pronto, buscando posts...');
-                var result = await client.getPosts(50, 0); // Aumentado para 50 posts
+                var result = await client.getPosts(6, 0); // Mostrar apenas 6 posts mais recentes na home
                 
                 console.log('📊 Resultado da busca:', {
                     success: result.success,
@@ -444,6 +447,26 @@
                 
                 grid.innerHTML = html;
                 console.log('✅ Posts renderizados com sucesso!');
+                
+                // Adicionar botão "Ver mais" se houver mais posts
+                var container = document.getElementById('posts-container');
+                if (container && result.data.length >= 6) {
+                    var existingBtn = container.querySelector('.ver-mais-btn');
+                    if (!existingBtn) {
+                        var btnDiv = document.createElement('div');
+                        btnDiv.style.textAlign = 'center';
+                        btnDiv.style.marginTop = '30px';
+                        btnDiv.className = 'ver-mais-btn';
+                        var btn = document.createElement('a');
+                        btn.href = 'artigos.html';
+                        btn.textContent = 'Ver Todos os Artigos →';
+                        btn.style.cssText = 'background-color: var(--blue-secondary); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s;';
+                        btn.onmouseover = function() { this.style.backgroundColor = 'var(--blue-primary)'; };
+                        btn.onmouseout = function() { this.style.backgroundColor = 'var(--blue-secondary)'; };
+                        btnDiv.appendChild(btn);
+                        container.appendChild(btnDiv);
+                    }
+                }
             }
             
             // Aguardar DOM e Supabase estarem prontos
