@@ -358,20 +358,72 @@ function initSupabase() {
   const client = window.supabase.createClient(supabaseUrl, supabaseKey);
   
   // Adicionar getPosts para a home do blog (usa status = 'published' ou publicado = true)
-  client.getPosts = async function(limit = 20, offset = 0, categoria = null) {
+  client.getPosts = async function(limit = 50, offset = 0, categoria = null) {
     try {
+      console.log('🔍 Buscando posts com:', { limit, offset, categoria });
+      
+      // Tentar diferentes formas de buscar posts publicados
       let query = this
         .from('blog360_posts')
-        .select('id, titulo, slug, resumo, categoria, imagem_destaque, author, published_at')
-        .or('status.eq.published,publicado.eq.true')
-        .order('published_at', { ascending: false })
-        .range(offset, offset + limit - 1);
-      if (categoria) query = query.eq('categoria', categoria);
-      const { data, error } = await query;
-      if (error) throw error;
-      return { success: true, data: data || [] };
+        .select('id, titulo, slug, resumo, categoria, imagem_destaque, author, published_at, status, publicado, created_at');
+      
+      // Filtrar por status publicado (tentar múltiplas condições)
+      // Primeiro, tentar buscar todos e filtrar depois se necessário
+      query = query.order('published_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false, nullsFirst: false });
+      
+      const { data: allData, error: allError } = await query;
+      
+      if (allError) {
+        console.error('❌ Erro na query inicial:', allError);
+        throw allError;
+      }
+      
+      console.log('📊 Total de posts encontrados (antes do filtro):', allData ? allData.length : 0);
+      
+      // Filtrar posts publicados manualmente
+      let filteredData = (allData || []).filter(function(post) {
+        // Considerar publicado se:
+        // 1. status === 'published'
+        // 2. publicado === true
+        // 3. Se não tiver status nem publicado, considerar publicado se tiver published_at
+        var isPublished = false;
+        
+        if (post.status === 'published' || post.publicado === true) {
+          isPublished = true;
+        } else if (!post.status && !post.hasOwnProperty('publicado') && post.published_at) {
+          // Se não tem campo status/publicado mas tem published_at, considerar publicado
+          isPublished = true;
+        }
+        
+        return isPublished;
+      });
+      
+      // Aplicar filtro de categoria se fornecido
+      if (categoria) {
+        filteredData = filteredData.filter(function(post) {
+          return post.categoria === categoria;
+        });
+      }
+      
+      // Aplicar paginação
+      var paginatedData = filteredData.slice(offset, offset + limit);
+      
+      console.log('✅ Posts filtrados:', {
+        total: filteredData.length,
+        paginados: paginatedData.length,
+        categoria: categoria || 'todas'
+      });
+      
+      return { success: true, data: paginatedData };
     } catch (error) {
-      console.error('Erro ao buscar posts:', error);
+      console.error('❌ Erro ao buscar posts:', error);
+      console.error('   Detalhes:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
       return { success: false, data: [], error: error.message };
     }
   };

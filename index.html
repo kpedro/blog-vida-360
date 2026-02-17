@@ -374,13 +374,60 @@
     <script>
         // Listar posts do Supabase (substitui grid estático se houver posts publicados)
         (function() {
-            document.addEventListener('DOMContentLoaded', async function() {
-                var grid = document.getElementById('posts-grid');
-                if (!grid) return;
+            async function loadPostsFromSupabase() {
+                console.log('📰 Tentando carregar posts do Supabase...');
+                
+                // Aguardar Supabase client estar pronto (com retry)
                 var client = window.supabaseClient;
-                if (!client || !client.getPosts) return;
-                var result = await client.getPosts(20, 0);
-                if (!result.success || !result.data || result.data.length === 0) return;
+                var attempts = 0;
+                var maxAttempts = 10;
+                
+                while ((!client || !client.getPosts) && attempts < maxAttempts) {
+                    console.log('⏳ Aguardando Supabase client... (tentativa ' + (attempts + 1) + '/' + maxAttempts + ')');
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    client = window.supabaseClient;
+                    attempts++;
+                }
+                
+                if (!client) {
+                    console.error('❌ Supabase client não disponível após ' + maxAttempts + ' tentativas');
+                    return;
+                }
+                
+                if (!client.getPosts) {
+                    console.error('❌ Método getPosts não encontrado no client');
+                    console.log('   Client disponível:', !!client);
+                    console.log('   Métodos disponíveis:', Object.keys(client));
+                    return;
+                }
+                
+                var grid = document.getElementById('posts-grid');
+                if (!grid) {
+                    console.error('❌ Elemento posts-grid não encontrado');
+                    return;
+                }
+                
+                console.log('✅ Cliente Supabase pronto, buscando posts...');
+                var result = await client.getPosts(50, 0); // Aumentado para 50 posts
+                
+                console.log('📊 Resultado da busca:', {
+                    success: result.success,
+                    dataLength: result.data ? result.data.length : 0,
+                    error: result.error
+                });
+                
+                if (!result.success) {
+                    console.error('❌ Erro ao buscar posts:', result.error);
+                    return;
+                }
+                
+                if (!result.data || result.data.length === 0) {
+                    console.warn('⚠️ Nenhum post encontrado no Supabase. Mantendo posts estáticos.');
+                    return;
+                }
+                
+                console.log('✅ ' + result.data.length + ' posts encontrados! Renderizando...');
+                
                 var baseUrl = window.location.href.replace(/\/index\.html$/, '/').replace(/\/$/, '');
                 var html = result.data.map(function(p) {
                     var titulo = p.titulo || p.title || 'Artigo';
@@ -389,12 +436,20 @@
                     var slug = p.slug || '';
                     var url = baseUrl + '/post.html?post=' + encodeURIComponent(slug);
                     return '<article class="post">' +
-                        '<img src="' + img + '" alt="" class="post-image" loading="lazy" onerror="this.src=\'assets/images/equilibrio-vida.jpg\'">' +
+                        '<img src="' + img + '" alt="' + titulo.replace(/"/g, '&quot;') + '" class="post-image" loading="lazy" onerror="this.src=\'assets/images/equilibrio-vida.jpg\'">' +
                         '<h3>' + titulo.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>' +
                         '<p>' + (resumo || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
                         '<a href="' + url + '" class="read-more">Leia mais...</a></article>';
                 }).join('');
+                
                 grid.innerHTML = html;
+                console.log('✅ Posts renderizados com sucesso!');
+            }
+            
+            // Aguardar DOM e Supabase estarem prontos
+            document.addEventListener('DOMContentLoaded', function() {
+                // Aguardar um pouco mais para garantir que initSupabase foi executado
+                setTimeout(loadPostsFromSupabase, 500);
             });
         })();
     </script>
