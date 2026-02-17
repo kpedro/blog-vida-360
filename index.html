@@ -285,7 +285,8 @@
 
         <section id="posts-container">
             <h2>Últimos Posts</h2>
-            <div class="posts-grid">
+            <div class="posts-grid" id="posts-grid">
+                <!-- Posts estáticos (fallback); substituídos por JS se houver posts no Supabase -->
                 <article class="post">
                     <img src="assets/images/saude-mental.jpg" alt="Saúde Mental" class="post-image" loading="lazy">
                     <h3>Como Cuidar da Saúde Mental no Dia a Dia</h3>
@@ -324,7 +325,8 @@
         <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
         <p style="margin-top: 10px; font-size: 0.9rem;">
             <a href="feed.xml" style="color: var(--blue-light); text-decoration: none;">📡 RSS Feed</a> | 
-            <a href="sitemap.xml" style="color: var(--blue-light); text-decoration: none;">🗺️ Sitemap</a>
+            <a href="sitemap.xml" style="color: var(--blue-light); text-decoration: none;">🗺️ Sitemap</a> |
+            <a href="admin-login.html" style="color: var(--blue-light); text-decoration: none; font-weight: 600;">🔐 Painel Admin</a>
         </p>
     </footer>
 
@@ -370,6 +372,33 @@
     <script src="assets/js/leads.js"></script>
     <script src="assets/js/performance.js"></script>
     <script src="assets/js/search.js"></script>
+    <script>
+        // Listar posts do Supabase (substitui grid estático se houver posts publicados)
+        (function() {
+            document.addEventListener('DOMContentLoaded', async function() {
+                var grid = document.getElementById('posts-grid');
+                if (!grid) return;
+                var client = window.supabaseClient;
+                if (!client || !client.getPosts) return;
+                var result = await client.getPosts(20, 0);
+                if (!result.success || !result.data || result.data.length === 0) return;
+                var baseUrl = window.location.href.replace(/\/index\.html$/, '/').replace(/\/$/, '');
+                var html = result.data.map(function(p) {
+                    var titulo = p.titulo || p.title || 'Artigo';
+                    var resumo = p.resumo || p.excerpt || '';
+                    var img = p.imagem_destaque || p.image_url || 'assets/images/equilibrio-vida.jpg';
+                    var slug = p.slug || '';
+                    var url = baseUrl + '/post.html?post=' + encodeURIComponent(slug);
+                    return '<article class="post">' +
+                        '<img src="' + img + '" alt="" class="post-image" loading="lazy" onerror="this.src=\'assets/images/equilibrio-vida.jpg\'">' +
+                        '<h3>' + titulo.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>' +
+                        '<p>' + (resumo || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>' +
+                        '<a href="' + url + '" class="read-more">Leia mais...</a></article>';
+                }).join('');
+                grid.innerHTML = html;
+            });
+        })();
+    </script>
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">

@@ -197,14 +197,57 @@
     <!-- Rodapé -->
     <footer>
         <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">
+            <a href="feed.xml" style="color: var(--blue-light); text-decoration: none;">📡 RSS Feed</a> | 
+            <a href="sitemap.xml" style="color: var(--blue-light); text-decoration: none;">🗺️ Sitemap</a> |
+            <a href="admin-login.html" style="color: var(--blue-light); text-decoration: none; font-weight: 600;">🔐 Painel Admin</a>
+        </p>
     </footer>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        // Tentar carregar artigo do Supabase (slug = ?post=)
+        (function() {
+            if (typeof initSupabase === 'function') window.supabaseClient = initSupabase();
+            document.addEventListener('DOMContentLoaded', async function() {
+                var params = new URLSearchParams(window.location.search);
+                var slug = params.get('post');
+                if (!slug) return;
+                var client = window.supabaseClient;
+                if (!client || !client.getPostBySlug) return;
+                var result = await client.getPostBySlug(slug);
+                if (!result.success || !result.data) return;
+                var p = result.data;
+                window.postLoadedFromSupabase = true;
+                var titulo = p.titulo || p.title || 'Post';
+                var desc = p.resumo || p.excerpt || '';
+                var img = p.imagem_destaque || p.image_url || '';
+                var base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+                var url = base + 'post.html?post=' + encodeURIComponent(p.slug || slug);
+                document.title = titulo;
+                var ogTitle = document.getElementById('og-title'); if (ogTitle) ogTitle.content = titulo;
+                var ogDesc = document.getElementById('og-description'); if (ogDesc) ogDesc.content = desc;
+                var ogImg = document.getElementById('og-image'); if (ogImg) ogImg.content = img;
+                var ogUrl = document.getElementById('og-url'); if (ogUrl) ogUrl.content = url;
+                var twTitle = document.getElementById('twitter-title'); if (twTitle) twTitle.content = titulo;
+                var twDesc = document.getElementById('twitter-description'); if (twDesc) twDesc.content = desc;
+                var twImg = document.getElementById('twitter-image'); if (twImg) twImg.content = img;
+                var el = document.getElementById('post-content');
+                if (el) el.innerHTML = p.conteudo || p.content || '<p>Conteúdo indisponível.</p>';
+            });
+        })();
+    </script>
     <script src="assets/js/performance.js"></script>
     <script src="assets/js/script.js"></script>
     <script src="assets/js/comments.js"></script>
     <script>
-        // Informações dos artigos
+        // Informações dos artigos (fallback para posts estáticos .md)
         const articles = {
             "saude-mental": {
                 title: "Como Cuidar da Saúde Mental no Dia a Dia",
@@ -244,12 +287,10 @@
             }
         };
     
-        // Obtenha o parâmetro da URL
         const params = new URLSearchParams(window.location.search);
         const postKey = params.get("post");
-    
-        // Atualize os metadados com base no artigo
-        if (articles[postKey]) {
+        // Só aplicar meta do objeto articles se não foi carregado do Supabase
+        if (!window.postLoadedFromSupabase && articles[postKey]) {
             const article = articles[postKey];
             document.title = article.title;
             document.getElementById("og-title").content = article.title;
