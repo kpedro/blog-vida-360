@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Blog Vida 360º",
   "scripts": {
-    "generate-og-png": "node scripts/generate-og-png.js"
+    "generate-og-png": "node scripts/generate-og-png.js",
+    "build": "node scripts/copy-post-template.js"
   },
   "devDependencies": {
     "sharp": "^0.33.2"

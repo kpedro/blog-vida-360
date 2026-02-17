@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">___OG_TITLE___ - Vida 360º</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    
+    <!-- Open Graph Metatags Dinâmicos -->
+    <meta property="og:title" content="___OG_TITLE___" id="og-title">
+    <meta property="og:description" content="___OG_DESCRIPTION___" id="og-description">
+    <meta property="og:image" content="___OG_IMAGE___" id="og-image">
+    <meta property="og:image:width" content="1200" id="og-image-width">
+    <meta property="og:image:height" content="630" id="og-image-height">
+    <meta property="og:image:alt" content="___OG_IMAGE_ALT___" id="og-image-alt">
+    <meta property="og:url" content="___OG_URL___" id="og-url">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Vida 360º">
+    
+    <!-- Twitter Card Metatags Dinâmicos -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="___OG_TITLE___" id="twitter-title">
+    <meta name="twitter:description" content="___OG_DESCRIPTION___" id="twitter-description">
+    <meta name="twitter:image" content="___OG_IMAGE___" id="twitter-image">
+    <meta name="twitter:image:alt" content="___OG_IMAGE_ALT___" id="twitter-image-alt">
+    
+    <!-- Script inline para atualizar meta tags ANTES do carregamento completo (para redes sociais) -->
+    <script>
+        // Atualizar meta tags o mais rápido possível para redes sociais
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var slug = params.get('post');
+            if (!slug) return;
+            
+            // Tentar buscar dados do post via Supabase (se já estiver disponível)
+            if (window.VITE_SUPABASE_URL && window.VITE_SUPABASE_ANON_KEY && window.supabase) {
+                try {
+                    var client = window.supabase.createClient(
+                        window.VITE_SUPABASE_URL,
+                        window.VITE_SUPABASE_ANON_KEY
+                    );
+                    
+                    // Buscar post
+                    client.from('blog360_posts')
+                        .select('titulo, resumo, imagem_destaque, slug')
+                        .eq('slug', slug)
+                        .or('status.eq.published,publicado.eq.true')
+                        .maybeSingle()
+                        .then(function(result) {
+                            if (result.data && !result.error) {
+                                var p = result.data;
+                                var titulo = (p.titulo || 'Post').trim();
+                                var desc = (p.resumo || '').trim();
+                                if (desc.length > 200) desc = desc.substring(0, 197) + '...';
+                                if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
+                                
+                                var img = p.imagem_destaque || '';
+                                if (img && !img.startsWith('http://') && !img.startsWith('https://')) {
+                                    img = window.location.origin + (img.startsWith('/') ? '' : '/') + img;
+                                }
+                                if (!img) img = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
+                                
+                                var url = window.location.href;
+                                
+                                // Atualizar meta tags
+                                var ogTitle = document.getElementById('og-title');
+                                if (ogTitle) ogTitle.setAttribute('content', titulo);
+                                
+                                var ogDesc = document.getElementById('og-description');
+                                if (ogDesc) ogDesc.setAttribute('content', desc);
+                                
+                                var ogImg = document.getElementById('og-image');
+                                if (ogImg) ogImg.setAttribute('content', img);
+                                
+                                var ogUrl = document.getElementById('og-url');
+                                if (ogUrl) ogUrl.setAttribute('content', url);
+                                
+                                var twTitle = document.getElementById('twitter-title');
+                                if (twTitle) twTitle.setAttribute('content', titulo);
+                                
+                                var twDesc = document.getElementById('twitter-description');
+                                if (twDesc) twDesc.setAttribute('content', desc);
+                                
+                                var twImg = document.getElementById('twitter-image');
+                                if (twImg) twImg.setAttribute('content', img);
+                                
+                                document.title = titulo + ' - Vida 360º';
+                            }
+                        })
+                        .catch(function(err) {
+                            console.warn('Erro ao buscar meta tags:', err);
+                        });
+                } catch (e) {
+                    console.warn('Erro ao inicializar Supabase para meta tags:', e);
+                }
+            }
+        })();
+    </script>
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --blue-dark: #003366; /* Azul escuro */
+            --blue-primary: #0052cc; /* Azul primário */
+            --blue-secondary: #007bff; /* Azul médio */
+            --blue-light: #cce4f6; /* Azul claro */
+            --blue-background: #e6f7ff; /* Azul muito claro */
+            --text-color: #ffffff; /* Texto branco */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--blue-background);
+            color: var(--blue-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            padding: 25px 0;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-color); /* Garantir que seja branco */
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--blue-light);
+        }
+
+        main .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        #post-content {
+            background-color: var(--blue-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        /* Botões de Compartilhamento */
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 15px;
+            background: #F8F9FA;
+            border-radius: 8px;
+            border-top: 2px solid #E74C3C;
+        }
+        
+        .share-buttons h3 {
+            width: 100%;
+            margin: 0 0 10px 0;
+            color: var(--blue-primary);
+            font-size: 16px;
+        }
+        
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            color: white;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .share-btn.whatsapp { background: #25D366; }
+        .share-btn.whatsapp:hover { background: #20BA5A; }
+        
+        .share-btn.facebook { background: #1877F2; }
+        .share-btn.facebook:hover { background: #166FE5; }
+        
+        .share-btn.twitter { background: #1DA1F2; }
+        .share-btn.twitter:hover { background: #1A91DA; }
+        
+        .share-btn.linkedin { background: #0077B5; }
+        .share-btn.linkedin:hover { background: #006399; }
+        
+        .share-btn.copy-link { background: #6C757D; }
+        .share-btn.copy-link:hover { background: #5A6268; }
+        
+        .share-btn.telegram { background: #0088CC; }
+        .share-btn.telegram:hover { background: #0077B5; }
+
+        .comment-section {
+            background-color: var(--blue-light);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .comment-section h2 {
+            color: var(--blue-primary);
+        }
+
+        #comment-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        #comment-form input, #comment-form textarea {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid var(--blue-secondary);
+            border-radius: 5px;
+        }
+
+        #comment-form button {
+            background-color: var(--blue-secondary);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #comment-form button:hover {
+            background-color: var(--blue-primary);
+        }
+
+        #comments {
+            margin-top: 20px;
+        }
+
+        #comments h3 {
+            color: var(--blue-primary);
+        }
+
+        footer {
+            background-color: var(--blue-dark);
+            color: var(--text-color);
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <div class="container">
+            <div class="logo">Vida 360º</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="artigos.html">Artigos</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li><a href="politica.html">Política</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        <!-- Área do Post -->
+        <div id="post-content">
+            Carregando post...
+        </div>
+        
+        <!-- Botões de Compartilhamento -->
+        <div class="share-buttons" id="share-buttons" style="display: none;">
+            <h3>📤 Compartilhe este artigo:</h3>
+            <a href="#" class="share-btn whatsapp" onclick="shareWhatsApp(event)" title="Compartilhar no WhatsApp">
+                💬 WhatsApp
+            </a>
+            <a href="#" class="share-btn facebook" onclick="shareFacebook(event)" title="Compartilhar no Facebook">
+                📘 Facebook
+            </a>
+            <a href="#" class="share-btn twitter" onclick="shareTwitter(event)" title="Compartilhar no Twitter">
+                🐦 Twitter
+            </a>
+            <a href="#" class="share-btn linkedin" onclick="shareLinkedIn(event)" title="Compartilhar no LinkedIn">
+                💼 LinkedIn
+            </a>
+            <a href="#" class="share-btn telegram" onclick="shareTelegram(event)" title="Compartilhar no Telegram">
+                ✈️ Telegram
+            </a>
+            <button type="button" class="share-btn copy-link" onclick="copyLinkToClipboard(event)" title="Copiar link">
+                📋 Copiar Link
+            </button>
+        </div>
+
+        <!-- Seção de Comentários -->
+        <section class="comment-section">
+            <h2>Deixe seu comentário</h2>
+            <form id="comment-form">
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" placeholder="Digite seu nome" required>
+
+                <label for="comment">Comentário:</label>
+                <textarea id="comment" name="comment" rows="5" placeholder="Digite seu comentário" required></textarea>
+
+                <button type="submit">Enviar Comentário</button>
+            </form>
+
+            <!-- Lista de Comentários -->
+            <div id="comments">
+                <h3>Comentários:</h3>
+                <p>Ainda não há comentários. Seja o primeiro a comentar!</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">
+            <a href="feed.xml" style="color: var(--blue-light); text-decoration: none;">📡 RSS Feed</a> | 
+            <a href="sitemap.xml" style="color: var(--blue-light); text-decoration: none;">🗺️ Sitemap</a> |
+            <a href="admin-login.html" style="color: var(--blue-light); text-decoration: none; font-weight: 600;">🔐 Painel Admin</a>
+        </p>
+        <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.9;">Alguns artigos podem conter links de indicação. Ao utilizá-los, você apoia o blog sem custo adicional.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        // Tentar carregar artigo do Supabase (slug = ?post=)
+        (function() {
+            if (typeof initSupabase === 'function') window.supabaseClient = initSupabase();
+            document.addEventListener('DOMContentLoaded', async function() {
+                var params = new URLSearchParams(window.location.search);
+                var slug = params.get('post');
+                if (!slug) return;
+                var client = window.supabaseClient;
+                if (!client || !client.getPostBySlug) return;
+                var result = await client.getPostBySlug(slug);
+                if (!result.success || !result.data) return;
+                var p = result.data;
+                window.postLoadedFromSupabase = true;
+                var titulo = (p.titulo || p.title || 'Post').trim();
+                
+                // Preparar resumo (limitar a 200 caracteres para OG)
+                var descCompleto = (p.resumo || p.excerpt || '').trim();
+                var desc = descCompleto.length > 200 ? descCompleto.substring(0, 197) + '...' : descCompleto;
+                if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
+                
+                // Garantir URL absoluta para imagem
+                var img = p.imagem_destaque || p.image_url || '';
+                if (img) {
+                    // Se a imagem não começa com http/https, tornar absoluta
+                    if (!img.startsWith('http://') && !img.startsWith('https://')) {
+                        var baseUrl = window.location.origin;
+                        var basePath = window.location.pathname.replace(/\/[^/]*$/, '');
+                        if (!img.startsWith('/')) {
+                            img = baseUrl + basePath + '/' + img;
+                        } else {
+                            img = baseUrl + img;
+                        }
+                    }
+                } else {
+                    // Fallback para imagem padrão
+                    img = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
+                }
+                
+                var base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+                var url = base + 'post.html?post=' + encodeURIComponent(p.slug || slug);
+                
+                // Atualizar título da página
+                document.title = titulo + ' - Vida 360º';
+                
+                // Atualizar todas as meta tags Open Graph
+                var ogTitle = document.getElementById('og-title'); 
+                if (ogTitle) ogTitle.setAttribute('content', titulo);
+                
+                var ogDesc = document.getElementById('og-description'); 
+                if (ogDesc) ogDesc.setAttribute('content', desc);
+                
+                var ogImg = document.getElementById('og-image'); 
+                if (ogImg) ogImg.setAttribute('content', img);
+                
+                var ogImgAlt = document.getElementById('og-image-alt');
+                if (ogImgAlt) ogImgAlt.setAttribute('content', titulo);
+                
+                var ogUrl = document.getElementById('og-url'); 
+                if (ogUrl) ogUrl.setAttribute('content', url);
+                
+                // Atualizar Twitter Cards
+                var twTitle = document.getElementById('twitter-title'); 
+                if (twTitle) twTitle.setAttribute('content', titulo);
+                
+                var twDesc = document.getElementById('twitter-description'); 
+                if (twDesc) twDesc.setAttribute('content', desc);
+                
+                var twImg = document.getElementById('twitter-image'); 
+                if (twImg) twImg.setAttribute('content', img);
+                
+                var twImgAlt = document.getElementById('twitter-image-alt');
+                if (twImgAlt) twImgAlt.setAttribute('content', titulo);
+                
+                console.log('✅ Meta tags atualizadas:', {
+                    titulo: titulo,
+                    descricao: desc.substring(0, 50) + '...',
+                    imagem: img,
+                    url: url
+                });
+                var el = document.getElementById('post-content');
+                if (el) el.innerHTML = p.conteudo || p.content || '<p>Conteúdo indisponível.</p>';
+                
+                // Mostrar botões de compartilhamento
+                var shareButtons = document.getElementById('share-buttons');
+                if (shareButtons) {
+                    shareButtons.style.display = 'flex';
+                    // Atualizar URLs de compartilhamento
+                    window.currentPostUrl = url;
+                    window.currentPostTitle = titulo;
+                }
+            });
+        })();
+    </script>
+    <script>
+        // Funções de Compartilhamento
+        function getCurrentPostInfo() {
+            const title = window.currentPostTitle || document.title || 'Vida 360º';
+            const url = window.currentPostUrl || window.location.href;
+            const text = title + ' - ' + url;
+            return { title, url, text };
+        }
+        
+        function shareWhatsApp(e) {
+            e.preventDefault();
+            const { text, url } = getCurrentPostInfo();
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+            window.open(whatsappUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function shareFacebook(e) {
+            e.preventDefault();
+            const { url } = getCurrentPostInfo();
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function shareTwitter(e) {
+            e.preventDefault();
+            const { title, url } = getCurrentPostInfo();
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+            window.open(twitterUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function shareLinkedIn(e) {
+            e.preventDefault();
+            const { url } = getCurrentPostInfo();
+            const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            window.open(linkedinUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function shareTelegram(e) {
+            e.preventDefault();
+            const { text, url } = getCurrentPostInfo();
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            window.open(telegramUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function copyLinkToClipboard(e) {
+            e.preventDefault();
+            const { url } = getCurrentPostInfo();
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = e.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Link Copiado!';
+                btn.style.background = '#27AE60';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#6C757D';
+                }, 2000);
+            }).catch(() => {
+                // Fallback para navegadores antigos
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Link copiado: ' + url);
+            });
+        }
+        
+        // Mostrar botões de compartilhamento para posts estáticos também
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const shareButtons = document.getElementById('share-buttons');
+                const postContent = document.getElementById('post-content');
+                if (shareButtons && postContent && postContent.textContent.trim() !== 'Carregando post...') {
+                    shareButtons.style.display = 'flex';
+                    if (!window.currentPostUrl) {
+                        window.currentPostUrl = window.location.href;
+                        window.currentPostTitle = document.title;
+                    }
+                }
+            }, 1000);
+        });
+    </script>
+    <script src="assets/js/performance.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/comments.js"></script>
+    <script>
+        // Informações dos artigos (fallback para posts estáticos .md)
+        const articles = {
+            "saude-mental": {
+                title: "Como Cuidar da Saúde Mental no Dia a Dia",
+                description: "Descubra práticas simples para manter a saúde mental em equilíbrio.",
+                image: "https://kpedro.github.io/blog-vida-360/assets/images/saude-mental.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=saude-mental"
+            },
+            "produtividade": {
+                title: "5 Passos para Aumentar sua Produtividade",
+                description: "Aprenda a organizar sua rotina e ser mais eficiente no trabalho e na vida pessoal.",
+                image: "https://kpedro.github.io/blog-vida-360/assets/images/produtividade.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=produtividade"
+            },
+            "equilibrio-vida": {
+                title: "Encontrando o Equilíbrio entre Trabalho e Vida Pessoal",
+                description: "Saiba como conciliar suas responsabilidades sem perder o bem-estar.",
+                image: "https://kpedro.github.io/blog-vida-360/assets/images/equilibrio-vida.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=equilibrio-vida"
+            },
+            "mentalidade-empreendedora": {
+                title: "Mentalidade Empreendedora – Como Pensar como um Sucesso",
+                description: "Descubra como cultivar uma mentalidade voltada para o crescimento e transformar sua trajetória.",
+                image: "https://i.postimg.cc/xdshKNZK/mediensturmer-a-Wf7mjww-JJo-unsplash.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=mentalidade-empreendedora"
+            },
+            "marketing-relacionamento": {
+                title: "O Poder do Marketing de Relacionamento",
+                description: "Aprenda como construir relações sólidas que geram resultados duradouros no seu negócio.",
+                image: "https://i.postimg.cc/gJn54k91/new-data-services-UO-QYR28h-S0-unsplash.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=marketing-relacionamento"
+            },
+            "habitos-produtivos": {
+                title: "7 Hábitos de Pessoas Altamente Produtivas",
+                description: "Aprenda os hábitos que pessoas produtivas praticam diariamente para alcançar resultados extraordinários.",
+                image: "https://i.postimg.cc/NGCSyXXY/john-schnobrich-Fl-Pc9-Voc-J4-unsplash-1.jpg",
+                url: "https://kpedro.github.io/blog-vida-360/post.html?post=habitos-produtivos"
+            }
+        };
+    
+        const params = new URLSearchParams(window.location.search);
+        const postKey = params.get("post");
+        // Só aplicar meta do objeto articles se não foi carregado do Supabase
+        if (!window.postLoadedFromSupabase && articles[postKey]) {
+            const article = articles[postKey];
+            document.title = article.title;
+            document.getElementById("og-title").content = article.title;
+            document.getElementById("og-description").content = article.description;
+            document.getElementById("og-image").content = article.image;
+            document.getElementById("og-url").content = article.url;
+    
+            document.getElementById("twitter-title").content = article.title;
+            document.getElementById("twitter-description").content = article.description;
+            document.getElementById("twitter-image").content = article.image;
+        } else {
+            console.error("Artigo não encontrado");
+        }
+    </script>
+    
+</body>
+</html>
+
