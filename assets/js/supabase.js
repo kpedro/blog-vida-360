@@ -132,21 +132,54 @@ class SupabaseClient {
 
   /**
    * Buscar posts publicados (blog360_posts, status = 'published')
+   * ATENÇÃO: Esta função usa filtro .or() que pode não funcionar bem.
+   * A função client.getPosts() adicionada ao cliente raw é mais completa.
    */
   async getPosts(limit = 20, offset = 0, categoria = null) {
     try {
       if (!this.client) return { success: false, data: [], error: 'Cliente não disponível' };
+      
+      // Buscar todos os posts primeiro (sem filtro de status)
       let query = this.client
         .from('blog360_posts')
-        .select('id, titulo, slug, resumo, categoria, imagem_destaque, author, published_at')
-        .or('status.eq.published,publicado.eq.true')
-        .order('published_at', { ascending: false })
-        .range(offset, offset + limit - 1);
+        .select('id, titulo, slug, resumo, categoria, imagem_destaque, author, published_at, status, publicado, created_at')
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false, nullsFirst: false });
 
-      if (categoria) query = query.eq('categoria', categoria);
-      const { data, error } = await query;
+      const { data: allData, error } = await query;
       if (error) throw error;
-      return { success: true, data: data || [] };
+      
+      // Filtrar posts publicados manualmente
+      let filteredData = (allData || []).filter(function(post) {
+        // Considerar publicado se tem published_at OU status published OU publicado = true
+        if (post.status === 'published' || post.publicado === true || post.published_at) {
+          return true;
+        }
+        // Posts antigos sem status podem ser considerados publicados se têm created_at antigo
+        if (!post.status && !post.hasOwnProperty('publicado') && post.created_at) {
+          try {
+            var createdDate = new Date(post.created_at);
+            var now = new Date();
+            var daysDiff = (now - createdDate) / (1000 * 60 * 60 * 24);
+            return daysDiff > 1; // Mais de 1 dia = considerado publicado
+          } catch (e) {
+            return false;
+          }
+        }
+        return false;
+      });
+      
+      // Aplicar filtro de categoria
+      if (categoria) {
+        filteredData = filteredData.filter(function(post) {
+          return post.categoria === categoria;
+        });
+      }
+      
+      // Aplicar paginação
+      var paginatedData = filteredData.slice(offset, offset + limit);
+      
+      return { success: true, data: paginatedData };
     } catch (error) {
       console.error('Erro ao buscar posts:', error);
       return { success: false, data: [], error: error.message };
@@ -386,14 +419,32 @@ function initSupabase() {
         // Considerar publicado se:
         // 1. status === 'published'
         // 2. publicado === true
-        // 3. Se não tiver status nem publicado, considerar publicado se tiver published_at
+        // 3. Tem published_at (data de publicação) - mais importante
+        // 4. Se não tiver status explícito, considerar publicado se tiver published_at
         var isPublished = false;
         
+        // Se tem status 'published' ou publicado = true, está publicado
         if (post.status === 'published' || post.publicado === true) {
           isPublished = true;
-        } else if (!post.status && !post.hasOwnProperty('publicado') && post.published_at) {
-          // Se não tem campo status/publicado mas tem published_at, considerar publicado
+        } 
+        // Se tem published_at, considerar publicado (mesmo que status seja diferente)
+        else if (post.published_at) {
           isPublished = true;
+        }
+        // Se não tem status nem publicado definidos, mas tem created_at antigo, considerar publicado
+        // (posts antigos podem não ter campo de status)
+        else if (!post.status && !post.hasOwnProperty('publicado') && post.created_at) {
+          // Considerar publicado se foi criado há mais de 1 dia (posts antigos)
+          try {
+            var createdDate = new Date(post.created_at);
+            var now = new Date();
+            var daysDiff = (now - createdDate) / (1000 * 60 * 60 * 24);
+            if (daysDiff > 1) {
+              isPublished = true;
+            }
+          } catch (e) {
+            // Se não conseguir parsear data, não considerar publicado
+          }
         }
         
         return isPublished;
