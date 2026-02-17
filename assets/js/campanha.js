@@ -11,13 +11,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Verificar autenticação
 async function checkAuthentication() {
     const supabaseClient = window.supabaseClient;
-    if (!supabaseClient || !supabaseClient.client) {
+    if (!supabaseClient || !supabaseClient.auth) {
+        console.error('❌ Supabase não inicializado na campanha');
         window.location.href = 'admin-login.html';
         return;
     }
     
-    const { data: { session } } = await supabaseClient.client.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
+        console.warn('⚠️ Nenhuma sessão encontrada');
         window.location.href = 'admin-login.html';
     }
 }
@@ -228,10 +230,15 @@ function updateEmailPreview() {
 async function loadEstimatedStats() {
     try {
         const supabaseClient = window.supabaseClient;
+        if (!supabaseClient) {
+            console.error('❌ Supabase não disponível');
+            return;
+        }
+        
         const segment = document.getElementById('campaign-segment').value;
         
         // Buscar total de leads
-        let query = supabaseClient.client.from('blog360_leads').select('*', { count: 'exact', head: true });
+        let query = supabaseClient.from('blog360_leads').select('*', { count: 'exact', head: true });
         
         // Aplicar filtros baseado no segmento
         if (segment === 'active') {
@@ -285,29 +292,45 @@ function validateCampaign() {
 async function saveCampaign(status) {
     try {
         const supabaseClient = window.supabaseClient;
+        if (!supabaseClient) {
+            throw new Error('Supabase não inicializado');
+        }
         
+        const nome = document.getElementById('campaign-name').value.trim();
+        const assunto = document.getElementById('campaign-subject').value.trim();
+        const segmento = document.getElementById('campaign-segment').value;
+        const conteudoHtml = document.getElementById('email-editor').innerHTML;
+        
+        if (!nome || !assunto || !segmento) {
+            alert('Por favor, preencha todos os campos obrigatórios (Nome, Assunto e Segmento)');
+            return;
+        }
+        
+        const enviadoEm = status === 'sent' ? new Date().toISOString() : null;
         const campaignData = {
-            name: document.getElementById('campaign-name').value,
-            subject: document.getElementById('campaign-subject').value,
-            preheader: document.getElementById('campaign-preheader').value,
-            sender_name: document.getElementById('sender-name').value,
-            sender_email: document.getElementById('sender-email').value,
-            segment: document.getElementById('campaign-segment').value,
-            template: selectedTemplate,
-            content: document.getElementById('email-editor').innerHTML,
+            nome: nome || 'Campanha',
+            tipo: 'newsletter',
+            assunto: assunto || 'Assunto',
+            conteudo_html: conteudoHtml,
+            segmento: segmento || null,
             status: status,
-            sent_at: status === 'sent' ? new Date().toISOString() : null
+            enviado_em: enviadoEm,
+            name: nome,
+            subject: assunto,
+            content: conteudoHtml,
+            segment: segmento
         };
         
         let result;
         if (currentCampaignId) {
-            result = await supabaseClient.client
-                .from('blog360_campaigns')
+            result = await supabaseClient
+                .from('blog360_email_campaigns')
                 .update(campaignData)
-                .eq('id', currentCampaignId);
+                .eq('id', currentCampaignId)
+                .select();
         } else {
-            result = await supabaseClient.client
-                .from('blog360_campaigns')
+            result = await supabaseClient
+                .from('blog360_email_campaigns')
                 .insert([campaignData])
                 .select();
             
@@ -316,7 +339,10 @@ async function saveCampaign(status) {
             }
         }
         
-        if (result.error) throw result.error;
+        if (result.error) {
+            console.error('Erro do Supabase:', result.error);
+            throw result.error;
+        }
         
         if (status === 'sent') {
             alert('✅ Campanha enviada com sucesso!');
@@ -326,10 +352,12 @@ async function saveCampaign(status) {
             alert('💾 Rascunho salvo!');
         }
         
-        window.location.href = 'admin-dashboard.html';
+        setTimeout(() => {
+            window.location.href = 'admin-dashboard.html';
+        }, 1000);
     } catch (error) {
         console.error('Erro ao salvar campanha:', error);
-        alert('Erro ao salvar a campanha. Tente novamente.');
+        alert('Erro ao salvar a campanha: ' + (error.message || 'Erro desconhecido') + '. Verifique o console.');
     }
 }
 

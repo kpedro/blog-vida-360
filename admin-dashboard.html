@@ -417,7 +417,55 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/js/supabase.js"></script>
-    <script src="assets/js/admin.js"></script>
+    
+    <!-- Configuração do Supabase -->
+    <script>
+        // Definir variáveis do Supabase globalmente
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    
+    <script src="assets/js/supabase.js" onerror="console.error('❌ Erro ao carregar supabase.js'); alert('Erro ao carregar supabase.js. Verifique se o servidor está rodando e os arquivos existem.');"></script>
+    <script>
+        // Aguardar Supabase CDN carregar antes de inicializar
+        function initializeSupabase() {
+            // Verificar se Supabase CDN está carregado
+            if (typeof window.supabase === 'undefined') {
+                console.warn('⚠️ Aguardando Supabase CDN carregar...');
+                setTimeout(initializeSupabase, 100);
+                return;
+            }
+            
+            // Verificar se initSupabase está disponível
+            if (typeof initSupabase === 'function') {
+                window.supabaseClient = initSupabase();
+                if (window.supabaseClient) {
+                    console.log('✅ Supabase inicializado para admin dashboard');
+                } else {
+                    console.error('❌ Falha ao inicializar Supabase');
+                }
+            } else {
+                console.error('❌ Função initSupabase não encontrada');
+                console.log('Verificando se supabase.js foi carregado...');
+                // Tentar recarregar após 1 segundo
+                setTimeout(() => {
+                    if (typeof initSupabase === 'function') {
+                        initializeSupabase();
+                    } else {
+                        console.error('❌ supabase.js não foi carregado corretamente');
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Inicializar quando DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeSupabase);
+        } else {
+            initializeSupabase();
+        }
+    </script>
+    
+    <script src="assets/js/admin.js?v=20260217-3" onerror="console.error('❌ Erro ao carregar admin.js'); alert('Erro ao carregar admin.js. Verifique se o servidor está rodando e os arquivos existem.');"></script>
 </body>
 </html>

@@ -10,13 +10,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Verificar autenticação
 async function checkAuthentication() {
     const supabaseClient = window.supabaseClient;
-    if (!supabaseClient || !supabaseClient.client) {
+    if (!supabaseClient || !supabaseClient.auth) {
+        console.error('❌ Supabase não inicializado no editor');
         window.location.href = 'admin-login.html';
         return;
     }
     
-    const { data: { session } } = await supabaseClient.client.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
+        console.warn('⚠️ Nenhuma sessão encontrada');
         window.location.href = 'admin-login.html';
     }
 }
@@ -72,11 +74,12 @@ function loadPostIfEditing() {
     }
 }
 
-// Carregar post existente
+// Carregar post existente (colunas do Supabase: titulo, resumo, categoria, autor, tags, imagem_destaque, conteudo)
 async function loadPost(postId) {
     try {
         const supabaseClient = window.supabaseClient;
-        const { data, error } = await supabaseClient.client
+        if (!supabaseClient) throw new Error('Supabase não inicializado');
+        const { data, error } = await supabaseClient
             .from('blog360_posts')
             .select('*')
             .eq('id', postId)
@@ -84,14 +87,14 @@ async function loadPost(postId) {
         
         if (error) throw error;
         
-        // Preencher formulário
-        document.getElementById('post-title').value = data.title || '';
-        document.getElementById('post-category').value = data.category || '';
-        document.getElementById('post-author').value = data.author || '';
-        document.getElementById('post-excerpt').value = data.excerpt || '';
-        document.getElementById('post-tags').value = data.tags || '';
-        document.getElementById('image-url').value = data.image_url || '';
-        document.getElementById('editor-content').innerHTML = data.content || '';
+        // Preencher formulário (suporta nomes em PT e EN para compatibilidade)
+        document.getElementById('post-title').value = data.titulo || data.title || '';
+        document.getElementById('post-category').value = data.categoria || data.category || '';
+        document.getElementById('post-author').value = data.autor || data.author || '';
+        document.getElementById('post-excerpt').value = data.resumo || data.excerpt || '';
+        document.getElementById('post-tags').value = Array.isArray(data.tags) ? data.tags.join(', ') : (data.tags || '');
+        document.getElementById('image-url').value = data.imagem_destaque || data.image_url || '';
+        document.getElementById('editor-content').innerHTML = data.conteudo || data.content || '';
         
         updatePreview();
         calculateSEOScore();
@@ -228,66 +231,78 @@ function validatePost() {
     return title && category && excerpt && content.length > 100;
 }
 
-// Salvar post
+// Salvar post (colunas existentes no Supabase: titulo, slug, conteudo_markdown, resumo, categoria, tags, imagem_destaque, publicado, status, published_at, content, author)
 async function savePost(status) {
     try {
         const supabaseClient = window.supabaseClient;
+        if (!supabaseClient) {
+            throw new Error('Supabase não inicializado');
+        }
         
-        const title = document.getElementById('post-title').value;
+        const title = document.getElementById('post-title').value.trim();
         const category = document.getElementById('post-category').value;
-        const author = document.getElementById('post-author').value;
-        const excerpt = document.getElementById('post-excerpt').value;
-        const tags = document.getElementById('post-tags').value;
-        const imageUrl = document.getElementById('image-url').value;
-        const content = document.getElementById('editor-content').innerHTML;
+        const authorVal = document.getElementById('post-author').value.trim();
+        const excerpt = document.getElementById('post-excerpt').value.trim();
+        const tagsStr = document.getElementById('post-tags').value.trim();
+        const imageUrl = document.getElementById('image-url').value.trim();
+        const contentHtml = document.getElementById('editor-content').innerHTML;
         
-        // Gerar slug
+        if (!title || !category || !excerpt) {
+            alert('Por favor, preencha todos os campos obrigatórios (Título, Categoria e Resumo)');
+            return;
+        }
+        
         const slug = title.toLowerCase()
             .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
             .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
+            .replace(/^-+|-+$/g, '') || 'artigo';
+        
+        const tagsArray = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+        const publishedAt = status === 'published' ? new Date().toISOString() : null;
         
         const postData = {
-            title,
+            titulo: title,
             slug,
-            category,
-            author,
-            excerpt,
-            tags,
-            image_url: imageUrl,
-            content,
-            status,
-            published_at: status === 'published' ? new Date().toISOString() : null
+            conteudo_markdown: contentHtml || '', // NOT NULL no Supabase
+            resumo: excerpt || null,
+            categoria: category || null,
+            tags: tagsArray,
+            imagem_destaque: imageUrl || null,
+            publicado: status === 'published',
+            status: status,
+            published_at: publishedAt,
+            content: contentHtml,
+            author: authorVal || null
         };
         
         let result;
         if (currentPostId) {
-            // Atualizar post existente
-            result = await supabaseClient.client
+            result = await supabaseClient
                 .from('blog360_posts')
                 .update(postData)
-                .eq('id', currentPostId);
+                .eq('id', currentPostId)
+                .select();
         } else {
-            // Criar novo post
-            result = await supabaseClient.client
+            result = await supabaseClient
                 .from('blog360_posts')
                 .insert([postData])
                 .select();
-            
-            if (result.data && result.data[0]) {
-                currentPostId = result.data[0].id;
-            }
+            if (result.data && result.data[0]) currentPostId = result.data[0].id;
         }
         
-        if (result.error) throw result.error;
+        if (result.error) {
+            console.error('Erro do Supabase:', result.error);
+            throw result.error;
+        }
         
         alert(status === 'published' ? '✅ Artigo publicado com sucesso!' : '💾 Rascunho salvo!');
-        
         if (status === 'published') {
-            window.location.href = 'admin-dashboard.html';
+            setTimeout(() => {
+                window.location.href = 'admin-dashboard.html';
+            }, 1000);
         }
     } catch (error) {
         console.error('Erro ao salvar post:', error);
-        alert('Erro ao salvar o artigo. Tente novamente.');
+        alert('Erro ao salvar o artigo: ' + (error.message || 'Erro desconhecido') + '. Verifique o console.');
     }
 }

@@ -21,10 +21,13 @@ class SupabaseClient {
     // Se usando via CDN, window.supabase já existe
     if (window.supabase) {
       this.client = window.supabase.createClient(this.supabaseUrl, this.supabaseKey);
+      this.auth = this.client.auth;
+      this.from = (...args) => this.client ? this.client.from(...args) : null;
       console.log('✅ Supabase Client criado com sucesso');
     } else {
       console.warn('⚠️ Supabase JS não carregado. Adicione o script no HTML.');
       this.client = null;
+      this.from = () => null;
     }
   }
 
@@ -128,48 +131,45 @@ class SupabaseClient {
   // ============================================
 
   /**
-   * Buscar posts publicados
+   * Buscar posts publicados (blog360_posts, status = 'published')
    */
-  async getPosts(limit = 10, offset = 0, categoria = null) {
+  async getPosts(limit = 20, offset = 0, categoria = null) {
     try {
+      if (!this.client) return { success: false, data: [], error: 'Cliente não disponível' };
       let query = this.client
-        .from('posts')
-        .select('*')
-        .eq('publicado', true)
+        .from('blog360_posts')
+        .select('id, titulo, slug, resumo, categoria, imagem_destaque, author, published_at')
+        .or('status.eq.published,publicado.eq.true')
         .order('published_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
-      if (categoria) {
-        query = query.eq('categoria', categoria);
-      }
-
+      if (categoria) query = query.eq('categoria', categoria);
       const { data, error } = await query;
-
       if (error) throw error;
-      return { success: true, data };
+      return { success: true, data: data || [] };
     } catch (error) {
       console.error('Erro ao buscar posts:', error);
-      return { success: false, error: error.message };
+      return { success: false, data: [], error: error.message };
     }
   }
 
   /**
-   * Buscar post por slug
+   * Buscar post por slug (status = 'published')
    */
   async getPostBySlug(slug) {
     try {
+      if (!this.client) return { success: false, data: null, error: 'Cliente não disponível' };
       const { data, error } = await this.client
         .from('blog360_posts')
         .select('*')
         .eq('slug', slug)
-        .eq('publicado', true)
-        .single();
-
+        .or('status.eq.published,publicado.eq.true')
+        .maybeSingle();
       if (error) throw error;
       return { success: true, data };
     } catch (error) {
       console.error('Erro ao buscar post:', error);
-      return { success: false, error: error.message };
+      return { success: false, data: null, error: error.message };
     }
   }
 
@@ -334,16 +334,36 @@ class SupabaseClient {
 let supabaseClient = null;
 
 function initSupabase() {
-  if (!supabaseClient) {
-    supabaseClient = new SupabaseClient();
+  // Se já existe, retornar
+  if (supabaseClient) {
+    return supabaseClient;
   }
+  
+  // Verificar se Supabase JS está carregado
+  if (!window.supabase) {
+    console.error('❌ Supabase JS não está carregado. Certifique-se de incluir o script do CDN.');
+    return null;
+  }
+  
+  // Obter credenciais
+  const supabaseUrl = window.VITE_SUPABASE_URL;
+  const supabaseKey = window.VITE_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('❌ Credenciais do Supabase não configuradas');
+    return null;
+  }
+  
+  // Criar cliente do Supabase diretamente
+  supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+  console.log('✅ Cliente Supabase criado diretamente');
+  
   return supabaseClient;
 }
 
 // Auto-inicializar se Supabase estiver disponível
 if (typeof window !== 'undefined') {
   window.initSupabase = initSupabase;
-  window.supabaseClient = supabaseClient;
 }
 
 // Para uso em módulos ES6

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Artigo - Blog Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F5F7FA; color: #2C3E50; min-height: 100vh; }
+        
+        .editor-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .editor-header h1 { font-size: 20px; }
+        .editor-header a { color: #ECF0F1; text-decoration: none; font-weight: 600; }
+        .editor-header a:hover { color: white; }
+        
+        .editor-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; }
+        @media (max-width: 900px) { .form-grid { grid-template-columns: 1fr; } }
+        
+        .main-form { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 1.5rem; }
+        .sidebar { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 1.5rem; height: fit-content; position: sticky; top: 1rem; }
+        
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; color: #2C3E50; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #E74C3C; }
+        
+        .char-count { font-size: 12px; color: #7F8C8D; margin-top: 4px; }
+        
+        /* Toolbar editor */
+        .editor-toolbar { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 0; border-bottom: 1px solid #ECF0F1; margin-bottom: 12px; }
+        .editor-toolbar button { padding: 8px 12px; border: 1px solid #E0E0E0; background: #FAFAFA; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .editor-toolbar button:hover { background: #ECF0F1; }
+        .editor-toolbar button.active { background: #E74C3C; color: white; border-color: #E74C3C; }
+        
+        #editor-content {
+            min-height: 320px; padding: 1rem; border: 1px solid #E0E0E0; border-radius: 6px; background: #FAFAFA;
+            font-size: 15px; line-height: 1.6; overflow-y: auto;
+        }
+        #editor-content:focus { outline: none; border-color: #E74C3C; background: white; }
+        
+        .btn-actions { display: flex; gap: 12px; margin-top: 1.5rem; flex-wrap: wrap; }
+        .btn-primary { background: #E74C3C; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px; }
+        .btn-primary:hover { background: #C0392B; }
+        .btn-secondary { background: #95A5A6; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px; }
+        .btn-secondary:hover { background: #7F8C8D; }
+        .btn-link { background: none; color: #3498DB; border: none; padding: 12px 0; font-weight: 600; cursor: pointer; text-decoration: underline; }
+        
+        /* Preview card */
+        .preview-card { background: #F8F9FA; border: 1px solid #E0E0E0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .preview-card h3 { font-size: 12px; text-transform: uppercase; color: #7F8C8D; margin-bottom: 8px; }
+        #preview-title { font-size: 18px; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+        #preview-description { font-size: 14px; color: #5D6D7E; margin-bottom: 4px; }
+        #preview-slug { font-size: 12px; color: #3498DB; }
+        
+        /* SEO Score */
+        .seo-score-wrap { text-align: center; padding: 1rem; }
+        .score-circle { width: 64px; height: 64px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto 8px; }
+        .score-circle.score-good { background: #D5F4E6; color: #27AE60; }
+        .score-circle.score-medium { background: #FFF3CD; color: #F39C12; }
+        .score-circle.score-bad { background: #FADBD8; color: #E74C3C; }
+        .seo-score-wrap p { font-size: 12px; color: #7F8C8D; }
+        
+        #image-preview { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 8px; display: none; }
+    </style>
+</head>
+<body>
+    <header class="editor-header">
+        <h1>✏️ Editor de Artigo</h1>
+        <a href="admin-dashboard.html">← Voltar ao painel</a>
+    </header>
+
+    <div class="editor-container">
+        <form id="editor-form" class="form-grid" onsubmit="return false;">
+            <div class="main-form">
+                <div class="form-group">
+                    <label for="post-title">Título do artigo *</label>
+                    <input type="text" id="post-title" name="title" placeholder="Ex: Como Cuidar da Saúde Mental no Dia a Dia" required maxlength="120">
+                    <div class="char-count"><span id="title-count">0</span>/120 caracteres</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-excerpt">Resumo / descrição (SEO) *</label>
+                    <textarea id="post-excerpt" name="excerpt" rows="3" placeholder="Breve descrição do artigo para buscas e redes sociais (120–160 caracteres)." maxlength="200"></textarea>
+                    <div class="char-count"><span id="excerpt-count">0</span>/200 caracteres</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Conteúdo *</label>
+                    <div class="editor-toolbar">
+                        <button type="button" onclick="formatText('bold')" title="Negrito">B</button>
+                        <button type="button" onclick="formatText('italic')" title="Itálico">I</button>
+                        <button type="button" onclick="formatText('underline')" title="Sublinhado">S</button>
+                        <button type="button" onclick="insertHeading('h2')" title="Título 2">H2</button>
+                        <button type="button" onclick="insertHeading('h3')" title="Título 3">H3</button>
+                        <button type="button" onclick="insertLink()" title="Inserir link">🔗</button>
+                        <button type="button" onclick="insertImage()" title="Inserir imagem por URL">🖼️</button>
+                        <label style="cursor:pointer; padding:8px 12px; border:1px solid #E0E0E0; border-radius:4px; background:#FAFAFA; font-size:14px;">📤 Upload <input type="file" accept="image/*" onchange="handleImageUpload(event)" style="display:none;"></label>
+                    </div>
+                    <div id="editor-content" contenteditable="true" data-placeholder="Escreva o conteúdo do artigo aqui..."></div>
+                    <div class="char-count"><span id="content-count">0</span> palavras</div>
+                </div>
+                
+                <div class="btn-actions">
+                    <button type="button" class="btn-secondary" onclick="saveDraft()">💾 Salvar rascunho</button>
+                    <button type="button" class="btn-primary" onclick="publishPost()">🚀 Publicar</button>
+                    <a href="admin-dashboard.html" class="btn-link">Cancelar</a>
+                </div>
+            </div>
+            
+            <aside class="sidebar">
+                <div class="form-group">
+                    <label for="post-category">Categoria *</label>
+                    <select id="post-category" name="category" required>
+                        <option value="saude-mental">Saúde Mental</option>
+                        <option value="produtividade">Produtividade</option>
+                        <option value="equilibrio">Equilíbrio</option>
+                        <option value="mentalidade">Mentalidade</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="artigo">Artigo geral</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="post-author">Autor</label>
+                    <input type="text" id="post-author" name="author" placeholder="Ex: Kadson Pedro" value="Kadson Pedro">
+                </div>
+                <div class="form-group">
+                    <label for="post-tags">Tags (separadas por vírgula)</label>
+                    <input type="text" id="post-tags" name="tags" placeholder="bem-estar, produtividade, hábitos">
+                </div>
+                <div class="form-group">
+                    <label for="image-url">URL da imagem de destaque</label>
+                    <input type="url" id="image-url" name="image_url" placeholder="https://...">
+                    <img id="image-preview" alt="Preview" src="">
+                </div>
+                
+                <div class="preview-card">
+                    <h3>Preview (como aparece no blog)</h3>
+                    <div id="preview-title">Título do seu artigo</div>
+                    <div id="preview-description">Descrição do artigo aparecerá aqui...</div>
+                    <div id="preview-slug">slug-do-artigo</div>
+                </div>
+                
+                <div class="seo-score-wrap">
+                    <div id="seo-score" class="score-circle score-bad">0</div>
+                    <p>Pontuação SEO</p>
+                </div>
+            </aside>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        // Aguardar Supabase CDN carregar antes de inicializar
+        function initializeSupabaseEditor() {
+            if (typeof window.supabase === 'undefined') {
+                console.warn('⚠️ Aguardando Supabase CDN carregar...');
+                setTimeout(initializeSupabaseEditor, 100);
+                return;
+            }
+            
+            if (typeof initSupabase === 'function') {
+                window.supabaseClient = initSupabase();
+                if (window.supabaseClient) {
+                    console.log('✅ Supabase inicializado para editor');
+                } else {
+                    console.error('❌ Falha ao inicializar Supabase no editor');
+                }
+            } else {
+                console.error('❌ Função initSupabase não encontrada');
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeSupabaseEditor);
+        } else {
+            initializeSupabaseEditor();
+        }
+    </script>
+    <script src="assets/js/editor-artigo.js"></script>
+</body>
+</html>

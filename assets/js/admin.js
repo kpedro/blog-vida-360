@@ -1,8 +1,30 @@
-// Admin Dashboard JavaScript
-const supabase = window.supabaseClient;
+// Admin Dashboard JavaScript (usa window.supabaseClient após DOMContentLoaded)
+// Updated: 2026-02-17 - Removida declaração duplicada de supabaseClient
+// Usar apenas window.supabaseClient para evitar conflito com supabase.js
 
 // Verificar autenticação ao carregar
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('📦 Dashboard carregado. Verificando Supabase...');
+    
+    // Aguardar um pouco para garantir que os scripts foram carregados
+    if (!window.supabaseClient) {
+        console.warn('⚠️ Supabase client não encontrado. Aguardando...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Usar window.supabaseClient diretamente (sem criar variável local)
+    const supabaseClient = window.supabaseClient;
+    
+    if (!supabaseClient) {
+        console.error('❌ Supabase não inicializado após espera');
+        console.log('window.supabaseClient:', window.supabaseClient);
+        console.log('window.VITE_SUPABASE_URL:', window.VITE_SUPABASE_URL);
+        console.log('window.VITE_SUPABASE_ANON_KEY:', window.VITE_SUPABASE_ANON_KEY ? 'Definida' : 'Não definida');
+        window.location.href = 'admin-login.html';
+        return;
+    }
+    
+    console.log('✅ Supabase client encontrado');
     await checkAuthentication();
     await loadUserInfo();
     initTabs();
@@ -10,32 +32,103 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Verificar se está autenticado
+function getLoginUrl() {
+    return window.location.origin + window.location.pathname.replace('admin-dashboard.html', 'admin-login.html') + '?reason=session';
+}
+
 async function checkAuthentication() {
-    if (!supabase) {
-        console.error('Supabase não inicializado');
-        window.location.href = 'admin-login.html';
+    console.log('🔍 Verificando autenticação...');
+    
+    const client = window.supabaseClient;
+    if (!client || !client.auth) {
+        console.error('❌ Supabase não inicializado');
+        window.location.replace(getLoginUrl());
+        return;
+    }
+
+    // Primeiro tentar getSession() (mais rápido, usa cache)
+        const { data: { session } } = await client.auth.getSession();
+    console.log('📋 Sessão encontrada (getSession):', session ? 'Sim' : 'Não');
+    
+    if (session) {
+        console.log('✅ Usuário autenticado:', session.user.email);
+        return; // Sessão válida, pode continuar
+    }
+
+    // Se não encontrou sessão, tentar getUser() (faz requisição ao servidor)
+    console.log('🔄 Sessão não encontrada no cache. Verificando com servidor...');
+    const { data: { user }, error } = await client.auth.getUser();
+    
+    if (error) {
+        console.error('❌ Erro ao verificar sessão:', error);
+        window.location.replace(getLoginUrl());
         return;
     }
     
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-        window.location.href = 'admin-login.html';
+    if (!user) {
+        console.warn('⚠️ Nenhum usuário autenticado encontrado');
+        window.location.replace(getLoginUrl());
+        return;
     }
+    
+    console.log('✅ Usuário autenticado (getUser):', user.email);
 }
 
 // Carregar informações do usuário
 async function loadUserInfo() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (user) {
-        document.getElementById('user-email').textContent = user.email;
+    try {
+        const userEmailElement = document.getElementById('user-email');
+        if (!userEmailElement) {
+            console.warn('⚠️ Elemento user-email não encontrado');
+            return;
+        }
+
+        // Usar window.supabaseClient diretamente
+        const client = window.supabaseClient;
+        if (!client || !client.auth) {
+            console.error('❌ Supabase client não disponível em loadUserInfo');
+            userEmailElement.textContent = 'Erro ao conectar';
+            return;
+        }
+
+        console.log('🔍 Carregando informações do usuário...');
+        const { data: { user }, error } = await client.auth.getUser();
+        
+        if (error) {
+            console.error('❌ Erro ao carregar informações do usuário:', error);
+            userEmailElement.textContent = 'Erro ao carregar';
+            return;
+        }
+        
+        if (user && user.email) {
+            userEmailElement.textContent = user.email;
+            console.log('✅ Email do usuário carregado:', user.email);
+        } else {
+            // Tentar pegar da sessão como fallback
+            const { data: { session } } = await client.auth.getSession();
+            if (session && session.user && session.user.email) {
+                userEmailElement.textContent = session.user.email;
+                console.log('✅ Email do usuário carregado da sessão:', session.user.email);
+            } else {
+                userEmailElement.textContent = 'Usuário não encontrado';
+                console.warn('⚠️ Usuário não encontrado');
+            }
+        }
+    } catch (err) {
+        console.error('❌ Erro em loadUserInfo:', err);
+        const userEmailElement = document.getElementById('user-email');
+        if (userEmailElement) {
+            userEmailElement.textContent = 'Erro ao carregar';
+        }
     }
 }
 
 // Logout
 async function logout() {
-    await supabase.auth.signOut();
+    const client = window.supabaseClient;
+    if (client && client.auth) {
+        await client.auth.signOut();
+    }
     window.location.href = 'admin-login.html';
 }
 
@@ -89,31 +182,45 @@ async function loadDashboardData() {
 // Carregar estatísticas
 async function loadStats() {
     try {
-        // Total de leads
-        const { count: totalLeads } = await supabase
+        const client = window.supabaseClient;
+        if (!client) {
+            console.error('❌ Supabase client não disponível');
+            return;
+        }
+        
+        const { count: totalLeads } = await client
             .from('blog360_leads')
             .select('*', { count: 'exact', head: true });
-        
-        document.getElementById('stat-total-leads').textContent = totalLeads || 0;
-        
-        // Total de posts (simulado - ajustar quando tiver tabela)
-        document.getElementById('stat-total-posts').textContent = '5';
-        
-        // Total de campanhas (simulado)
-        document.getElementById('stat-total-campaigns').textContent = '0';
-        
-        // Taxa de abertura (simulado)
-        document.getElementById('stat-open-rate').textContent = '0';
-        
+        document.getElementById('stat-total-leads').textContent = totalLeads ?? 0;
+
+        const { count: totalPosts } = await client
+            .from('blog360_posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'published');
+        document.getElementById('stat-total-posts').textContent = totalPosts ?? 0;
+
+        const { count: totalCampaigns } = await client
+            .from('blog360_email_campaigns')
+            .select('*', { count: 'exact', head: true })
+            .not('enviado_em', 'is', null);
+        document.getElementById('stat-total-campaigns').textContent = totalCampaigns ?? 0;
+        document.getElementById('stat-open-rate').textContent = '0%';
     } catch (error) {
         console.error('Erro ao carregar stats:', error);
+        document.getElementById('stat-total-posts').textContent = '0';
     }
 }
 
 // Carregar últimos inscritos
 async function loadRecentLeads() {
     try {
-        const { data: leads, error } = await supabase
+        const client = window.supabaseClient;
+        if (!client) {
+            console.error('❌ Supabase client não disponível');
+            return;
+        }
+        
+        const { data: leads, error } = await client
             .from('blog360_leads')
             .select('*')
             .order('created_at', { ascending: false })
@@ -147,7 +254,13 @@ async function loadRecentLeads() {
 // Carregar todos os inscritos
 async function loadAllLeads() {
     try {
-        const { data: leads, error } = await supabase
+        const client = window.supabaseClient;
+        if (!client) {
+            console.error('❌ Supabase client não disponível');
+            return;
+        }
+        
+        const { data: leads, error } = await client
             .from('blog360_leads')
             .select('*')
             .order('created_at', { ascending: false });
@@ -176,88 +289,135 @@ async function loadAllLeads() {
     }
 }
 
-// Carregar todas as postagens
+// Carregar todas as postagens (Supabase blog360_posts)
 async function loadAllPosts() {
     const tbody = document.getElementById('all-posts');
-    
-    // Dados simulados (substituir por dados reais do Supabase)
-    const posts = [
-        {
-            title: 'Como Cuidar da Saúde Mental no Dia a Dia',
-            category: 'Saúde Mental',
-            status: 'published',
-            date: '2025-01-10'
-        },
-        {
-            title: '7 Hábitos de Pessoas Altamente Produtivas',
-            category: 'Produtividade',
-            status: 'published',
-            date: '2025-01-08'
-        },
-        {
-            title: 'Encontrando o Equilíbrio entre Trabalho e Vida Pessoal',
-            category: 'Equilíbrio na Vida',
-            status: 'published',
-            date: '2025-01-05'
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            console.error('❌ Supabase client não disponível');
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Erro ao conectar ao Supabase</td></tr>';
+            return;
         }
-    ];
-    
-    if (posts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhuma postagem ainda</td></tr>';
-        return;
+        
+        const { data: posts, error } = await client
+            .from('blog360_posts')
+            .select('id, titulo, categoria, status, published_at, created_at')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (!posts || posts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhuma postagem ainda. <a href="admin-editor-artigo.html">Criar primeiro artigo</a></td></tr>';
+            return;
+        }
+        tbody.innerHTML = posts.map(post => {
+            const titulo = post.titulo || post.title || 'Sem título';
+            const categoria = post.categoria || post.category || '-';
+            const status = post.status || 'draft';
+            const dataExibir = post.published_at || post.created_at;
+            return `<tr>
+                <td><strong>${escapeHtml(titulo)}</strong></td>
+                <td>${escapeHtml(categoria)}</td>
+                <td><span class="badge ${status === 'published' ? 'published' : 'draft'}">${status === 'published' ? 'Publicado' : 'Rascunho'}</span></td>
+                <td>${formatDate(dataExibir)}</td>
+                <td class="action-buttons">
+                    <a href="admin-editor-artigo.html?id=${post.id}" class="btn-icon" title="Editar">✏️</a>
+                    <button type="button" class="btn-icon" title="Excluir" data-id="${post.id}" data-titulo="${escapeHtml(titulo).replace(/"/g, '&quot;')}" onclick="deletePost(this)">🗑️</button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao carregar postagens:', error);
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Erro ao carregar. Verifique a tabela blog360_posts no Supabase.</td></tr>';
     }
-    
-    tbody.innerHTML = posts.map(post => `
-        <tr>
-            <td><strong>${post.title}</strong></td>
-            <td>${post.category}</td>
-            <td><span class="badge ${post.status === 'published' ? 'published' : 'draft'}">${post.status === 'published' ? 'Publicado' : 'Rascunho'}</span></td>
-            <td>${formatDate(post.date)}</td>
-            <td class="action-buttons">
-                <button class="btn-icon" title="Editar">✏️</button>
-                <button class="btn-icon" title="Excluir">🗑️</button>
-            </td>
-        </tr>
-    `).join('');
 }
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+async function deletePost(btn) {
+    const id = btn && btn.dataset && btn.dataset.id;
+    const titulo = (btn && btn.dataset && btn.dataset.titulo) ? btn.dataset.titulo : 'este artigo';
+    if (!id) return;
+    const msgConfirm = 'Excluir o artigo "' + titulo + '"? Esta acao nao pode ser desfeita.';
+    if (!confirm(msgConfirm)) return;
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            alert('Erro: Supabase não disponível');
+            return;
+        }
+        const { error } = await client.from('blog360_posts').delete().eq('id', id);
+        if (error) throw error;
+        alert('Artigo excluido.');
+        loadAllPosts();
+        loadStats();
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao excluir. Tente novamente.');
+    }
+}
+window.deletePost = deletePost;
 
 // Carregar todas as campanhas
 async function loadAllCampaigns() {
     const tbody = document.getElementById('all-campaigns');
-    
-    // Dados simulados
-    const campaigns = [];
-    
-    if (campaigns.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="empty-state">
-                    <div style="padding: 2rem;">
-                        <p style="font-size: 18px; margin-bottom: 10px;">📧 Nenhuma campanha criada ainda</p>
-                        <p style="color: #7F8C8D;">Crie sua primeira campanha de email marketing!</p>
-                    </div>
-                </td>
-            </tr>
-        `;
-        return;
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            console.error('❌ Supabase client não disponível');
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Erro ao conectar ao Supabase</td></tr>';
+            return;
+        }
+        
+        const { data: campaigns, error } = await client
+            .from('blog360_email_campaigns')
+            .select('id, nome, name, assunto, subject, status, enviado_em, created_at')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (!campaigns || campaigns.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <div style="padding: 2rem;">
+                            <p style="font-size: 18px; margin-bottom: 10px;">📧 Nenhuma campanha criada ainda</p>
+                            <p style="color: #7F8C8D;">Crie sua primeira campanha em <a href="admin-nova-campanha.html">Nova Campanha</a>.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        tbody.innerHTML = campaigns.map(c => {
+            const nome = c.nome || c.name || 'Sem nome';
+            const assunto = c.assunto || c.subject || '-';
+            const dataExibir = c.enviado_em || c.created_at;
+            const enviada = !!c.enviado_em;
+            return `<tr>
+                <td><strong>${escapeHtml(nome)}</strong></td>
+                <td>${escapeHtml(assunto)}</td>
+                <td>${c.enviados ?? '-'}</td>
+                <td>${c.abertos ?? '-'}</td>
+                <td>${formatDate(dataExibir)}</td>
+                <td><span class="badge ${enviada ? 'published' : 'draft'}">${enviada ? 'Enviado' : 'Rascunho'}</span></td>
+            </tr>`;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao carregar campanhas:', error);
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Erro ao carregar. Verifique a tabela blog360_email_campaigns no Supabase.</td></tr>';
     }
-    
-    tbody.innerHTML = campaigns.map(campaign => `
-        <tr>
-            <td><strong>${campaign.name}</strong></td>
-            <td>${campaign.subject}</td>
-            <td>${campaign.sent || 0}</td>
-            <td>${campaign.opens || 0} (${campaign.openRate || 0}%)</td>
-            <td>${formatDate(campaign.date)}</td>
-            <td><span class="badge ${campaign.status === 'sent' ? 'published' : 'draft'}">${campaign.status === 'sent' ? 'Enviado' : 'Rascunho'}</span></td>
-        </tr>
-    `).join('');
 }
 
 // Exportar leads para CSV
 async function exportLeads() {
     try {
-        const { data: leads, error } = await supabase
+        const client = window.supabaseClient;
+        if (!client) {
+            alert('Erro: Supabase não disponível');
+            return;
+        }
+        
+        const { data: leads, error } = await client
             .from('blog360_leads')
             .select('*')
             .order('created_at', { ascending: false });

@@ -367,7 +367,38 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
     <script src="assets/js/supabase.js"></script>
+    <script>
+        // Aguardar Supabase CDN carregar antes de inicializar
+        function initializeSupabaseCampaign() {
+            if (typeof window.supabase === 'undefined') {
+                console.warn('⚠️ Aguardando Supabase CDN carregar...');
+                setTimeout(initializeSupabaseCampaign, 100);
+                return;
+            }
+            
+            if (typeof initSupabase === 'function') {
+                window.supabaseClient = initSupabase();
+                if (window.supabaseClient) {
+                    console.log('✅ Supabase inicializado para campanha');
+                } else {
+                    console.error('❌ Falha ao inicializar Supabase na campanha');
+                }
+            } else {
+                console.error('❌ Função initSupabase não encontrada');
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeSupabaseCampaign);
+        } else {
+            initializeSupabaseCampaign();
+        }
+    </script>
     <script src="assets/js/campanha.js"></script>
 </body>
 </html>
