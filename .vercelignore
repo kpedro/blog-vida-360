@@ -1,0 +1,4 @@
+# Ignorar post.html no deploy: a rota envia /post.html para a API dynamic-post,
+# que devolve o HTML com meta tags (og:image, título, resumo) por artigo.
+# O template está em api/post-template.html.
+post.html
