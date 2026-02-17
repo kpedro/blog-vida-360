@@ -414,40 +414,30 @@ function initSupabase() {
       
       console.log('📊 Total de posts encontrados (antes do filtro):', allData ? allData.length : 0);
       
-      // Filtrar posts publicados manualmente
+      // Filtrar posts publicados manualmente (incluir artigos antigos)
       let filteredData = (allData || []).filter(function(post) {
+        // Excluir apenas rascunhos explícitos
+        if (post.status === 'draft' || post.status === 'private') {
+          return false;
+        }
         // Considerar publicado se:
-        // 1. status === 'published'
-        // 2. publicado === true
-        // 3. Tem published_at (data de publicação) - mais importante
-        // 4. Se não tiver status explícito, considerar publicado se tiver published_at
-        var isPublished = false;
-        
-        // Se tem status 'published' ou publicado = true, está publicado
+        // 1. status === 'published' ou publicado === true
         if (post.status === 'published' || post.publicado === true) {
-          isPublished = true;
-        } 
-        // Se tem published_at, considerar publicado (mesmo que status seja diferente)
-        else if (post.published_at) {
-          isPublished = true;
+          return true;
         }
-        // Se não tem status nem publicado definidos, mas tem created_at antigo, considerar publicado
-        // (posts antigos podem não ter campo de status)
-        else if (!post.status && !post.hasOwnProperty('publicado') && post.created_at) {
-          // Considerar publicado se foi criado há mais de 1 dia (posts antigos)
-          try {
-            var createdDate = new Date(post.created_at);
-            var now = new Date();
-            var daysDiff = (now - createdDate) / (1000 * 60 * 60 * 24);
-            if (daysDiff > 1) {
-              isPublished = true;
-            }
-          } catch (e) {
-            // Se não conseguir parsear data, não considerar publicado
-          }
+        // 2. Tem published_at
+        if (post.published_at) {
+          return true;
         }
-        
-        return isPublished;
+        // 3. Tem created_at (artigos antigos sem status preenchido)
+        if (post.created_at) {
+          return true;
+        }
+        // 4. Fallback: tem slug e título (evita esconder posts antigos)
+        if (post.slug && (post.titulo || post.title)) {
+          return true;
+        }
+        return false;
       });
       
       // Aplicar filtro de categoria se fornecido

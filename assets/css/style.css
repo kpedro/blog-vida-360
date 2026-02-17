@@ -213,12 +213,12 @@ main {
     margin-bottom: 15px;
 }
 
-/* Botão Leia Mais */
+/* Botão Leia Mais - azul claro para melhor leitura */
 .read-more {
     display: inline-block;
     padding: 10px 15px;
-    background-color: #0052cc; /* Azul primário */
-    color: #ffffff; /* Branco */
+    background-color: #3498db; /* Azul claro */
+    color: #ffffff;
     text-decoration: none;
     border-radius: 5px;
     font-size: 14px;
@@ -226,8 +226,8 @@ main {
 }
 
 .read-more:hover {
-    background-color: #007bff; /* Azul médio */
-    color: #ffffff; /* Branco */
+    background-color: #5dade2;
+    color: #ffffff;
 }
 
 /* Estilo do Conteúdo do Post */
