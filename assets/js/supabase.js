@@ -355,8 +355,46 @@ function initSupabase() {
   }
   
   // Criar cliente do Supabase diretamente
-  supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-  console.log('✅ Cliente Supabase criado diretamente');
+  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  // Adicionar getPosts para a home do blog (usa status = 'published' ou publicado = true)
+  client.getPosts = async function(limit = 20, offset = 0, categoria = null) {
+    try {
+      let query = this
+        .from('blog360_posts')
+        .select('id, titulo, slug, resumo, categoria, imagem_destaque, author, published_at')
+        .or('status.eq.published,publicado.eq.true')
+        .order('published_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+      if (categoria) query = query.eq('categoria', categoria);
+      const { data, error } = await query;
+      if (error) throw error;
+      return { success: true, data: data || [] };
+    } catch (error) {
+      console.error('Erro ao buscar posts:', error);
+      return { success: false, data: [], error: error.message };
+    }
+  };
+  
+  // Adicionar getPostBySlug para a página do post
+  client.getPostBySlug = async function(slug) {
+    try {
+      const { data, error } = await this
+        .from('blog360_posts')
+        .select('*')
+        .eq('slug', slug)
+        .or('status.eq.published,publicado.eq.true')
+        .maybeSingle();
+      if (error) throw error;
+      return { success: true, data };
+    } catch (error) {
+      console.error('Erro ao buscar post:', error);
+      return { success: false, data: null, error: error.message };
+    }
+  };
+  
+  supabaseClient = client;
+  console.log('✅ Cliente Supabase criado diretamente (com getPosts/getPostBySlug)');
   
   return supabaseClient;
 }

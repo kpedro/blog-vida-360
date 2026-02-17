@@ -356,12 +356,10 @@
             
             if (typeof initSupabase === 'function') {
                 window.supabaseClient = initSupabase();
-                if (window.supabaseClient && window.supabaseClient.client) {
+                if (window.supabaseClient && (window.supabaseClient.from || window.supabaseClient.getPosts)) {
                     console.log('✅ Supabase Client inicializado com sucesso!');
-                    console.log('   - Cliente disponível:', !!window.supabaseClient.client);
                 } else {
                     console.error('❌ Supabase Client NÃO inicializado corretamente!');
-                    console.error('   - window.supabaseClient:', window.supabaseClient);
                 }
             } else {
                 console.error('❌ Função initSupabase não encontrada!');
