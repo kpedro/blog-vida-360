@@ -8,6 +8,7 @@
   ],
   "routes": [
     {"src": "/post.html", "dest": "/api/dynamic-post"},
+    {"src": "/posts/([^/]+)", "dest": "/api/dynamic-post?post=$1"},
     {"src": "/api/(.*)", "dest": "/api/$1"},
     {"src": "/(.*)", "dest": "/$1"}
   ]
