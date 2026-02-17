@@ -8,7 +8,6 @@
   ],
   "rewrites": [
     {"source": "/post.html", "destination": "/api/dynamic-post"},
-    {"source": "/posts/:slug", "destination": "/api/dynamic-post?post=:slug"},
-    {"source": "/api/:path*", "destination": "/api/:path*"}
+    {"source": "/posts/:slug", "destination": "/api/dynamic-post?post=:slug"}
   ]
 }
