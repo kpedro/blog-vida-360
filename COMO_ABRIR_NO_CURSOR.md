@@ -8,6 +8,14 @@
 
 ---
 
+### ⚡ **Resumo: como abrir localmente**
+1. **Terminal:** `Set-Location C:\Users\Kadson\blog-vida-360` → depois `npx --yes http-server -p 8080`
+2. **Onde ver:** no navegador **http://localhost:8080** ou, **dentro do Cursor**, `Ctrl+Shift+P` → **Simple Browser: Show** → `http://localhost:8080`
+
+*(detalhes nas Opções 3 e 4 abaixo)*
+
+---
+
 ## 📋 **Opção 1: Abrir Diretamente no Cursor (Recomendado)** ⚡
 
 **Este é o método mais simples e direto para trabalhar apenas no blog:**
@@ -49,30 +57,56 @@
 
 ---
 
-## 🌐 **Opção 3: Abrir no Navegador (Visualizar)**
+## 🌐 **Opção 3: Abrir Localmente (Servidor + Navegador)**
 
-### **Método 1: Abrir Arquivo Direto**
-1. No Cursor, clique com botão direito em `index.html`
-2. Selecione **"Open with Live Server"** (se tiver a extensão)
-3. Ou clique com botão direito → **"Reveal in File Explorer"**
-4. Dê duplo clique em `index.html`
+**Resumo:** para ver o blog rodando na sua máquina: (1) suba um servidor no terminal; (2) abra o endereço no navegador ou **numa aba dentro do Cursor** (Opção 4).
 
-### **Método 2: Usar Servidor Local**
-```bash
-# No terminal do Cursor (PowerShell)
-cd C:\Users\Kadson\blog-vida-360
+### **Passo 1: Subir o servidor no terminal**
 
-# Opção A: Python (se tiver instalado)
-python -m http.server 8000
+No terminal do Cursor (PowerShell), na pasta do blog:
 
-# Opção B: Node.js (se tiver instalado)
-npx http-server -p 8000
+```powershell
+# Ir para a pasta do blog
+Set-Location C:\Users\Kadson\blog-vida-360
+
+# Opção A: Node.js (recomendado) — no PowerShell use ";" em vez de "&&"
+npx --yes http-server -p 8080
+
+# Opção B: Python (se tiver instalado)
+python -m http.server 8080
 
 # Opção C: PHP (se tiver instalado)
-php -S localhost:8000
+php -S localhost:8080
 ```
 
-Depois acesse: **http://localhost:8000**
+> **Windows/PowerShell:** Se der erro com `&&`, use só os comandos em linhas separadas ou `;` entre eles (ex.: `Set-Location C:\Users\Kadson\blog-vida-360; npx --yes http-server -p 8080`).
+
+Deixe o terminal aberto enquanto quiser ver o blog. Para parar o servidor: **Ctrl+C**.
+
+### **Passo 2: Onde abrir**
+
+- **No navegador (Chrome, Edge, etc.):** acesse **http://localhost:8080**
+- **Em uma aba dentro do Cursor:** use a **Opção 4** abaixo (Simple Browser).
+
+### **Método alternativo: abrir arquivo direto (sem servidor)**
+1. No Cursor, clique com botão direito em `index.html`
+2. Selecione **"Open with Live Server"** (se tiver a extensão)
+3. Ou: botão direito → **"Reveal in File Explorer"** e duplo clique em `index.html`  
+*(algumas coisas podem não funcionar sem servidor, por causa de caminhos e CORS.)*
+
+---
+
+## 📱 **Opção 4: Ver em uma aba dentro do Cursor (Simple Browser)**
+
+**Ideal quando você quer ver o blog sem sair do Cursor.**
+
+1. **Suba o servidor** (se ainda não estiver rodando) — veja o **Passo 1** da Opção 3.
+2. Pressione **`Ctrl+Shift+P`** para abrir a Paleta de Comandos.
+3. Digite: **`Simple Browser: Show`** (ou apenas "Simple Browser").
+4. Selecione **"Simple Browser: Show"**.
+5. Na barra que aparecer, digite: **`http://localhost:8080`** e pressione **Enter**.
+
+O blog abre em uma aba do próprio Cursor. Para usar outra porta (ex.: 8000), troque o número na URL.
 
 ---
 

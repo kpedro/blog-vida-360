@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Admin - Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .signup-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; width: 100%; }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { color: #2C3E50; font-size: 32px; margin-bottom: 5px; }
+        .logo p { color: #7F8C8D; font-size: 14px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: #2C3E50; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px 15px; border: 2px solid #ECF0F1; border-radius: 6px; font-size: 14px; transition: border-color 0.3s; }
+        .form-group input:focus { outline: none; border-color: #3498DB; }
+        .btn-signup { width: 100%; padding: 14px; background: #3498DB; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+        .btn-signup:hover { background: #2980B9; }
+        .btn-signup:disabled { background: #BDC3C7; cursor: not-allowed; }
+        .message { padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; display: none; }
+        .message.error { background: #FADBD8; color: #C0392B; border: 1px solid #E74C3C; }
+        .message.success { background: #D5F4E6; color: #27AE60; border: 1px solid #27AE60; }
+        .footer-link { text-align: center; margin-top: 20px; }
+        .footer-link a { color: #E74C3C; text-decoration: none; font-size: 14px; }
+        .footer-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="logo">
+            <h1>✍️ Vida 360º</h1>
+            <p>Criar Conta de Administrador</p>
+        </div>
+        <div id="message" class="message"></div>
+        <form id="signup-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" required placeholder="••••••••" minlength="6">
+            </div>
+            <button type="submit" class="btn-signup" id="btn-submit">Cadastrar</button>
+        </form>
+        <div class="footer-link">
+            <a href="admin-login.html">Já tem uma conta? Entrar</a>
+            <span style="color: #BDC3C7; margin: 0 10px;">|</span>
+            <a href="index.html">← Voltar ao Blog</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        if (typeof initSupabase === 'function') window.supabaseClient = initSupabase();
+        const signupForm = document.getElementById('signup-form');
+        const messageDiv = document.getElementById('message');
+        const btnSubmit = document.getElementById('btn-submit');
+        const supabase = window.supabaseClient;
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            btnSubmit.disabled = true;
+            hideMessage();
+
+            try {
+                if (!supabase || !supabase.auth) { throw new Error('Supabase não configurado. Verifique as credenciais do projeto.'); }
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) throw error;
+
+                if (data.user) {
+                    showMessage('Cadastro realizado com sucesso! Por favor, verifique seu email para confirmar a conta.', 'success');
+                    signupForm.reset();
+                }
+
+            } catch (error) {
+                console.error('Erro no cadastro:', error);
+                showMessage(error.message, 'error');
+            } finally {
+                btnSubmit.disabled = false;
+            }
+        });
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = "message " + type;
+            messageDiv.style.display = 'block';
+        }
+        
+        function hideMessage() {
+            messageDiv.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

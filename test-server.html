@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste Servidor</title>
+</head>
+<body>
+    <h1>Teste de Carregamento de Scripts</h1>
+    <div id="status"></div>
+    
+    <script>
+        const statusDiv = document.getElementById('status');
+        
+        // Testar carregamento de scripts
+        function testScript(url, name) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = () => {
+                    statusDiv.innerHTML += `<p style="color: green;">✅ ${name} carregado com sucesso</p>`;
+                    resolve();
+                };
+                script.onerror = () => {
+                    statusDiv.innerHTML += `<p style="color: red;">❌ ${name} FALHOU ao carregar de: ${url}</p>`;
+                    reject();
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Testar arquivos
+        Promise.all([
+            testScript('assets/js/supabase.js', 'supabase.js'),
+            testScript('assets/js/admin.js', 'admin.js')
+        ]).then(() => {
+            statusDiv.innerHTML += '<h2 style="color: green;">✅ Todos os scripts carregados!</h2>';
+        }).catch(() => {
+            statusDiv.innerHTML += '<h2 style="color: red;">❌ Alguns scripts falharam</h2>';
+        });
+    </script>
+</body>
+</html>

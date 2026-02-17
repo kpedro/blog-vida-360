@@ -126,6 +126,17 @@ header .container {
     letter-spacing: -0.02em;
 }
 
+/* Logo branco quando header tem fundo escuro */
+header[style*="background-color: var(--blue-dark)"],
+header[style*="background-color: #003366"],
+header {
+    background-color: var(--blue-dark) !important;
+}
+
+header .logo {
+    color: var(--text-color) !important;
+}
+
 /* Menu de Navegação */
 nav ul {
     list-style: none;
@@ -513,6 +524,7 @@ footer {
 
 @media (max-width: 480px) {
     header .logo {
+    color: var(--text-color) !important; /* Branco no header escuro */
         font-size: 1.5rem;
     }
 

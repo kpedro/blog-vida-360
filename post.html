@@ -61,6 +61,7 @@
         header .logo {
             font-size: 2rem;
             font-weight: bold;
+            color: var(--text-color); /* Garantir que seja branco */
         }
 
         nav ul {
@@ -92,6 +93,63 @@
             border-radius: 10px;
             margin-bottom: 30px;
         }
+        
+        /* Botões de Compartilhamento */
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 15px;
+            background: #F8F9FA;
+            border-radius: 8px;
+            border-top: 2px solid #E74C3C;
+        }
+        
+        .share-buttons h3 {
+            width: 100%;
+            margin: 0 0 10px 0;
+            color: var(--blue-primary);
+            font-size: 16px;
+        }
+        
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            color: white;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .share-btn.whatsapp { background: #25D366; }
+        .share-btn.whatsapp:hover { background: #20BA5A; }
+        
+        .share-btn.facebook { background: #1877F2; }
+        .share-btn.facebook:hover { background: #166FE5; }
+        
+        .share-btn.twitter { background: #1DA1F2; }
+        .share-btn.twitter:hover { background: #1A91DA; }
+        
+        .share-btn.linkedin { background: #0077B5; }
+        .share-btn.linkedin:hover { background: #006399; }
+        
+        .share-btn.copy-link { background: #6C757D; }
+        .share-btn.copy-link:hover { background: #5A6268; }
+        
+        .share-btn.telegram { background: #0088CC; }
+        .share-btn.telegram:hover { background: #0077B5; }
 
         .comment-section {
             background-color: var(--blue-light);
@@ -172,6 +230,29 @@
         <div id="post-content">
             Carregando post...
         </div>
+        
+        <!-- Botões de Compartilhamento -->
+        <div class="share-buttons" id="share-buttons" style="display: none;">
+            <h3>📤 Compartilhe este artigo:</h3>
+            <a href="#" class="share-btn whatsapp" onclick="shareWhatsApp(event)" title="Compartilhar no WhatsApp">
+                💬 WhatsApp
+            </a>
+            <a href="#" class="share-btn facebook" onclick="shareFacebook(event)" title="Compartilhar no Facebook">
+                📘 Facebook
+            </a>
+            <a href="#" class="share-btn twitter" onclick="shareTwitter(event)" title="Compartilhar no Twitter">
+                🐦 Twitter
+            </a>
+            <a href="#" class="share-btn linkedin" onclick="shareLinkedIn(event)" title="Compartilhar no LinkedIn">
+                💼 LinkedIn
+            </a>
+            <a href="#" class="share-btn telegram" onclick="shareTelegram(event)" title="Compartilhar no Telegram">
+                ✈️ Telegram
+            </a>
+            <button type="button" class="share-btn copy-link" onclick="copyLinkToClipboard(event)" title="Copiar link">
+                📋 Copiar Link
+            </button>
+        </div>
 
         <!-- Seção de Comentários -->
         <section class="comment-section">
@@ -240,8 +321,100 @@
                 var twImg = document.getElementById('twitter-image'); if (twImg) twImg.content = img;
                 var el = document.getElementById('post-content');
                 if (el) el.innerHTML = p.conteudo || p.content || '<p>Conteúdo indisponível.</p>';
+                
+                // Mostrar botões de compartilhamento
+                var shareButtons = document.getElementById('share-buttons');
+                if (shareButtons) {
+                    shareButtons.style.display = 'flex';
+                    // Atualizar URLs de compartilhamento
+                    window.currentPostUrl = url;
+                    window.currentPostTitle = titulo;
+                }
             });
         })();
+    </script>
+    <script>
+        // Funções de Compartilhamento
+        function getCurrentPostInfo() {
+            const title = window.currentPostTitle || document.title || 'Vida 360º';
+            const url = window.currentPostUrl || window.location.href;
+            const text = title + ' - ' + url;
+            return { title, url, text };
+        }
+        
+        function shareWhatsApp(e) {
+            e.preventDefault();
+            const { text, url } = getCurrentPostInfo();
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+            window.open(whatsappUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function shareFacebook(e) {
+            e.preventDefault();
+            const { url } = getCurrentPostInfo();
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function shareTwitter(e) {
+            e.preventDefault();
+            const { title, url } = getCurrentPostInfo();
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+            window.open(twitterUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function shareLinkedIn(e) {
+            e.preventDefault();
+            const { url } = getCurrentPostInfo();
+            const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            window.open(linkedinUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function shareTelegram(e) {
+            e.preventDefault();
+            const { text, url } = getCurrentPostInfo();
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            window.open(telegramUrl, '_blank', 'width=600,height=400');
+        }
+        
+        function copyLinkToClipboard(e) {
+            e.preventDefault();
+            const { url } = getCurrentPostInfo();
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = e.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Link Copiado!';
+                btn.style.background = '#27AE60';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#6C757D';
+                }, 2000);
+            }).catch(() => {
+                // Fallback para navegadores antigos
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Link copiado: ' + url);
+            });
+        }
+        
+        // Mostrar botões de compartilhamento para posts estáticos também
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const shareButtons = document.getElementById('share-buttons');
+                const postContent = document.getElementById('post-content');
+                if (shareButtons && postContent && postContent.textContent.trim() !== 'Carregando post...') {
+                    shareButtons.style.display = 'flex';
+                    if (!window.currentPostUrl) {
+                        window.currentPostUrl = window.location.href;
+                        window.currentPostTitle = document.title;
+                    }
+                }
+            }, 1000);
+        });
     </script>
     <script src="assets/js/performance.js"></script>
     <script src="assets/js/script.js"></script>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Definir senha (uma vez) - Blog Vida 360º</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); min-height: 100vh; padding: 20px; display: flex; align-items: center; justify-content: center; }
+        .box { background: white; padding: 32px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 440px; width: 100%; }
+        h1 { color: #2C3E50; font-size: 20px; margin-bottom: 8px; }
+        .aviso { background: #FEF9E7; border: 1px solid #F4D03F; color: #7D6608; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; color: #2C3E50; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        .form-group input { width: 100%; padding: 10px 12px; border: 2px solid #ECF0F1; border-radius: 6px; font-size: 14px; }
+        .form-group small { display: block; color: #7F8C8D; font-size: 12px; margin-top: 4px; }
+        .btn { width: 100%; padding: 12px; background: #27AE60; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+        .btn:hover { background: #219A52; }
+        .btn:disabled { background: #BDC3C7; cursor: not-allowed; }
+        .message { padding: 12px; border-radius: 6px; margin-top: 16px; font-size: 14px; display: none; }
+        .message.success { background: #D5F4E6; color: #1E8449; border: 1px solid #27AE60; }
+        .message.error { background: #FADBD8; color: #C0392B; border: 1px solid #E74C3C; }
+        .link { margin-top: 16px; text-align: center; }
+        .link a { color: #3498DB; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🔐 Definir senha (uma vez)</h1>
+        <p style="color: #7F8C8D; font-size: 14px; margin-bottom: 16px;">Use quando o email de confirmação não chegar. Não compartilhe esta página.</p>
+
+        <div class="aviso">
+            ⚠️ Use só no seu computador. A chave <strong>service_role</strong> é secreta — não salve no projeto nem suba no Git.
+        </div>
+        <div style="background: #E8F4F8; border: 1px solid #3498DB; color: #2874A6; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 20px;">
+            💡 <strong>Dica:</strong> Se esta página não funcionar (erro de CORS), use a solução mais simples: no Supabase → Authentication → Providers → Email → desative "Confirm email". Depois você pode fazer login normalmente.
+        </div>
+
+        <form id="form">
+            <div class="form-group">
+                <label for="email">Seu email (o que você usou no cadastro)</label>
+                <input type="email" id="email" placeholder="seu@email.com" required>
+                <small>Vamos localizar seu usuário por este email.</small>
+            </div>
+            <div class="form-group">
+                <label for="service_key">Chave service_role do Supabase</label>
+                <input type="password" id="service_key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." required autocomplete="off">
+                <small>Supabase → Project Settings → API → service_role (secret)</small>
+            </div>
+            <div class="form-group">
+                <label for="new_password">Nova senha (mín. 6 caracteres)</label>
+                <input type="password" id="new_password" minlength="6" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn" id="btn">Definir senha e confirmar email</button>
+        </form>
+
+        <div id="message" class="message"></div>
+        <div class="link">
+            <a href="admin-login.html">← Voltar ao login</a>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+
+        document.getElementById('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const serviceKey = document.getElementById('service_key').value.trim();
+            const newPassword = document.getElementById('new_password').value;
+            const btn = document.getElementById('btn');
+            const msg = document.getElementById('message');
+
+            msg.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = 'Processando...';
+
+            try {
+                if (!email || !serviceKey || !newPassword) {
+                    throw new Error('Preencha todos os campos.');
+                }
+                if (newPassword.length < 6) {
+                    throw new Error('A senha deve ter no mínimo 6 caracteres.');
+                }
+
+                // Passo 1: Encontrar usuário pelo email usando API REST
+                const listResponse = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': serviceKey,
+                        'Authorization': `Bearer ${serviceKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!listResponse.ok) {
+                    const errorData = await listResponse.json().catch(() => ({ message: 'Erro ao buscar usuários' }));
+                    throw new Error(errorData.message || `Erro HTTP ${listResponse.status}: ${listResponse.statusText}`);
+                }
+
+                const listData = await listResponse.json();
+                const users = listData.users || [];
+                const user = users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
+
+                if (!user) {
+                    throw new Error('Nenhum usuário encontrado com o email: ' + email + '. Confira o email ou crie a conta em "Cadastre-se" no login.');
+                }
+
+                // Passo 2: Atualizar senha e confirmar email usando API REST
+                const updateResponse = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${user.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'apikey': serviceKey,
+                        'Authorization': `Bearer ${serviceKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        password: newPassword,
+                        email_confirm: true
+                    })
+                });
+
+                if (!updateResponse.ok) {
+                    const errorData = await updateResponse.json().catch(() => ({ message: 'Erro ao atualizar usuário' }));
+                    throw new Error(errorData.message || `Erro HTTP ${updateResponse.status}: ${updateResponse.statusText}`);
+                }
+
+                msg.className = 'message success';
+                msg.textContent = '✅ Senha definida e email confirmado! Agora entre em admin-login.html com este email e a nova senha.';
+                msg.style.display = 'block';
+                document.getElementById('form').reset();
+                btn.textContent = 'Definir senha e confirmar email';
+            } catch (err) {
+                console.error('Erro completo:', err);
+                msg.className = 'message error';
+                let errorMsg = err.message || 'Erro ao atualizar. Verifique a chave service_role e o email.';
+                
+                // Mensagens mais amigáveis
+                if (errorMsg.includes('401') || errorMsg.includes('Unauthorized')) {
+                    errorMsg = 'Chave service_role inválida. Verifique se copiou a chave correta (service_role, não anon) do Supabase → Project Settings → API.';
+                } else if (errorMsg.includes('403') || errorMsg.includes('Forbidden')) {
+                    errorMsg = 'Sem permissão. Verifique se a chave service_role está correta e tem permissões de admin.';
+                } else if (errorMsg.includes('CORS') || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+                    errorMsg = 'Erro de CORS (navegador bloqueou). Use a solução alternativa: Supabase → Authentication → Providers → Email → desative "Confirm email". Depois faça login normalmente.';
+                } else if (errorMsg.includes('404')) {
+                    errorMsg = 'URL do Supabase incorreta ou usuário não encontrado. Verifique o email.';
+                }
+                
+                msg.textContent = errorMsg;
+                msg.style.display = 'block';
+                btn.textContent = 'Definir senha e confirmar email';
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

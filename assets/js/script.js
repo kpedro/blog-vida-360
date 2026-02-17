@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Renderização do post com lazy loading
+    // Se o post foi carregado do Supabase, não buscar .md
+    if (window.postLoadedFromSupabase) return;
     const markdownFile = new URLSearchParams(window.location.search).get("post");
     if (markdownFile) {
         // Mostrar loading
