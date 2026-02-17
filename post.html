@@ -9,18 +9,96 @@
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     
     <!-- Open Graph Metatags Dinâmicos -->
-    <meta property="og:title" content="" id="og-title">
-    <meta property="og:description" content="" id="og-description">
+    <meta property="og:title" content="Vida 360º - Blog" id="og-title">
+    <meta property="og:description" content="Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio" id="og-description">
     <meta property="og:image" content="https://blog-vida-360.vercel.app/assets/images/og-banner.png" id="og-image">
+    <meta property="og:image:width" content="1200" id="og-image-width">
+    <meta property="og:image:height" content="630" id="og-image-height">
+    <meta property="og:image:alt" content="Vida 360º Blog" id="og-image-alt">
     <meta property="og:url" content="" id="og-url">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Vida 360º">
     
     <!-- Twitter Card Metatags Dinâmicos -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="" id="twitter-title">
-    <meta name="twitter:description" content="" id="twitter-description">
+    <meta name="twitter:title" content="Vida 360º - Blog" id="twitter-title">
+    <meta name="twitter:description" content="Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio" id="twitter-description">
     <meta name="twitter:image" content="https://blog-vida-360.vercel.app/assets/images/og-banner.png" id="twitter-image">
+    <meta name="twitter:image:alt" content="Vida 360º Blog" id="twitter-image-alt">
+    
+    <!-- Script inline para atualizar meta tags ANTES do carregamento completo (para redes sociais) -->
+    <script>
+        // Atualizar meta tags o mais rápido possível para redes sociais
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var slug = params.get('post');
+            if (!slug) return;
+            
+            // Tentar buscar dados do post via Supabase (se já estiver disponível)
+            if (window.VITE_SUPABASE_URL && window.VITE_SUPABASE_ANON_KEY && window.supabase) {
+                try {
+                    var client = window.supabase.createClient(
+                        window.VITE_SUPABASE_URL,
+                        window.VITE_SUPABASE_ANON_KEY
+                    );
+                    
+                    // Buscar post
+                    client.from('blog360_posts')
+                        .select('titulo, resumo, imagem_destaque, slug')
+                        .eq('slug', slug)
+                        .or('status.eq.published,publicado.eq.true')
+                        .maybeSingle()
+                        .then(function(result) {
+                            if (result.data && !result.error) {
+                                var p = result.data;
+                                var titulo = (p.titulo || 'Post').trim();
+                                var desc = (p.resumo || '').trim();
+                                if (desc.length > 200) desc = desc.substring(0, 197) + '...';
+                                if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
+                                
+                                var img = p.imagem_destaque || '';
+                                if (img && !img.startsWith('http://') && !img.startsWith('https://')) {
+                                    img = window.location.origin + (img.startsWith('/') ? '' : '/') + img;
+                                }
+                                if (!img) img = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
+                                
+                                var url = window.location.href;
+                                
+                                // Atualizar meta tags
+                                var ogTitle = document.getElementById('og-title');
+                                if (ogTitle) ogTitle.setAttribute('content', titulo);
+                                
+                                var ogDesc = document.getElementById('og-description');
+                                if (ogDesc) ogDesc.setAttribute('content', desc);
+                                
+                                var ogImg = document.getElementById('og-image');
+                                if (ogImg) ogImg.setAttribute('content', img);
+                                
+                                var ogUrl = document.getElementById('og-url');
+                                if (ogUrl) ogUrl.setAttribute('content', url);
+                                
+                                var twTitle = document.getElementById('twitter-title');
+                                if (twTitle) twTitle.setAttribute('content', titulo);
+                                
+                                var twDesc = document.getElementById('twitter-description');
+                                if (twDesc) twDesc.setAttribute('content', desc);
+                                
+                                var twImg = document.getElementById('twitter-image');
+                                if (twImg) twImg.setAttribute('content', img);
+                                
+                                document.title = titulo + ' - Vida 360º';
+                            }
+                        })
+                        .catch(function(err) {
+                            console.warn('Erro ao buscar meta tags:', err);
+                        });
+                } catch (e) {
+                    console.warn('Erro ao inicializar Supabase para meta tags:', e);
+                }
+            }
+        })();
+    </script>
     
     <link rel="stylesheet" href="assets/css/style.css">
 
@@ -306,19 +384,72 @@
                 if (!result.success || !result.data) return;
                 var p = result.data;
                 window.postLoadedFromSupabase = true;
-                var titulo = p.titulo || p.title || 'Post';
-                var desc = p.resumo || p.excerpt || '';
+                var titulo = (p.titulo || p.title || 'Post').trim();
+                
+                // Preparar resumo (limitar a 200 caracteres para OG)
+                var descCompleto = (p.resumo || p.excerpt || '').trim();
+                var desc = descCompleto.length > 200 ? descCompleto.substring(0, 197) + '...' : descCompleto;
+                if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
+                
+                // Garantir URL absoluta para imagem
                 var img = p.imagem_destaque || p.image_url || '';
+                if (img) {
+                    // Se a imagem não começa com http/https, tornar absoluta
+                    if (!img.startsWith('http://') && !img.startsWith('https://')) {
+                        var baseUrl = window.location.origin;
+                        var basePath = window.location.pathname.replace(/\/[^/]*$/, '');
+                        if (!img.startsWith('/')) {
+                            img = baseUrl + basePath + '/' + img;
+                        } else {
+                            img = baseUrl + img;
+                        }
+                    }
+                } else {
+                    // Fallback para imagem padrão
+                    img = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
+                }
+                
                 var base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
                 var url = base + 'post.html?post=' + encodeURIComponent(p.slug || slug);
-                document.title = titulo;
-                var ogTitle = document.getElementById('og-title'); if (ogTitle) ogTitle.content = titulo;
-                var ogDesc = document.getElementById('og-description'); if (ogDesc) ogDesc.content = desc;
-                var ogImg = document.getElementById('og-image'); if (ogImg) ogImg.content = img;
-                var ogUrl = document.getElementById('og-url'); if (ogUrl) ogUrl.content = url;
-                var twTitle = document.getElementById('twitter-title'); if (twTitle) twTitle.content = titulo;
-                var twDesc = document.getElementById('twitter-description'); if (twDesc) twDesc.content = desc;
-                var twImg = document.getElementById('twitter-image'); if (twImg) twImg.content = img;
+                
+                // Atualizar título da página
+                document.title = titulo + ' - Vida 360º';
+                
+                // Atualizar todas as meta tags Open Graph
+                var ogTitle = document.getElementById('og-title'); 
+                if (ogTitle) ogTitle.setAttribute('content', titulo);
+                
+                var ogDesc = document.getElementById('og-description'); 
+                if (ogDesc) ogDesc.setAttribute('content', desc);
+                
+                var ogImg = document.getElementById('og-image'); 
+                if (ogImg) ogImg.setAttribute('content', img);
+                
+                var ogImgAlt = document.getElementById('og-image-alt');
+                if (ogImgAlt) ogImgAlt.setAttribute('content', titulo);
+                
+                var ogUrl = document.getElementById('og-url'); 
+                if (ogUrl) ogUrl.setAttribute('content', url);
+                
+                // Atualizar Twitter Cards
+                var twTitle = document.getElementById('twitter-title'); 
+                if (twTitle) twTitle.setAttribute('content', titulo);
+                
+                var twDesc = document.getElementById('twitter-description'); 
+                if (twDesc) twDesc.setAttribute('content', desc);
+                
+                var twImg = document.getElementById('twitter-image'); 
+                if (twImg) twImg.setAttribute('content', img);
+                
+                var twImgAlt = document.getElementById('twitter-image-alt');
+                if (twImgAlt) twImgAlt.setAttribute('content', titulo);
+                
+                console.log('✅ Meta tags atualizadas:', {
+                    titulo: titulo,
+                    descricao: desc.substring(0, 50) + '...',
+                    imagem: img,
+                    url: url
+                });
                 var el = document.getElementById('post-content');
                 if (el) el.innerHTML = p.conteudo || p.content || '<p>Conteúdo indisponível.</p>';
                 
