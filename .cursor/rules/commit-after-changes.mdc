@@ -1,9 +1,11 @@
 ---
-description: Fazer commit (e push) sempre que houver mudanças no projeto
+description: Fazer commit e push sempre que houver mudanças; só assim o Vercel atualiza
 alwaysApply: true
 ---
 
-# Commit após alterações
+# Commit e push após alterações
+
+**Nenhuma mudança entra no ar no Vercel até que seja feito commit e push para o repositório.** O deploy depende do que está no GitHub.
 
 Sempre que forem feitas alterações em arquivos do repositório (blog-vida-360):
 
@@ -17,3 +19,5 @@ Sempre que forem feitas alterações em arquivos do repositório (blog-vida-360)
 3. **Não commitar**: arquivos sensíveis (.env, chaves), node_modules, arquivos gerados temporários ou que o usuário pedir para não versionar.
 
 4. No Windows/PowerShell usar `;` em vez de `&&` para encadear comandos (ex.: `git add .; git status`).
+
+5. **Se o push falhar** (ex.: credenciais não disponíveis no terminal): o commit fica só local. O usuário deve rodar `git push` no próprio ambiente para enviar ao GitHub e disparar o deploy no Vercel.
