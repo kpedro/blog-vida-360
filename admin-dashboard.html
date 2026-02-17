@@ -295,6 +295,7 @@
             <li><a href="#" class="nav-link" data-tab="inscritos">👥 Inscritos</a></li>
             <li><a href="#" class="nav-link" data-tab="postagens">📝 Postagens</a></li>
             <li><a href="#" class="nav-link" data-tab="campanhas">📧 Campanhas</a></li>
+            <li><a href="#" class="nav-link" data-tab="protocolos">📘 Protocolos</a></li>
         </ul>
     </nav>
     
@@ -426,6 +427,63 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Tab: Protocolos -->
+        <div id="tab-protocolos" class="tab-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>📘 Protocolos / Materiais exclusivos</h2>
+                    <button class="btn-primary" onclick="openProtocolModal()">+ Novo Protocolo</button>
+                </div>
+                <p style="padding: 0 1.5rem 1rem; color: #7F8C8D; font-size: 14px;">Cadastre PDFs (link do arquivo) para enviar de forma exclusiva a quem solicitar pelo blog ou WhatsApp.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Descrição</th>
+                            <th>Link do arquivo</th>
+                            <th>Ativo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-protocols">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal Novo/Editar Protocolo -->
+        <div id="protocol-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 8px; max-width: 500px; width: 90%; padding: 1.5rem; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
+                <h3 style="margin-bottom: 1rem;" id="protocol-modal-title">Novo Protocolo</h3>
+                <input type="hidden" id="protocol-id" value="">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">Título *</label>
+                    <input type="text" id="protocol-titulo" placeholder="Ex: Protocolo de Suporte Metabólico" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">Descrição curta</label>
+                    <textarea id="protocol-descricao" rows="2" placeholder="Uma linha para a página do blog" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">URL do PDF (link do arquivo) *</label>
+                    <input type="url" id="protocol-arquivo-url" placeholder="https://... (Drive, Canva, Supabase Storage)" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="protocol-ativo" checked>
+                        <span>Visível na página de Protocolos do blog</span>
+                    </label>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn-icon" onclick="closeProtocolModal()" style="padding: 8px 16px;">Cancelar</button>
+                    <button type="button" class="btn-primary" onclick="saveProtocol()">Salvar</button>
+                </div>
             </div>
         </div>
     </div>

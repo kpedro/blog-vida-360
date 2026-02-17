@@ -487,9 +487,26 @@ function initSupabase() {
       return { success: false, data: null, error: error.message };
     }
   };
+
+  // Listar protocolos ativos (página Protocolos do blog)
+  client.getProtocols = async function() {
+    try {
+      const { data, error } = await this
+        .from('blog360_protocols')
+        .select('id, titulo, descricao_curta, arquivo_url, ordem')
+        .eq('ativo', true)
+        .order('ordem', { ascending: true })
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return { success: true, data: data || [] };
+    } catch (error) {
+      console.error('Erro ao buscar protocolos:', error);
+      return { success: false, data: [], error: error.message };
+    }
+  };
   
   supabaseClient = client;
-  console.log('✅ Cliente Supabase criado diretamente (com getPosts/getPostBySlug)');
+  console.log('✅ Cliente Supabase criado diretamente (com getPosts/getPostBySlug/getProtocols)');
   
   return supabaseClient;
 }

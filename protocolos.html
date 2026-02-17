@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolos Exclusivos - Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <meta property="og:title" content="Protocolos Exclusivos - Vida 360º">
+    <meta property="og:description" content="Solicite materiais exclusivos: protocolos de rotinas de saúde e suporte metabólico.">
+    <meta property="og:image" content="https://blog-vida-360.vercel.app/assets/images/og-banner.png">
+    <meta property="og:url" content="https://blog-vida-360.vercel.app/protocolos.html">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue-dark: #003366;
+            --blue-primary: #0052cc;
+            --blue-secondary: #007bff;
+            --blue-light: #cce4f6;
+            --blue-background: #e6f7ff;
+            --text-color: #ffffff;
+        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--blue-background); color: var(--blue-dark); margin: 0; padding: 0; }
+        header { background-color: var(--blue-dark); color: var(--text-color); padding: 25px 0; }
+        header .container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header .logo { font-size: 2rem; font-weight: bold; color: var(--text-color); }
+        nav ul { list-style: none; display: flex; gap: 20px; }
+        nav ul li a { text-decoration: none; color: var(--text-color); font-weight: bold; transition: color 0.3s; }
+        nav ul li a:hover { color: var(--blue-light); }
+        main .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .page-header { text-align: center; margin-bottom: 2rem; }
+        .page-header h1 { color: var(--blue-primary); margin-bottom: 0.5rem; }
+        .page-header p { color: #555; font-size: 1.05rem; }
+        .protocols-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .protocol-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; }
+        .protocol-card h3 { color: var(--blue-primary); margin: 0 0 0.75rem 0; font-size: 1.25rem; }
+        .protocol-card p { color: #555; margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.5; }
+        .protocol-card .btn-whatsapp { display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background 0.2s; border: none; cursor: pointer; font-size: 1rem; }
+        .protocol-card .btn-whatsapp:hover { background: #20BA5A; color: white; }
+        .loading { text-align: center; padding: 3rem; color: var(--blue-primary); }
+        .no-protocols { text-align: center; padding: 3rem; background: var(--blue-light); border-radius: 12px; color: var(--blue-dark); }
+        footer { background-color: var(--blue-dark); color: var(--text-color); text-align: center; padding: 15px 0; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">Vida 360º</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="artigos.html">Artigos</a></li>
+                    <li><a href="protocolos.html" aria-current="page">Protocolos</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li><a href="politica.html">Política</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>📘 Protocolos Exclusivos</h1>
+            <p>Materiais práticos para organização da saúde e rotinas. Solicite pelo WhatsApp e receba o link do PDF de forma exclusiva.</p>
+        </div>
+        <div id="protocolos-container" class="protocols-grid">
+            <div class="loading">Carregando protocolos...</div>
+        </div>
+    </main>
+
+    <a href="https://wa.me/5592994314016?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20o%20protocolo%20de%20rotinas%20de%20sa%C3%BAde." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+
+    <footer>
+        <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">
+            <a href="feed.xml" style="color: var(--blue-light); text-decoration: none;">📡 RSS Feed</a> |
+            <a href="sitemap.xml" style="color: var(--blue-light); text-decoration: none;">🗺️ Sitemap</a> |
+            <a href="admin-login.html" style="color: var(--blue-light); text-decoration: none; font-weight: 600;">🔐 Painel Admin</a>
+        </p>
+        <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.9;">Alguns artigos podem conter links de indicação. Ao utilizá-los, você apoia o blog sem custo adicional.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        (function() {
+            var WA_NUMBER = '5592994314016';
+            function loadProtocols() {
+                var container = document.getElementById('protocolos-container');
+                if (!container) return;
+                if (typeof initSupabase === 'function' && !window.supabaseClient) window.supabaseClient = initSupabase();
+                var client = window.supabaseClient;
+                if (!client || !client.getProtocols) {
+                    container.innerHTML = '<div class="no-protocols"><p>Nenhum protocolo disponível no momento. Entre em contato pelo WhatsApp para solicitar materiais.</p></div>';
+                    return;
+                }
+                client.getProtocols().then(function(r) {
+                    if (!r.success || !r.data || r.data.length === 0) {
+                        container.innerHTML = '<div class="no-protocols"><p>Nenhum protocolo cadastrado ainda. Em breve teremos materiais exclusivos aqui.</p><p style="margin-top: 1rem;">Você já pode nos contactar pelo WhatsApp para solicitar o <strong>Protocolo de Suporte Metabólico</strong>.</p></div>';
+                        return;
+                    }
+                    var html = r.data.map(function(p) {
+                        var titulo = (p.titulo || 'Protocolo').trim();
+                        var msg = encodeURIComponent('Olá! Gostaria de receber o protocolo: ' + titulo);
+                        var url = 'https://wa.me/' + WA_NUMBER + '?text=' + msg;
+                        var desc = (p.descricao_curta || '').trim();
+                        return '<div class="protocol-card">' +
+                            '<h3>' + escapeHtml(titulo) + '</h3>' +
+                            (desc ? '<p>' + escapeHtml(desc) + '</p>' : '') +
+                            '<a href="' + escapeHtml(url) + '" class="btn-whatsapp" target="_blank" rel="noopener noreferrer">💬 Solicitar por WhatsApp</a>' +
+                            '</div>';
+                    }).join('');
+                    container.innerHTML = html;
+                }).catch(function() {
+                    container.innerHTML = '<div class="no-protocols"><p>Não foi possível carregar os protocolos. Tente novamente ou entre em contato pelo WhatsApp.</p></div>';
+                });
+            }
+            function escapeHtml(s) {
+                var div = document.createElement('div');
+                div.textContent = s;
+                return div.innerHTML;
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadProtocols);
+            else loadProtocols();
+        })();
+    </script>
+</body>
+</html>

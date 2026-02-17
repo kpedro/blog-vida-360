@@ -170,6 +170,9 @@ async function loadTabData(tabId) {
         case 'campanhas':
             await loadAllCampaigns();
             break;
+        case 'protocolos':
+            await loadAllProtocols();
+            break;
     }
 }
 
@@ -463,6 +466,131 @@ async function exportLeads() {
         alert('Erro ao exportar leads. Tente novamente.');
     }
 }
+
+// --- Protocolos (blog360_protocols) ---
+async function loadAllProtocols() {
+    const tbody = document.getElementById('all-protocols');
+    if (!tbody) return;
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Erro ao conectar ao Supabase</td></tr>';
+            return;
+        }
+        const { data: list, error } = await client
+            .from('blog360_protocols')
+            .select('*')
+            .order('ordem', { ascending: true })
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum protocolo cadastrado. Clique em "+ Novo Protocolo" para adicionar.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = list.map(p => {
+            const url = p.arquivo_url || '';
+            const urlShort = url.length > 40 ? url.substring(0, 37) + '...' : url;
+            return `<tr>
+                <td><strong>${escapeHtml(p.titulo || '')}</strong></td>
+                <td>${escapeHtml((p.descricao_curta || '').slice(0, 50))}${(p.descricao_curta || '').length > 50 ? '…' : ''}</td>
+                <td>${url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(urlShort)}</a> <button type="button" class="btn-icon" title="Copiar link" onclick="copyProtocolLink('${url.replace(/'/g, "\\'")}')">📋</button>` : '-'}</td>
+                <td><span class="badge ${p.ativo ? 'published' : 'draft'}">${p.ativo ? 'Sim' : 'Não'}</span></td>
+                <td class="action-buttons">
+                    <button type="button" class="btn-icon" title="Editar" onclick='openProtocolModal(${JSON.stringify(p)})'>✏️</button>
+                    <button type="button" class="btn-icon" title="Excluir" data-id="${p.id}" data-titulo="${(p.titulo || '').replace(/"/g, '&quot;')}" onclick="deleteProtocol(this)">🗑️</button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao carregar protocolos:', error);
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Erro ao carregar. Execute o SQL BLOG360_PROTOCOLOS.sql no Supabase.</td></tr>';
+    }
+}
+function openProtocolModal(protocol) {
+    const modal = document.getElementById('protocol-modal');
+    const titleEl = document.getElementById('protocol-modal-title');
+    document.getElementById('protocol-id').value = protocol ? protocol.id : '';
+    document.getElementById('protocol-titulo').value = protocol ? (protocol.titulo || '') : '';
+    document.getElementById('protocol-descricao').value = protocol ? (protocol.descricao_curta || '') : '';
+    document.getElementById('protocol-arquivo-url').value = protocol ? (protocol.arquivo_url || '') : '';
+    document.getElementById('protocol-ativo').checked = protocol ? !!protocol.ativo : true;
+    titleEl.textContent = protocol ? 'Editar Protocolo' : 'Novo Protocolo';
+    if (modal) modal.style.display = 'flex';
+}
+function closeProtocolModal() {
+    const modal = document.getElementById('protocol-modal');
+    if (modal) modal.style.display = 'none';
+}
+async function saveProtocol() {
+    const id = document.getElementById('protocol-id').value.trim();
+    const titulo = document.getElementById('protocol-titulo').value.trim();
+    const arquivo_url = document.getElementById('protocol-arquivo-url').value.trim();
+    if (!titulo) {
+        alert('Preencha o título.');
+        return;
+    }
+    if (!arquivo_url) {
+        alert('Preencha a URL do PDF (link do arquivo).');
+        return;
+    }
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            alert('Erro: Supabase não disponível');
+            return;
+        }
+        const payload = {
+            titulo,
+            descricao_curta: document.getElementById('protocol-descricao').value.trim() || null,
+            arquivo_url: arquivo_url || null,
+            ativo: document.getElementById('protocol-ativo').checked,
+            updated_at: new Date().toISOString()
+        };
+        if (id) {
+            const { error } = await client.from('blog360_protocols').update(payload).eq('id', id);
+            if (error) throw error;
+            alert('Protocolo atualizado.');
+        } else {
+            const { error } = await client.from('blog360_protocols').insert(payload);
+            if (error) throw error;
+            alert('Protocolo criado.');
+        }
+        closeProtocolModal();
+        loadAllProtocols();
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao salvar. Verifique se a tabela blog360_protocols existe no Supabase.');
+    }
+}
+async function deleteProtocol(btn) {
+    const id = btn && btn.dataset && btn.dataset.id;
+    const titulo = (btn && btn.dataset && btn.dataset.titulo) ? btn.dataset.titulo : 'este protocolo';
+    if (!id) return;
+    if (!confirm('Excluir o protocolo "' + titulo + '"?')) return;
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            alert('Erro: Supabase não disponível');
+            return;
+        }
+        const { error } = await client.from('blog360_protocols').delete().eq('id', id);
+        if (error) throw error;
+        alert('Protocolo excluído.');
+        loadAllProtocols();
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao excluir.');
+    }
+}
+function copyProtocolLink(url) {
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(() => alert('Link copiado!')).catch(() => alert('Copie o link manualmente.'));
+}
+window.openProtocolModal = openProtocolModal;
+window.closeProtocolModal = closeProtocolModal;
+window.saveProtocol = saveProtocol;
+window.deleteProtocol = deleteProtocol;
+window.copyProtocolLink = copyProtocolLink;
 
 // Carregar dados da visão geral
 async function loadOverviewData() {
