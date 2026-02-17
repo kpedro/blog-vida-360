@@ -314,31 +314,74 @@
             var filteredPosts = [];
 
             async function init() {
+                console.log('🔍 Inicializando página de artigos...');
+                
+                // Inicializar Supabase client se ainda não foi inicializado
+                if (typeof initSupabase === 'function' && !window.supabaseClient) {
+                    console.log('📦 Inicializando Supabase client...');
+                    window.supabaseClient = initSupabase();
+                }
+                
                 // Aguardar Supabase client estar pronto
                 var client = window.supabaseClient;
                 var attempts = 0;
-                while ((!client || !client.getPosts) && attempts < 10) {
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                var maxAttempts = 15;
+                
+                while ((!client || !client.getPosts) && attempts < maxAttempts) {
+                    console.log('⏳ Aguardando Supabase client... (tentativa ' + (attempts + 1) + '/' + maxAttempts + ')');
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    // Tentar inicializar novamente se ainda não estiver disponível
+                    if (!window.supabaseClient && typeof initSupabase === 'function') {
+                        window.supabaseClient = initSupabase();
+                    }
+                    
                     client = window.supabaseClient;
                     attempts++;
                 }
 
-                if (!client || !client.getPosts) {
+                if (!client) {
+                    console.error('❌ Supabase client não disponível após ' + maxAttempts + ' tentativas');
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>Por favor, recarregue a página.</p></div>';
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>Não foi possível conectar ao banco de dados. Por favor, recarregue a página.</p></div>';
                     return;
                 }
 
+                if (!client.getPosts) {
+                    console.error('❌ Método getPosts não encontrado no client');
+                    console.log('   Client disponível:', !!client);
+                    console.log('   Métodos disponíveis:', Object.keys(client));
+                    document.getElementById('posts-container').innerHTML = 
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>Erro na configuração do cliente. Por favor, recarregue a página.</p></div>';
+                    return;
+                }
+                
+                console.log('✅ Cliente Supabase pronto!');
+
                 // Carregar todos os posts
+                console.log('📰 Buscando posts do Supabase...');
                 var result = await client.getPosts(200, 0);
-                if (result.success && result.data) {
+                
+                console.log('📊 Resultado da busca:', {
+                    success: result.success,
+                    dataLength: result.data ? result.data.length : 0,
+                    error: result.error
+                });
+                
+                if (result.success && result.data && result.data.length > 0) {
                     allPosts = result.data;
                     filteredPosts = allPosts;
+                    console.log('✅ ' + allPosts.length + ' artigos carregados com sucesso!');
                     renderPosts();
                     setupFilters();
-                } else {
+                } else if (result.success && result.data && result.data.length === 0) {
+                    console.warn('⚠️ Nenhum artigo encontrado');
                     document.getElementById('posts-container').innerHTML = 
                         '<div class="no-posts"><h3>Nenhum artigo encontrado</h3><p>Ainda não há artigos publicados.</p></div>';
+                } else {
+                    console.error('❌ Erro ao buscar posts:', result.error);
+                    document.getElementById('posts-container').innerHTML = 
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>' + (result.error || 'Erro desconhecido') + '</p><p>Por favor, recarregue a página.</p></div>';
                 }
             }
 
