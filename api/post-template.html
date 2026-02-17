@@ -304,6 +304,9 @@
 
     <!-- Conteúdo Principal -->
     <main class="container">
+        <!-- Título e autor do artigo (preenchidos pelo JS) -->
+        <h1 id="article-title" class="article-title" style="display:none; margin-bottom: 0.25rem;"></h1>
+        <p id="article-byline" class="article-byline" style="display:none; margin-top: 0; margin-bottom: 1.5rem; font-size: 0.95rem; color: var(--blue-primary);"></p>
         <!-- Área do Post -->
         <div id="post-content">
             Carregando post...
@@ -451,6 +454,19 @@
                     imagem: img,
                     url: url
                 });
+                // Exibir título do artigo na página
+                var titleEl = document.getElementById('article-title');
+                if (titleEl) {
+                    titleEl.textContent = titulo;
+                    titleEl.style.display = '';
+                }
+                // Exibir autor (por autor)
+                var authorEl = document.getElementById('article-byline');
+                var autor = (p.autor || p.author || '').trim();
+                if (authorEl) {
+                    authorEl.textContent = autor ? 'Por ' + autor : '';
+                    authorEl.style.display = autor ? '' : 'none';
+                }
                 var el = document.getElementById('post-content');
                 if (el) el.innerHTML = p.conteudo || p.content || '<p>Conteúdo indisponível.</p>';
                 
