@@ -139,10 +139,10 @@ class SupabaseClient {
     try {
       if (!this.client) return { success: false, data: [], error: 'Cliente não disponível' };
       
-      // Buscar todos os posts primeiro (sem filtro de status)
+      // Buscar todos os posts (select * evita erro se colunas tiverem nome diferente)
       let query = this.client
         .from('blog360_posts')
-        .select('id, titulo, slug, resumo, categoria, imagem_destaque, author, published_at, status, publicado, created_at')
+        .select('*')
         .order('published_at', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false, nullsFirst: false });
 
@@ -187,7 +187,7 @@ class SupabaseClient {
   }
 
   /**
-   * Buscar post por slug (status = 'published')
+   * Buscar post por slug (exclui só draft/private para incluir artigos antigos)
    */
   async getPostBySlug(slug) {
     try {
@@ -196,9 +196,10 @@ class SupabaseClient {
         .from('blog360_posts')
         .select('*')
         .eq('slug', slug)
-        .or('status.eq.published,publicado.eq.true')
         .maybeSingle();
       if (error) throw error;
+      if (!data) return { success: true, data: null };
+      if (data.status === 'draft' || data.status === 'private') return { success: true, data: null };
       return { success: true, data };
     } catch (error) {
       console.error('Erro ao buscar post:', error);
@@ -395,10 +396,10 @@ function initSupabase() {
     try {
       console.log('🔍 Buscando posts com:', { limit, offset, categoria });
       
-      // Tentar diferentes formas de buscar posts publicados
+      // Buscar todos os posts (select * evita erro se colunas tiverem nome diferente)
       let query = this
         .from('blog360_posts')
-        .select('id, titulo, slug, resumo, categoria, imagem_destaque, author, published_at, status, publicado, created_at');
+        .select('*');
       
       // Filtrar por status publicado (tentar múltiplas condições)
       // Primeiro, tentar buscar todos e filtrar depois se necessário
@@ -469,16 +470,17 @@ function initSupabase() {
     }
   };
   
-  // Adicionar getPostBySlug para a página do post
+  // Adicionar getPostBySlug para a página do post (inclui artigos antigos sem status)
   client.getPostBySlug = async function(slug) {
     try {
       const { data, error } = await this
         .from('blog360_posts')
         .select('*')
         .eq('slug', slug)
-        .or('status.eq.published,publicado.eq.true')
         .maybeSingle();
       if (error) throw error;
+      if (!data) return { success: true, data: null };
+      if (data.status === 'draft' || data.status === 'private') return { success: true, data: null };
       return { success: true, data };
     } catch (error) {
       console.error('Erro ao buscar post:', error);
