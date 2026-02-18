@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Você realmente precisa de suplementação? - Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <meta name="description" content="Descubra se sua rotina e sinais do corpo indicam que vale a pena avaliar suplementação para saúde metabólica.">
+    <meta property="og:title" content="Quiz: Você realmente precisa de suplementação? - Vida 360º">
+    <meta property="og:description" content="Descubra se sua rotina indica que vale avaliar suplementação para saúde metabólica.">
+    <meta property="og:image" content="https://blog-vida-360.vercel.app/assets/images/og-banner.png">
+    <meta property="og:url" content="https://blog-vida-360.vercel.app/quiz-suplementacao.html">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .quiz-page { max-width: 640px; margin: 0 auto; padding: var(--spacing-lg) 0; }
+        .quiz-page h1 { color: var(--blue-primary); text-align: center; margin-bottom: var(--spacing-sm); }
+        .quiz-page .subtitle { text-align: center; color: var(--gray-600); margin-bottom: var(--spacing-xl); }
+        .quiz-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+        .quiz-progress { height: 6px; background: var(--gray-200); border-radius: 3px; margin-bottom: var(--spacing-lg); overflow: hidden; }
+        .quiz-progress-bar { height: 100%; background: var(--blue-secondary); border-radius: 3px; transition: width 0.3s ease; width: 0%; }
+        .quiz-step { display: none; }
+        .quiz-step.active { display: block; animation: fadeIn 0.3s ease; }
+        .quiz-step h2 { color: var(--blue-primary); font-size: 1.25rem; margin-bottom: var(--spacing-md); }
+        .quiz-options { list-style: none; padding: 0; margin: 0; }
+        .quiz-options li { margin-bottom: var(--spacing-sm); }
+        .quiz-options label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .quiz-options label:hover { border-color: var(--blue-secondary); background: var(--gray-50); }
+        .quiz-options input:checked + label { border-color: var(--blue-secondary); background: rgba(52, 152, 219, 0.08); }
+        .quiz-options input { position: absolute; opacity: 0; }
+        .quiz-nav { display: flex; justify-content: space-between; margin-top: var(--spacing-lg); flex-wrap: wrap; gap: var(--spacing-sm); }
+        .quiz-btn { padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius); font-weight: 600; cursor: pointer; transition: var(--transition); border: none; font-size: 1rem; }
+        .quiz-btn-prev { background: var(--gray-200); color: var(--gray-900); }
+        .quiz-btn-prev:hover { background: var(--gray-300); }
+        .quiz-btn-next { background: var(--blue-secondary); color: var(--text-color); }
+        .quiz-btn-next:hover { background: var(--blue-primary); }
+        .quiz-btn-next:disabled { opacity: 0.5; cursor: not-allowed; }
+        .quiz-result { display: none; text-align: center; }
+        .quiz-result.active { display: block; }
+        .quiz-result h2 { color: var(--blue-primary); margin-bottom: var(--spacing-md); }
+        .quiz-result .result-message { font-size: 1.1rem; line-height: 1.7; margin-bottom: var(--spacing-lg); color: var(--gray-900); }
+        .quiz-result .cta-whatsapp {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #25D366; color: #fff; padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius); text-decoration: none; font-weight: 600; transition: var(--transition);
+        }
+        .quiz-result .cta-whatsapp:hover { filter: brightness(1.05); transform: translateY(-2px); }
+        .quiz-result .disclaimer { font-size: var(--font-size-sm); color: var(--gray-600); margin-top: var(--spacing-xl); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo"><a href="index.html" style="color: inherit; text-decoration: none;">Vida 360º</a></div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="artigos.html">Artigos</a></li>
+                    <li><a href="protocolos.html">Protocolos</a></li>
+                    <li><a href="quiz-suplementacao.html" aria-current="page">Quiz</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li><a href="politica.html">Política</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="quiz-page">
+            <h1>Quiz: Você realmente precisa de suplementação?</h1>
+            <p class="subtitle">Saúde metabólica em poucos minutos</p>
+
+            <div id="quiz-container" class="quiz-card">
+                <div class="quiz-progress" aria-hidden="true">
+                    <div id="quiz-progress-bar" class="quiz-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+
+                <form id="quiz-form">
+                    <!-- Step 1 -->
+                    <div class="quiz-step active" data-step="1">
+                        <h2>1. Você consome vegetais diariamente?</h2>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q1" id="q1_a" value="0" required><label for="q1_a">Sim</label></li>
+                            <li><input type="radio" name="q1" id="q1_b" value="1"><label for="q1_b">Às vezes</label></li>
+                            <li><input type="radio" name="q1" id="q1_c" value="2"><label for="q1_c">Raramente</label></li>
+                        </ul>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="quiz-step" data-step="2">
+                        <h2>2. Você sente cansaço frequente mesmo dormindo bem?</h2>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q2" id="q2_a" value="0"><label for="q2_a">Raramente</label></li>
+                            <li><input type="radio" name="q2" id="q2_b" value="1"><label for="q2_b">Às vezes</label></li>
+                            <li><input type="radio" name="q2" id="q2_c" value="2"><label for="q2_c">Sim, com frequência</label></li>
+                        </ul>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="quiz-step" data-step="3">
+                        <h2>3. Sua alimentação é regular (horários e qualidade)?</h2>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q3" id="q3_a" value="0"><label for="q3_a">Sim, na maior parte do tempo</label></li>
+                            <li><input type="radio" name="q3" id="q3_b" value="1"><label for="q3_b">Às vezes é irregular</label></li>
+                            <li><input type="radio" name="q3" id="q3_c" value="2"><label for="q3_c">Rotina muito corrida, alimentação irregular</label></li>
+                        </ul>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="quiz-step" data-step="4">
+                        <h2>4. Você já fez exames que indicaram possíveis insuficiências (vitaminas, minerais)?</h2>
+                        <ul class="quiz-options">
+                            <li><input type="radio" name="q4" id="q4_a" value="0"><label for="q4_a">Não, ou estão normais</label></li>
+                            <li><input type="radio" name="q4" id="q4_b" value="1"><label for="q4_b">Alguns no limite</label></li>
+                            <li><input type="radio" name="q4" id="q4_c" value="2"><label for="q4_c">Sim, com orientação profissional em andamento</label></li>
+                        </ul>
+                    </div>
+
+                    <div class="quiz-nav">
+                        <button type="button" id="quiz-prev" class="quiz-btn quiz-btn-prev" style="visibility: hidden;">← Anterior</button>
+                        <button type="button" id="quiz-next" class="quiz-btn quiz-btn-next">Próxima →</button>
+                    </div>
+                </form>
+
+                <div id="quiz-result" class="quiz-result">
+                    <h2 id="result-title">Seu resultado</h2>
+                    <p id="result-message" class="result-message"></p>
+                    <a id="cta-whatsapp" class="cta-whatsapp" href="#" target="_blank" rel="noopener noreferrer">
+                        Enviar QUIZ no WhatsApp para análise personalizada
+                    </a>
+                    <p class="disclaimer">Aviso: Este quiz é educativo e não substitui acompanhamento médico ou nutricional.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <a href="https://wa.me/5592994314016?text=Ol%C3%A1!%20Fiz%20o%20quiz%20de%20suplementa%C3%A7%C3%A3o%20e%20gostaria%20de%20saber%20mais." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+
+    <footer>
+        <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="assets/js/quiz.js"></script>
+</body>
+</html>
