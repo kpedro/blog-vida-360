@@ -37,200 +37,64 @@
     <!-- Favicon Novo -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <style>
-        /* Variáveis de Cores - Nova Paleta Minimalista */
-        :root {
-            /* Cores Principais */
-            --primary: #2C3E50;
-            --primary-light: #34495E;
-            --accent: #E74C3C;
-            --accent-light: #EC7063;
-            
-            /* Neutros */
-            --white: #FFFFFF;
-            --gray-50: #FAFAFA;
-            --gray-100: #F5F5F5;
-            --gray-200: #EEEEEE;
-            --gray-300: #E0E0E0;
-            --gray-600: #757575;
-            --gray-900: #212121;
-            
-            /* Sucesso/Confiança */
-            --success: #27AE60;
-            --info: #3498DB;
-            
-            /* Sombras */
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-            --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
-            
-            /* Transições */
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-fast: all 0.15s ease;
-            
-            /* Espaçamento */
-            --spacing-xs: 0.5rem;
-            --spacing-sm: 1rem;
-            --spacing-md: 1.5rem;
-            --spacing-lg: 2rem;
-            --spacing-xl: 3rem;
-            
-            /* Tipografia */
-            --font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --font-size-base: 1rem;
-            --font-size-sm: 0.875rem;
-            --font-size-lg: 1.125rem;
-            --font-size-xl: 1.25rem;
-            --font-size-2xl: 1.5rem;
-            --font-size-3xl: 2rem;
-            
-            /* Border Radius */
-            --radius-sm: 0.375rem;
-            --radius: 0.5rem;
-            --radius-md: 0.75rem;
-            --radius-lg: 1rem;
-            
-            /* Cores Antigas (compatibilidade) */
-            --blue-dark: #2C3E50;
-            --blue-primary: #2C3E50;
-            --blue-secondary: #3498DB;
-            --blue-light: #ECF0F1;
-            --blue-background: #FAFAFA;
-            --text-color: #FFFFFF;
-            --text-dark: #212121;
-            --shadow-hover: 0 8px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Estilos Globais */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--blue-background);
-            color: var(--blue-dark);
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: var(--blue-dark);
-            color: var(--text-color);
-            padding: 25px 0; /* Aumentei a espessura do cabeçalho */
-        }
-
-        header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header .logo {
-            font-size: 2rem; /* Aumentei o tamanho do texto */
-            font-weight: bold;
-            color: var(--text-color); /* Garantir que seja branco */
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-
-        nav ul li a:hover {
-            color: var(--blue-light);
-        }
-
-        main .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
+        /* Home: estilos específicos (paleta e layout vêm do style.css) */
         #home {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: var(--spacing-xl);
         }
 
         #posts-container {
             background-color: var(--blue-light);
-            padding: 20px;
-            border-radius: 10px;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
         }
 
-        #posts-container h2 {
-            text-align: center;
-            color: var(--blue-primary);
-            margin-bottom: 20px;
-        }
-
-        .posts-grid {
-            display: grid;
+        #posts-container .posts-grid {
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: var(--spacing-lg);
         }
 
-        .post {
-            background-color: var(--blue-background);
-            border: 1px solid var(--blue-secondary);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        #posts-container .post {
+            background-color: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: var(--transition);
         }
 
-        .post:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        #posts-container .post:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
         }
 
-        .post-image {
+        #posts-container .post-image {
             width: 100%;
             height: 200px;
             object-fit: cover;
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
         }
 
-        .post h3 {
+        #posts-container .post h3 {
             color: var(--blue-primary);
-            font-size: 1.2rem;
-            padding: 10px;
+            font-size: var(--font-size-xl);
+            padding: var(--spacing-md);
         }
 
-        .post p {
-            padding: 0 10px 10px;
-            color: var(--blue-secondary);
+        #posts-container .post p {
+            padding: 0 var(--spacing-md) var(--spacing-md);
+            color: var(--gray-600);
         }
 
-        .read-more {
+        #posts-container .read-more {
             display: block;
             text-align: center;
-            padding: 10px;
-            background-color: #3498db;
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 0 0 10px 10px;
-            transition: background-color 0.3s;
-        }
-
-        .read-more:hover {
-            background-color: #5dade2;
-            color: #fff;
+            margin: 0;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
         }
 
         footer {
-            background-color: var(--blue-dark);
-            color: var(--text-color);
-            text-align: center;
-            padding: 15px 0;
-            margin-top: 30px;
+            margin-top: var(--spacing-xl);
         }
     </style>
 </head>
@@ -258,38 +122,26 @@
             <p>Explore conteúdos exclusivos sobre <strong>saúde, bem-estar, produtividade, mentalidade e equilíbrio</strong> para uma vida mais plena.</p>
             
             <!-- CTA Newsletter - Topo -->
-            <div class="cta-newsletter" style="margin: 30px 0; background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); color: white; padding: 2rem; border-radius: 1rem; text-align: center; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);">
-                <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.25rem;">📧 Receba Conteúdo Exclusivo!</h3>
-                <p style="margin-bottom: 1.5rem; opacity: 0.9;">Cadastre-se e receba nosso <strong>Guia Completo de Bem-Estar</strong> grátis!</p>
-                <form class="newsletter-form" data-origem="form_topo" style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px; margin: 0 auto;">
-                    <input 
-                        type="email" 
-                        name="email" 
-                        placeholder="Seu melhor email" 
-                        required
-                        aria-label="Email para newsletter"
-                        style="padding: 0.875rem 1rem; border: 1px solid #E0E0E0; border-radius: 0.5rem; font-size: 1rem; background-color: rgba(255, 255, 255, 0.95); color: #212121; width: 100%; box-sizing: border-box;"
-                    >
-                    <button type="submit" style="padding: 0.875rem 1.5rem; background-color: #E74C3C; color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">Quero Receber Grátis</button>
+            <div class="cta-newsletter">
+                <h3>📧 Receba Conteúdo Exclusivo!</h3>
+                <p>Cadastre-se e receba nosso <strong>Guia Completo de Bem-Estar</strong> grátis!</p>
+                <form class="newsletter-form" data-origem="form_topo">
+                    <input type="email" name="email" placeholder="Seu melhor email" required aria-label="Email para newsletter">
+                    <button type="submit">Quero Receber Grátis</button>
                 </form>
             </div>
             
             <!-- Barra de Busca -->
-            <div id="search-container" style="margin: 30px auto; max-width: 600px;">
-                <input 
-                    type="search" 
-                    id="search-input" 
-                    placeholder="🔍 Buscar posts..." 
-                    style="width: 100%; padding: 15px; font-size: 1rem; border: 2px solid var(--blue-secondary); border-radius: 10px; box-sizing: border-box;"
-                >
-                <div id="search-results" style="display: none; margin-top: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+            <div id="search-container" class="search-container">
+                <input type="search" id="search-input" placeholder="🔍 Buscar posts...">
+                <div id="search-results"></div>
             </div>
         </section>
 
         <section id="posts-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0;">📚 Últimos Artigos</h2>
-                <a href="artigos.html" style="background-color: var(--blue-secondary); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.backgroundColor='var(--blue-primary)'" onmouseout="this.style.backgroundColor='var(--blue-secondary)'">Ver Todos os Artigos →</a>
+            <div class="section-header">
+                <h2>📚 Últimos Artigos</h2>
+                <a href="artigos.html" class="btn-secondary">Ver Todos os Artigos →</a>
             </div>
             <div class="posts-grid" id="posts-grid">
                 <!-- Posts estáticos (fallback); substituídos por JS se houver posts no Supabase -->
