@@ -505,6 +505,23 @@ function initSupabase() {
     }
   };
 
+  // Listar ebooks ativos (página Ebooks do blog)
+  client.getEbooks = async function() {
+    try {
+      const { data, error } = await this
+        .from('blog360_ebooks')
+        .select('id, titulo, descricao_curta, descricao_completa, arquivo_url, imagem_capa_url, tipo_envio, ordem')
+        .eq('ativo', true)
+        .order('ordem', { ascending: true })
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return { success: true, data: data || [] };
+    } catch (error) {
+      console.error('Erro ao buscar ebooks:', error);
+      return { success: false, data: [], error: error.message };
+    }
+  };
+
   // Listar quizzes (admin: todos; blog: só ativos via RLS)
   client.getQuizzes = async function(activeOnly) {
     try {

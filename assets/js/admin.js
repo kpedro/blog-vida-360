@@ -173,6 +173,9 @@ async function loadTabData(tabId) {
         case 'protocolos':
             await loadAllProtocols();
             break;
+        case 'ebooks':
+            await loadAllEbooks();
+            break;
         case 'quizzes':
             await loadAllQuizzes();
             break;
@@ -594,6 +597,131 @@ window.closeProtocolModal = closeProtocolModal;
 window.saveProtocol = saveProtocol;
 window.deleteProtocol = deleteProtocol;
 window.copyProtocolLink = copyProtocolLink;
+
+// --- Ebooks (blog360_ebooks) ---
+async function loadAllEbooks() {
+    const tbody = document.getElementById('all-ebooks');
+    if (!tbody) return;
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Erro ao conectar ao Supabase</td></tr>';
+            return;
+        }
+        const { data: list, error } = await client
+            .from('blog360_ebooks')
+            .select('*')
+            .order('ordem', { ascending: true })
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum ebook cadastrado. Clique em "+ Novo Ebook" para adicionar.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = list.map(e => {
+            const tipoMap = { whatsapp: 'WhatsApp', download: 'Download', ambos: 'Ambos' };
+            return `<tr>
+                <td><strong>${escapeHtml(e.titulo || '')}</strong></td>
+                <td>${escapeHtml((e.descricao_curta || '').slice(0, 60))}${(e.descricao_curta || '').length > 60 ? '…' : ''}</td>
+                <td><span class="badge ${e.tipo_envio === 'download' ? 'published' : 'draft'}">${tipoMap[e.tipo_envio] || e.tipo_envio}</span></td>
+                <td><span class="badge ${e.ativo ? 'published' : 'draft'}">${e.ativo ? 'Sim' : 'Não'}</span></td>
+                <td class="action-buttons">
+                    <button type="button" class="btn-icon" title="Editar" onclick='openEbookModal(${JSON.stringify(e)})'>✏️</button>
+                    <button type="button" class="btn-icon" title="Excluir" data-id="${e.id}" data-titulo="${(e.titulo || '').replace(/"/g, '&quot;')}" onclick="deleteEbook(this)">🗑️</button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch (error) {
+        console.error('Erro ao carregar ebooks:', error);
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Erro ao carregar. Execute o SQL BLOG360_EBOOKS.sql no Supabase.</td></tr>';
+    }
+}
+function openEbookModal(ebook) {
+    const modal = document.getElementById('ebook-modal');
+    const titleEl = document.getElementById('ebook-modal-title');
+    document.getElementById('ebook-id').value = ebook ? ebook.id : '';
+    document.getElementById('ebook-titulo').value = ebook ? (ebook.titulo || '') : '';
+    document.getElementById('ebook-descricao-curta').value = ebook ? (ebook.descricao_curta || '') : '';
+    document.getElementById('ebook-descricao-completa').value = ebook ? (ebook.descricao_completa || '') : '';
+    document.getElementById('ebook-arquivo-url').value = ebook ? (ebook.arquivo_url || '') : '';
+    document.getElementById('ebook-imagem-url').value = ebook ? (ebook.imagem_capa_url || '') : '';
+    document.getElementById('ebook-tipo-envio').value = ebook ? (ebook.tipo_envio || 'whatsapp') : 'whatsapp';
+    document.getElementById('ebook-ativo').checked = ebook ? !!ebook.ativo : true;
+    titleEl.textContent = ebook ? 'Editar Ebook' : 'Novo Ebook';
+    if (modal) modal.style.display = 'flex';
+}
+function closeEbookModal() {
+    const modal = document.getElementById('ebook-modal');
+    if (modal) modal.style.display = 'none';
+}
+async function saveEbook() {
+    const id = document.getElementById('ebook-id').value.trim();
+    const titulo = document.getElementById('ebook-titulo').value.trim();
+    const arquivo_url = document.getElementById('ebook-arquivo-url').value.trim();
+    if (!titulo) {
+        alert('Preencha o título.');
+        return;
+    }
+    if (!arquivo_url) {
+        alert('Preencha a URL do arquivo (PDF).');
+        return;
+    }
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            alert('Erro: Supabase não disponível');
+            return;
+        }
+        const payload = {
+            titulo,
+            descricao_curta: document.getElementById('ebook-descricao-curta').value.trim() || null,
+            descricao_completa: document.getElementById('ebook-descricao-completa').value.trim() || null,
+            arquivo_url: arquivo_url || null,
+            imagem_capa_url: document.getElementById('ebook-imagem-url').value.trim() || null,
+            tipo_envio: document.getElementById('ebook-tipo-envio').value || 'whatsapp',
+            ativo: document.getElementById('ebook-ativo').checked,
+            updated_at: new Date().toISOString()
+        };
+        if (id) {
+            const { error } = await client.from('blog360_ebooks').update(payload).eq('id', id);
+            if (error) throw error;
+            alert('Ebook atualizado.');
+        } else {
+            const { error } = await client.from('blog360_ebooks').insert(payload);
+            if (error) throw error;
+            alert('Ebook criado.');
+        }
+        closeEbookModal();
+        loadAllEbooks();
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao salvar. Verifique se a tabela blog360_ebooks existe no Supabase.');
+    }
+}
+async function deleteEbook(btn) {
+    const id = btn && btn.dataset && btn.dataset.id;
+    const titulo = (btn && btn.dataset && btn.dataset.titulo) ? btn.dataset.titulo : 'este ebook';
+    if (!id) return;
+    if (!confirm('Excluir o ebook "' + titulo + '"?')) return;
+    try {
+        const client = window.supabaseClient;
+        if (!client) {
+            alert('Erro: Supabase não disponível');
+            return;
+        }
+        const { error } = await client.from('blog360_ebooks').delete().eq('id', id);
+        if (error) throw error;
+        alert('Ebook excluído.');
+        loadAllEbooks();
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao excluir.');
+    }
+}
+window.openEbookModal = openEbookModal;
+window.closeEbookModal = closeEbookModal;
+window.saveEbook = saveEbook;
+window.deleteEbook = deleteEbook;
 
 // --- Quizzes (blog360_quizzes) ---
 async function loadAllQuizzes() {

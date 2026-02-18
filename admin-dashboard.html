@@ -296,6 +296,7 @@
             <li><a href="#" class="nav-link" data-tab="postagens">📝 Postagens</a></li>
             <li><a href="#" class="nav-link" data-tab="campanhas">📧 Campanhas</a></li>
             <li><a href="#" class="nav-link" data-tab="protocolos">📘 Protocolos</a></li>
+            <li><a href="#" class="nav-link" data-tab="ebooks">📚 Ebooks</a></li>
             <li><a href="#" class="nav-link" data-tab="quizzes">🧪 Quizzes</a></li>
         </ul>
     </nav>
@@ -458,6 +459,33 @@
             </div>
         </div>
 
+        <!-- Tab: Ebooks -->
+        <div id="tab-ebooks" class="tab-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>📚 Ebooks / Materiais digitais</h2>
+                    <button class="btn-primary" onclick="openEbookModal()">+ Novo Ebook</button>
+                </div>
+                <p style="padding: 0 1.5rem 1rem; color: #7F8C8D; font-size: 14px;">Cadastre ebooks (PDFs, guias) para disponibilizar no blog via download direto ou envio por WhatsApp.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Descrição</th>
+                            <th>Tipo</th>
+                            <th>Ativo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-ebooks">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Tab: Quizzes -->
         <div id="tab-quizzes" class="tab-content">
             <div class="table-container">
@@ -511,6 +539,52 @@
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <button type="button" class="btn-icon" onclick="closeProtocolModal()" style="padding: 8px 16px;">Cancelar</button>
                     <button type="button" class="btn-primary" onclick="saveProtocol()">Salvar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Novo/Editar Ebook -->
+        <div id="ebook-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 8px; max-width: 600px; width: 90%; padding: 1.5rem; box-shadow: 0 8px 32px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;">
+                <h3 style="margin-bottom: 1rem;" id="ebook-modal-title">Novo Ebook</h3>
+                <input type="hidden" id="ebook-id" value="">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">Título *</label>
+                    <input type="text" id="ebook-titulo" placeholder="Ex: Guia Completo de Bem-Estar" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">Descrição curta</label>
+                    <textarea id="ebook-descricao-curta" rows="2" placeholder="Uma linha para a página do blog" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">Descrição completa (opcional)</label>
+                    <textarea id="ebook-descricao-completa" rows="3" placeholder="Texto detalhado sobre o ebook" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">URL do arquivo (PDF) *</label>
+                    <input type="url" id="ebook-arquivo-url" placeholder="https://... (Drive, Canva, Supabase Storage)" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">URL da imagem de capa (opcional)</label>
+                    <input type="url" id="ebook-imagem-url" placeholder="https://... (imagem do ebook)" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px;">Tipo de envio *</label>
+                    <select id="ebook-tipo-envio" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="whatsapp">WhatsApp (enviar link via WhatsApp)</option>
+                        <option value="download">Download direto (link público)</option>
+                        <option value="ambos">Ambos (WhatsApp + download)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="ebook-ativo" checked>
+                        <span>Visível na página de Ebooks do blog</span>
+                    </label>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn-icon" onclick="closeEbookModal()" style="padding: 8px 16px;">Cancelar</button>
+                    <button type="button" class="btn-primary" onclick="saveEbook()">Salvar</button>
                 </div>
             </div>
         </div>
