@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Quiz - Blog Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F5F7FA; color: #2C3E50; min-height: 100vh; }
+        .editor-header { background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .editor-header h1 { font-size: 20px; }
+        .editor-header a { color: #ECF0F1; text-decoration: none; font-weight: 600; }
+        .editor-header a:hover { color: white; }
+        .editor-container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .card h2 { font-size: 18px; margin-bottom: 1rem; color: #2C3E50; border-bottom: 1px solid #ECF0F1; padding-bottom: 8px; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #E74C3C; }
+        .question-block { background: #F8F9FA; border: 1px solid #E0E0E0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .question-block .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+        @media (max-width: 600px) { .question-block .row { grid-template-columns: 1fr; } }
+        .result-block { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 1rem; align-items: start; }
+        .result-block label { font-weight: 600; font-size: 14px; }
+        .btn-primary { background: #E74C3C; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px; }
+        .btn-primary:hover { background: #C0392B; }
+        .btn-secondary { background: #95A5A6; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .btn-secondary:hover { background: #7F8C8D; }
+        .btn-small { padding: 6px 12px; font-size: 13px; }
+        .actions-quiz { display: flex; gap: 12px; margin-top: 1.5rem; flex-wrap: wrap; }
+        .help { font-size: 12px; color: #7F8C8D; margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <header class="editor-header">
+        <h1>🧪 Editor de Quiz</h1>
+        <a href="admin-dashboard.html#quizzes">← Voltar ao painel</a>
+    </header>
+    <div class="editor-container">
+        <input type="hidden" id="quiz-id" value="">
+        <div class="card">
+            <h2>Dados do quiz</h2>
+            <div class="form-group">
+                <label>Título *</label>
+                <input type="text" id="quiz-title" placeholder="Ex: Você realmente precisa de suplementação para saúde metabólica?">
+            </div>
+            <div class="form-group">
+                <label>Slug (URL) *</label>
+                <input type="text" id="quiz-slug" placeholder="Ex: suplementacao">
+                <p class="help">Será usado em quiz.html?quiz=<strong>slug</strong></p>
+            </div>
+            <div class="form-group">
+                <label>Descrição (opcional)</label>
+                <textarea id="quiz-description" rows="2" placeholder="Texto curto exibido na listagem"></textarea>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" id="quiz-active" checked> Quiz ativo (visível no blog)</label>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Perguntas (opções A, B, C – resultado por maioria)</h2>
+            <div id="questions-container"></div>
+            <button type="button" class="btn-secondary" id="add-question">+ Adicionar pergunta</button>
+        </div>
+
+        <div class="card">
+            <h2>Resultados (por maioria A, B ou C)</h2>
+            <div class="form-group result-block">
+                <label>Maioria A – Título</label>
+                <div><input type="text" id="result-a-title" placeholder="Ex: Base bem estruturada"></div>
+            </div>
+            <div class="form-group result-block">
+                <label>Maioria A – Mensagem</label>
+                <div><textarea id="result-a-message" rows="3" placeholder="Texto exibido quando a maioria das respostas for A"></textarea></div>
+            </div>
+            <div class="form-group result-block">
+                <label>Maioria B – Título</label>
+                <div><input type="text" id="result-b-title" placeholder="Ex: Ajustes necessários"></div>
+            </div>
+            <div class="form-group result-block">
+                <label>Maioria B – Mensagem</label>
+                <div><textarea id="result-b-message" rows="3" placeholder="Texto quando maioria B"></textarea></div>
+            </div>
+            <div class="form-group result-block">
+                <label>Maioria C – Título</label>
+                <div><input type="text" id="result-c-title" placeholder="Ex: Precisa reorganizar rotina"></div>
+            </div>
+            <div class="form-group result-block">
+                <label>Maioria C – Mensagem</label>
+                <div><textarea id="result-c-message" rows="3" placeholder="Texto quando maioria C"></textarea></div>
+            </div>
+        </div>
+
+        <div class="actions-quiz">
+            <button type="button" class="btn-primary" id="save-quiz">Salvar quiz</button>
+            <a href="admin-dashboard.html" class="btn-secondary">Cancelar</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co'; window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';</script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+(function() {
+    var client;
+    var params = new URLSearchParams(window.location.search);
+    var quizId = params.get('id');
+
+    function getContainer() { return document.getElementById('questions-container'); }
+    function optByLetter(opts, letter) {
+        if (!opts || !opts.length) return '';
+        var o = opts.find(function(x) { return (x.option_letter || x.letter) === letter; });
+        return (o && (o.option_text || o.text)) ? String(o.option_text || o.text).replace(/"/g, '&quot;') : '';
+    }
+    function addQuestionBlock(data) {
+        data = data || { question_text: '', options: [] };
+        var idx = getContainer().querySelectorAll('.question-block').length;
+        var opts = data.options || [];
+        var div = document.createElement('div');
+        div.className = 'question-block';
+        div.innerHTML = '<div class="form-group"><label>Pergunta ' + (idx + 1) + '</label><input type="text" class="q-text" placeholder="Texto da pergunta" value="' + (data.question_text || '').replace(/"/g, '&quot;') + '"></div>' +
+            '<div class="row">' +
+            '<div class="form-group"><label>Opção A</label><input type="text" class="opt-a" placeholder="A" value="' + optByLetter(opts, 'A') + '"></div>' +
+            '<div class="form-group"><label>Opção B</label><input type="text" class="opt-b" placeholder="B" value="' + optByLetter(opts, 'B') + '"></div>' +
+            '<div class="form-group"><label>Opção C</label><input type="text" class="opt-c" placeholder="C" value="' + optByLetter(opts, 'C') + '"></div>' +
+            '</div>' +
+            '<button type="button" class="btn-secondary btn-small remove-q" style="margin-top:8px">Remover pergunta</button>';
+        getContainer().appendChild(div);
+        div.querySelector('.remove-q').onclick = function() { div.remove(); };
+    }
+
+    document.getElementById('add-question').onclick = function() { addQuestionBlock(); };
+
+    function collectQuestions() {
+        var blocks = getContainer().querySelectorAll('.question-block');
+        var out = [];
+        blocks.forEach(function(blk) {
+            var text = (blk.querySelector('.q-text') || {}).value || '';
+            var a = (blk.querySelector('.opt-a') || {}).value || '';
+            var b = (blk.querySelector('.opt-b') || {}).value || '';
+            var c = (blk.querySelector('.opt-c') || {}).value || '';
+            if (!text.trim()) return;
+            out.push({ question_text: text.trim(), options: [{ letter: 'A', text: a.trim() }, { letter: 'B', text: b.trim() }, { letter: 'C', text: c.trim() }] });
+        });
+        return out;
+    }
+
+    function collectResults() {
+        return [
+            { letter: 'A', title: (document.getElementById('result-a-title') || {}).value || '', message: (document.getElementById('result-a-message') || {}).value || '' },
+            { letter: 'B', title: (document.getElementById('result-b-title') || {}).value || '', message: (document.getElementById('result-b-message') || {}).value || '' },
+            { letter: 'C', title: (document.getElementById('result-c-title') || {}).value || '', message: (document.getElementById('result-c-message') || {}).value || '' }
+        ];
+    }
+
+    document.getElementById('save-quiz').onclick = async function() {
+        var title = (document.getElementById('quiz-title') || {}).value || '';
+        var slug = (document.getElementById('quiz-slug') || {}).value || '';
+        if (!title.trim()) { alert('Preencha o título.'); return; }
+        if (!slug.trim()) { alert('Preencha o slug.'); return; }
+        slug = slug.replace(/\s+/g, '-').toLowerCase();
+        var questions = collectQuestions();
+        if (questions.length === 0) { alert('Adicione ao menos uma pergunta com opções A, B e C.'); return; }
+        var results = collectResults();
+        if (!results[0].title && !results[1].title && !results[2].title) { alert('Preencha ao menos um título de resultado (A, B ou C).'); return; }
+
+        if (!window.supabaseClient || !window.supabaseClient.from) {
+            alert('Supabase não disponível.');
+            return;
+        }
+        var c = window.supabaseClient;
+        try {
+            var id = (document.getElementById('quiz-id') || {}).value || '';
+            if (id) {
+                await c.from('blog360_quizzes').update({
+                    title: title.trim(),
+                    slug: slug.trim(),
+                    description: (document.getElementById('quiz-description') || {}).value.trim() || null,
+                    active: (document.getElementById('quiz-active') || {}).checked,
+                    updated_at: new Date().toISOString()
+                }).eq('id', id);
+                var delQ = await c.from('blog360_quiz_questions').select('id').eq('quiz_id', id);
+                if (delQ.data && delQ.data.length) {
+                    for (var i = 0; i < delQ.data.length; i++) {
+                        await c.from('blog360_quiz_options').delete().eq('question_id', delQ.data[i].id);
+                    }
+                    await c.from('blog360_quiz_questions').delete().eq('quiz_id', id);
+                }
+                await c.from('blog360_quiz_results').delete().eq('quiz_id', id);
+            } else {
+                var ins = await c.from('blog360_quizzes').insert({
+                    title: title.trim(),
+                    slug: slug.trim(),
+                    description: (document.getElementById('quiz-description') || {}).value.trim() || null,
+                    active: (document.getElementById('quiz-active') || {}).checked
+                }).select('id').single();
+                if (ins.error) throw ins.error;
+                id = ins.data.id;
+            }
+
+            for (var i = 0; i < questions.length; i++) {
+                var qq = await c.from('blog360_quiz_questions').insert({ quiz_id: id, sort_order: i, question_text: questions[i].question_text }).select('id').single();
+                if (qq.error) throw qq.error;
+                for (var j = 0; j < (questions[i].options || []).length; j++) {
+                    var o = questions[i].options[j];
+                    await c.from('blog360_quiz_options').insert({ question_id: qq.data.id, option_letter: o.letter, option_text: o.text || '' });
+                }
+            }
+            for (var r = 0; r < results.length; r++) {
+                await c.from('blog360_quiz_results').insert({
+                    quiz_id: id,
+                    result_letter: results[r].letter,
+                    title: results[r].title || '',
+                    message: results[r].message || null
+                });
+            }
+            alert('Quiz salvo! Link no blog: quiz.html?quiz=' + slug);
+            if (!document.getElementById('quiz-id').value) {
+                document.getElementById('quiz-id').value = id;
+                window.history.replaceState({}, '', 'admin-editor-quiz.html?id=' + id);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erro ao salvar. Verifique se executou BLOG360_QUIZZES.sql no Supabase.');
+        }
+    };
+
+    function init() {
+        if (typeof initSupabase === 'function') window.supabaseClient = initSupabase();
+        client = window.supabaseClient;
+        if (!client || !client.getQuizById) {
+            getContainer().innerHTML = '<p style="color:#7F8C8D">Carregando...</p>';
+            setTimeout(init, 200);
+            return;
+        }
+        if (quizId) {
+            client.getQuizById(quizId).then(function(res) {
+                if (res.success && res.data) {
+                    var q = res.data;
+                    document.getElementById('quiz-id').value = q.id;
+                    document.getElementById('quiz-title').value = q.title || '';
+                    document.getElementById('quiz-slug').value = q.slug || '';
+                    document.getElementById('quiz-description').value = q.description || '';
+                    document.getElementById('quiz-active').checked = !!q.active;
+                    var resMap = {};
+                    (q.results || []).forEach(function(r) { resMap[r.result_letter] = r; });
+                    ['A','B','C'].forEach(function(l) {
+                        var r = resMap[l] || {};
+                        var elT = document.getElementById('result-' + l.toLowerCase() + '-title');
+                        var elM = document.getElementById('result-' + l.toLowerCase() + '-message');
+                        if (elT) elT.value = r.title || '';
+                        if (elM) elM.value = r.message || '';
+                    });
+                    getContainer().innerHTML = '';
+                    (q.questions || []).forEach(function(qq) {
+                        addQuestionBlock({
+                            question_text: qq.question_text,
+                            options: (qq.options || []).map(function(o) { return { letter: o.option_letter, text: o.option_text }; })
+                        });
+                    });
+                    if ((q.questions || []).length === 0) addQuestionBlock();
+                } else {
+                    getContainer().innerHTML = '';
+                    addQuestionBlock();
+                }
+            }).catch(function() {
+                getContainer().innerHTML = '';
+                addQuestionBlock();
+            });
+        } else {
+            getContainer().innerHTML = '';
+            addQuestionBlock();
+        }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+})();
+    </script>
+</body>
+</html>

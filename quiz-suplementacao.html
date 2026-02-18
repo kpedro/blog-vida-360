@@ -62,6 +62,9 @@
             border-radius: var(--radius); text-decoration: none; font-weight: 600; transition: var(--transition);
         }
         .quiz-result .cta-whatsapp:hover { filter: brightness(1.05); transform: translateY(-2px); }
+        .quiz-result .quiz-rotina-cta { margin-top: var(--spacing-lg); margin-bottom: var(--spacing-sm); font-size: 1rem; line-height: 1.6; color: var(--gray-900); }
+        .quiz-result .cta-rotina { background: var(--blue-primary); margin-top: 0; }
+        .quiz-result .cta-rotina:hover { background: var(--blue-secondary); }
         .quiz-result .disclaimer { font-size: var(--font-size-sm); color: var(--gray-600); margin-top: var(--spacing-xl); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -75,7 +78,7 @@
                     <li><a href="index.html">Início</a></li>
                     <li><a href="artigos.html">Artigos</a></li>
                     <li><a href="protocolos.html">Protocolos</a></li>
-                    <li><a href="quiz-suplementacao.html" aria-current="page">Quiz</a></li>
+                    <li><a href="quiz.html" aria-current="page">Quiz</a></li>
                     <li><a href="sobre.html">Sobre</a></li>
                     <li><a href="contato.html">Contato</a></li>
                     <li><a href="politica.html">Política</a></li>
@@ -86,8 +89,8 @@
 
     <main class="container">
         <div class="quiz-page">
-            <h1>Quiz: Você realmente precisa de suplementação?</h1>
-            <p class="subtitle">Saúde metabólica em poucos minutos</p>
+            <h1>Você realmente precisa de suplementação para saúde metabólica?</h1>
+            <p class="subtitle">Responda em poucos minutos</p>
 
             <div id="quiz-container" class="quiz-card">
                 <div class="quiz-progress" aria-hidden="true">
@@ -99,36 +102,36 @@
                     <div class="quiz-step active" data-step="1">
                         <h2>1. Você consome vegetais diariamente?</h2>
                         <ul class="quiz-options">
-                            <li><input type="radio" name="q1" id="q1_a" value="0" required><label for="q1_a">Sim</label></li>
-                            <li><input type="radio" name="q1" id="q1_b" value="1"><label for="q1_b">Às vezes</label></li>
-                            <li><input type="radio" name="q1" id="q1_c" value="2"><label for="q1_c">Raramente</label></li>
+                            <li><input type="radio" name="q1" id="q1_a" value="A" required><label for="q1_a">Sim</label></li>
+                            <li><input type="radio" name="q1" id="q1_b" value="B"><label for="q1_b">Às vezes</label></li>
+                            <li><input type="radio" name="q1" id="q1_c" value="C"><label for="q1_c">Raramente</label></li>
                         </ul>
                     </div>
                     <!-- Step 2 -->
                     <div class="quiz-step" data-step="2">
                         <h2>2. Você sente cansaço frequente mesmo dormindo bem?</h2>
                         <ul class="quiz-options">
-                            <li><input type="radio" name="q2" id="q2_a" value="0"><label for="q2_a">Raramente</label></li>
-                            <li><input type="radio" name="q2" id="q2_b" value="1"><label for="q2_b">Às vezes</label></li>
-                            <li><input type="radio" name="q2" id="q2_c" value="2"><label for="q2_c">Sim, com frequência</label></li>
+                            <li><input type="radio" name="q2" id="q2_a" value="A" required><label for="q2_a">Sim</label></li>
+                            <li><input type="radio" name="q2" id="q2_b" value="B"><label for="q2_b">Às vezes</label></li>
+                            <li><input type="radio" name="q2" id="q2_c" value="C"><label for="q2_c">Não</label></li>
                         </ul>
                     </div>
                     <!-- Step 3 -->
                     <div class="quiz-step" data-step="3">
-                        <h2>3. Sua alimentação é regular (horários e qualidade)?</h2>
+                        <h2>3. Você pratica atividade física regularmente?</h2>
                         <ul class="quiz-options">
-                            <li><input type="radio" name="q3" id="q3_a" value="0"><label for="q3_a">Sim, na maior parte do tempo</label></li>
-                            <li><input type="radio" name="q3" id="q3_b" value="1"><label for="q3_b">Às vezes é irregular</label></li>
-                            <li><input type="radio" name="q3" id="q3_c" value="2"><label for="q3_c">Rotina muito corrida, alimentação irregular</label></li>
+                            <li><input type="radio" name="q3" id="q3_a" value="A"><label for="q3_a">3x ou mais por semana</label></li>
+                            <li><input type="radio" name="q3" id="q3_b" value="B"><label for="q3_b">1–2x</label></li>
+                            <li><input type="radio" name="q3" id="q3_c" value="C"><label for="q3_c">Não pratico</label></li>
                         </ul>
                     </div>
                     <!-- Step 4 -->
                     <div class="quiz-step" data-step="4">
-                        <h2>4. Você já fez exames que indicaram possíveis insuficiências (vitaminas, minerais)?</h2>
+                        <h2>4. Seus exames já mostraram glicose ou colesterol alterados?</h2>
                         <ul class="quiz-options">
-                            <li><input type="radio" name="q4" id="q4_a" value="0"><label for="q4_a">Não, ou estão normais</label></li>
-                            <li><input type="radio" name="q4" id="q4_b" value="1"><label for="q4_b">Alguns no limite</label></li>
-                            <li><input type="radio" name="q4" id="q4_c" value="2"><label for="q4_c">Sim, com orientação profissional em andamento</label></li>
+                            <li><input type="radio" name="q4" id="q4_a" value="A"><label for="q4_a">Sim</label></li>
+                            <li><input type="radio" name="q4" id="q4_b" value="B"><label for="q4_b">Não</label></li>
+                            <li><input type="radio" name="q4" id="q4_c" value="C"><label for="q4_c">Nunca fiz exame</label></li>
                         </ul>
                     </div>
 
@@ -144,6 +147,8 @@
                     <a id="cta-whatsapp" class="cta-whatsapp" href="#" target="_blank" rel="noopener noreferrer">
                         Enviar QUIZ no WhatsApp para análise personalizada
                     </a>
+                    <p class="quiz-rotina-cta">Se você deseja organizar uma rotina personalizada de suporte metabólico com base nas suas respostas, envie a palavra <strong>ROTINA</strong> no WhatsApp.</p>
+                    <a id="cta-rotina-whatsapp" class="cta-whatsapp cta-rotina" href="https://wa.me/5592994314016?text=ROTINA" target="_blank" rel="noopener noreferrer">Enviar ROTINA no WhatsApp</a>
                     <p class="disclaimer">Aviso: Este quiz é educativo e não substitui acompanhamento médico ou nutricional.</p>
                 </div>
             </div>

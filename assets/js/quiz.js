@@ -1,12 +1,19 @@
 /**
- * Quiz: Você realmente precisa de suplementação?
- * Blog Vida 360º - Lógica do quiz e CTA WhatsApp
+ * Quiz - Lógica por maioria (A / B / C)
+ * Blog Vida 360º - Suplementação e quizzes dinâmicos
  */
 (function () {
     'use strict';
 
     var TOTAL_STEPS = 4;
     var WHATSAPP_NUMBER = '5592994314016';
+
+    // Resultados por maioria (Maioria A / B / C)
+    var RESULT_BY_MAJORITY = {
+        A: { id: 'A', title: 'Base bem estruturada', message: 'Pela suas respostas, sua rotina parece bem estruturada em alimentação, movimento e cuidados. Manter a consistência e, se quiser, fazer acompanhamento com profissional para ajustes finos pode ser o próximo passo.' },
+        B: { id: 'B', title: 'Ajustes necessários', message: 'Alguns pontos indicam que vale a pena reorganizar hábitos: alimentação, sono e atividade física. Pequenos ajustes fazem diferença. Considere conversar com um profissional para um plano personalizado.' },
+        C: { id: 'C', title: 'Precisa reorganizar rotina', message: 'Sua rotina e respostas sugerem que o foco primeiro deve ser a base: alimentação, sono e movimento. Quando isso estiver mais estável, a suplementação pode ser avaliada com um profissional. Converse com médico ou nutricionista.' }
+    };
 
     var form = document.getElementById('quiz-form');
     var steps = document.querySelectorAll('.quiz-step');
@@ -24,8 +31,10 @@
 
     function updateProgress() {
         var pct = (currentStep / TOTAL_STEPS) * 100;
-        progressBar.style.width = pct + '%';
-        progressBar.setAttribute('aria-valuenow', Math.round(pct));
+        if (progressBar) {
+            progressBar.style.width = pct + '%';
+            progressBar.setAttribute('aria-valuenow', Math.round(pct));
+        }
     }
 
     function showStep(step) {
@@ -34,41 +43,44 @@
             var n = parseInt(el.getAttribute('data-step'), 10);
             el.classList.toggle('active', n === step);
         });
-        btnPrev.style.visibility = step === 1 ? 'hidden' : 'visible';
-        btnNext.textContent = step === TOTAL_STEPS ? 'Ver resultado' : 'Próxima →';
+        if (btnPrev) btnPrev.style.visibility = step === 1 ? 'hidden' : 'visible';
+        if (btnNext) btnNext.textContent = step === TOTAL_STEPS ? 'Ver resultado' : 'Próxima →';
         updateProgress();
     }
 
-    function getScore() {
-        var score = 0;
+    /** Retorna a letra da maioria (A, B ou C) a partir das respostas */
+    function getMajorityLetter() {
+        var counts = { A: 0, B: 0, C: 0 };
         ['q1', 'q2', 'q3', 'q4'].forEach(function (name) {
             var input = form.querySelector('input[name="' + name + '"]:checked');
-            if (input) score += parseInt(input.value, 10);
+            if (input && counts.hasOwnProperty(input.value)) counts[input.value]++;
         });
-        return score;
+        var max = Math.max(counts.A, counts.B, counts.C);
+        if (counts.A === max) return 'A';
+        if (counts.B === max) return 'B';
+        return 'C';
     }
 
-    function getResultBand(score) {
-        if (score <= 2) return { id: 'base', title: 'Sua base está boa', message: 'Pela sua rotina e respostas, sua alimentação e hábitos parecem bem estruturados. Manter consistência e, se quiser, fazer acompanhamento com profissional para ajustes finos pode ser o próximo passo.' };
-        if (score <= 5) return { id: 'avaliar', title: 'Vale avaliar com calma', message: 'Alguns sinais indicam que pode valer a pena conversar com um profissional para avaliar se suplementação faz sentido para você. Priorize sempre alimentação e sono; suplementos são complementos, nunca substitutos.' };
-        return { id: 'sinais', title: 'Sinais indicam que pode ajudar', message: 'Sua rotina e respostas sugerem que vale a pena uma avaliação profissional. Suplementação pode ser um suporte útil quando bem indicada. Converse com médico ou nutricionista para um plano personalizado.' };
+    function getResultByMajority(letter) {
+        return RESULT_BY_MAJORITY[letter] || RESULT_BY_MAJORITY.B;
     }
 
     function showResult() {
-        var score = getScore();
-        var band = getResultBand(score);
-        resultTitle.textContent = band.title;
-        resultMessage.textContent = band.message;
-        var text = encodeURIComponent('Olá! Fiz o quiz de suplementação. Meu resultado: "' + band.title + '". Gostaria de saber mais.');
-        ctaWhatsapp.href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + text;
+        var letter = getMajorityLetter();
+        var band = getResultByMajority(letter);
+        if (resultTitle) resultTitle.textContent = band.title;
+        if (resultMessage) resultMessage.textContent = band.message;
+        if (ctaWhatsapp) {
+            var text = encodeURIComponent('Olá! Fiz o quiz de suplementação. Meu resultado: "' + band.title + '". Gostaria de saber mais.');
+            ctaWhatsapp.href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + text;
+        }
 
-        form.style.display = 'none';
-        document.querySelector('.quiz-progress').style.display = 'none';
-        document.querySelector('.quiz-nav').style.display = 'none';
-        quizResult.classList.add('active');
-
-        // Opcional: salvar resultado no Supabase (crie tabela blog360_quiz_respostas ou use leads com email)
-        // Ex.: window.supabaseClient.from('blog360_quiz_respostas').insert({ quiz_id: 'suplementacao', score, band: band.id });
+        if (form) form.style.display = 'none';
+        var prog = document.querySelector('.quiz-progress');
+        if (prog) prog.style.display = 'none';
+        var nav = document.querySelector('.quiz-nav');
+        if (nav) nav.style.display = 'none';
+        if (quizResult) quizResult.classList.add('active');
     }
 
     function goNext() {
@@ -86,11 +98,7 @@
         if (currentStep > 1) showStep(currentStep - 1);
     }
 
-    btnNext.addEventListener('click', goNext);
-    btnPrev.addEventListener('click', goPrev);
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        goNext();
-    });
+    if (btnNext) btnNext.addEventListener('click', goNext);
+    if (btnPrev) btnPrev.addEventListener('click', goPrev);
+    if (form) form.addEventListener('submit', function (e) { e.preventDefault(); goNext(); });
 })();

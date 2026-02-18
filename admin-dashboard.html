@@ -296,6 +296,7 @@
             <li><a href="#" class="nav-link" data-tab="postagens">📝 Postagens</a></li>
             <li><a href="#" class="nav-link" data-tab="campanhas">📧 Campanhas</a></li>
             <li><a href="#" class="nav-link" data-tab="protocolos">📘 Protocolos</a></li>
+            <li><a href="#" class="nav-link" data-tab="quizzes">🧪 Quizzes</a></li>
         </ul>
     </nav>
     
@@ -449,6 +450,33 @@
                         </tr>
                     </thead>
                     <tbody id="all-protocols">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Quizzes -->
+        <div id="tab-quizzes" class="tab-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>🧪 Quizzes do blog</h2>
+                    <button class="btn-primary" onclick="window.location.href='admin-editor-quiz.html'">+ Novo Quiz</button>
+                </div>
+                <p style="padding: 0 1.5rem 1rem; color: #7F8C8D; font-size: 14px;">Crie quizzes (perguntas A/B/C) e exiba no blog. Resultado por maioria: A, B ou C.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Slug</th>
+                            <th>Ativo</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-quizzes">
                         <tr>
                             <td colspan="5" class="loading">Carregando...</td>
                         </tr>

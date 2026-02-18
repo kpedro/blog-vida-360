@@ -173,6 +173,9 @@ async function loadTabData(tabId) {
         case 'protocolos':
             await loadAllProtocols();
             break;
+        case 'quizzes':
+            await loadAllQuizzes();
+            break;
     }
 }
 
@@ -591,6 +594,73 @@ window.closeProtocolModal = closeProtocolModal;
 window.saveProtocol = saveProtocol;
 window.deleteProtocol = deleteProtocol;
 window.copyProtocolLink = copyProtocolLink;
+
+// --- Quizzes (blog360_quizzes) ---
+async function loadAllQuizzes() {
+    const tbody = document.getElementById('all-quizzes');
+    if (!tbody) return;
+    try {
+        const client = window.supabaseClient;
+        if (!client || !client.getQuizzes) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Erro ao conectar ao Supabase</td></tr>';
+            return;
+        }
+        const result = await client.getQuizzes(false);
+        if (!result.success || !result.data) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum quiz. Clique em "+ Novo Quiz" para criar.</td></tr>';
+            return;
+        }
+        const list = result.data;
+        if (list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum quiz. Clique em "+ Novo Quiz" para criar.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = list.map(q => `
+            <tr>
+                <td><strong>${escapeHtml(q.title || '')}</strong></td>
+                <td><code>${escapeHtml(q.slug || '')}</code></td>
+                <td><span class="badge ${q.active ? 'published' : 'draft'}">${q.active ? 'Sim' : 'Não'}</span></td>
+                <td>${formatDate(q.created_at)}</td>
+                <td class="action-buttons">
+                    <a href="admin-editor-quiz.html?id=${q.id}" class="btn-icon" title="Editar">✏️</a>
+                    <button type="button" class="btn-icon" title="${q.active ? 'Desativar' : 'Ativar'}" onclick="toggleQuizActive('${q.id}', ${!!q.active})">${q.active ? '👁️' : '🔒'}</button>
+                    <button type="button" class="btn-icon" title="Excluir" onclick="deleteQuiz('${q.id}', '${(q.title || '').replace(/'/g, "\\'")}')">🗑️</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        console.error('Erro ao carregar quizzes:', error);
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Erro ao carregar. Execute BLOG360_QUIZZES.sql no Supabase.</td></tr>';
+    }
+}
+async function toggleQuizActive(quizId, currentlyActive) {
+    try {
+        const client = window.supabaseClient;
+        if (!client) return;
+        const { error } = await client.from('blog360_quizzes').update({ active: !currentlyActive, updated_at: new Date().toISOString() }).eq('id', quizId);
+        if (error) throw error;
+        loadAllQuizzes();
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao atualizar.');
+    }
+}
+async function deleteQuiz(quizId, title) {
+    if (!confirm('Excluir o quiz "' + (title || '') + '"?')) return;
+    try {
+        const client = window.supabaseClient;
+        if (!client) return;
+        const { error } = await client.from('blog360_quizzes').delete().eq('id', quizId);
+        if (error) throw error;
+        alert('Quiz excluído.');
+        loadAllQuizzes();
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao excluir.');
+    }
+}
+window.toggleQuizActive = toggleQuizActive;
+window.deleteQuiz = deleteQuiz;
 
 // Carregar dados da visão geral
 async function loadOverviewData() {

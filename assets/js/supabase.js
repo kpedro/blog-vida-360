@@ -504,9 +504,72 @@ function initSupabase() {
       return { success: false, data: [], error: error.message };
     }
   };
-  
+
+  // Listar quizzes (admin: todos; blog: só ativos via RLS)
+  client.getQuizzes = async function(activeOnly) {
+    try {
+      var query = this.from('blog360_quizzes').select('id, title, slug, description, active, created_at').order('created_at', { ascending: false });
+      if (activeOnly === true) query = query.eq('active', true);
+      var res = await query;
+      if (res.error) throw res.error;
+      return { success: true, data: res.data || [] };
+    } catch (error) {
+      console.error('Erro ao buscar quizzes:', error);
+      return { success: false, data: [], error: error.message };
+    }
+  };
+
+  // Buscar quiz por slug (para página do blog) – com perguntas, opções e resultados
+  client.getQuizBySlug = async function(slug) {
+    try {
+      var qRes = await this.from('blog360_quizzes').select('*').eq('slug', slug).eq('active', true).maybeSingle();
+      if (qRes.error) throw qRes.error;
+      if (!qRes.data) return { success: true, data: null };
+      var quiz = qRes.data;
+      var qqRes = await this.from('blog360_quiz_questions').select('id, sort_order, question_text').eq('quiz_id', quiz.id).order('sort_order', { ascending: true });
+      if (qqRes.error) throw qqRes.error;
+      var questions = qqRes.data || [];
+      for (var i = 0; i < questions.length; i++) {
+        var optRes = await this.from('blog360_quiz_options').select('option_letter, option_text').eq('question_id', questions[i].id).order('option_letter');
+        questions[i].options = (optRes.data || []).sort(function(a, b) { return (a.option_letter > b.option_letter) ? 1 : -1; });
+      }
+      quiz.questions = questions;
+      var resRes = await this.from('blog360_quiz_results').select('result_letter, title, message').eq('quiz_id', quiz.id);
+      if (resRes.error) throw resRes.error;
+      quiz.results = resRes.data || [];
+      return { success: true, data: quiz };
+    } catch (error) {
+      console.error('Erro ao buscar quiz por slug:', error);
+      return { success: false, data: null, error: error.message };
+    }
+  };
+
+  // Buscar quiz por id com perguntas/opções/resultados (admin)
+  client.getQuizById = async function(id) {
+    try {
+      var qRes = await this.from('blog360_quizzes').select('*').eq('id', id).maybeSingle();
+      if (qRes.error) throw qRes.error;
+      if (!qRes.data) return { success: true, data: null };
+      var quiz = qRes.data;
+      var qqRes = await this.from('blog360_quiz_questions').select('id, sort_order, question_text').eq('quiz_id', quiz.id).order('sort_order', { ascending: true });
+      if (qqRes.error) throw qqRes.error;
+      var questions = qqRes.data || [];
+      for (var i = 0; i < questions.length; i++) {
+        var optRes = await this.from('blog360_quiz_options').select('option_letter, option_text').eq('question_id', questions[i].id).order('option_letter');
+        questions[i].options = optRes.data || [];
+      }
+      quiz.questions = questions;
+      var resRes = await this.from('blog360_quiz_results').select('result_letter, title, message').eq('quiz_id', quiz.id);
+      quiz.results = resRes.data || [];
+      return { success: true, data: quiz };
+    } catch (error) {
+      console.error('Erro ao buscar quiz por id:', error);
+      return { success: false, data: null, error: error.message };
+    }
+  };
+
   supabaseClient = client;
-  console.log('✅ Cliente Supabase criado diretamente (com getPosts/getPostBySlug/getProtocols)');
+  console.log('✅ Cliente Supabase criado (getPosts/getPostBySlug/getProtocols/getQuizzes/getQuizBySlug/getQuizById)');
   
   return supabaseClient;
 }

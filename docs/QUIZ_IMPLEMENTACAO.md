@@ -2,11 +2,12 @@
 
 ## O que foi implementado
 
-- **Página:** `quiz-suplementacao.html` — Quiz *"Você realmente precisa de suplementação para saúde metabólica?"*
-- **Perguntas:** 4 (vegetais diários, cansaço, alimentação regular, exames/insuficiências).
-- **Resultado:** 3 faixas (base boa / vale avaliar / sinais indicam), com CTA para WhatsApp com o resultado no texto.
-- **Menu:** link "Quiz" adicionado em todas as páginas do blog.
-- **Home:** bloco de destaque para o quiz acima da busca.
+- **Quiz estático:** `quiz-suplementacao.html` — *"Você realmente precisa de suplementação para saúde metabólica?"* com 4 perguntas e resultado por **maioria A/B/C** (Base bem estruturada / Ajustes necessários / Precisa reorganizar rotina).
+- **Quiz dinâmico:** `quiz.html?quiz=SLUG` — carrega quiz criado no admin pelo slug. Sem `?quiz=` redireciona para o quiz de suplementação.
+- **Admin:** no painel, aba **Quizzes** — listar, criar, editar, ativar/desativar e excluir. Editor em `admin-editor-quiz.html`: título, slug, perguntas (cada uma com 3 opções A, B, C), resultados (título e mensagem para A, B e C).
+- **Banco:** tabelas `blog360_quizzes`, `blog360_quiz_questions`, `blog360_quiz_options`, `blog360_quiz_results` (SQL em `supabase/BLOG360_QUIZZES.sql`).
+- **Menu:** link "Quiz" em todas as páginas aponta para `quiz.html`.
+- **Home:** destaque "Fazer o quiz" aponta para `quiz.html`.
 
 ## Como usar
 
