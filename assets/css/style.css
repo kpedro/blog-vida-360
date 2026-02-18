@@ -126,15 +126,22 @@ header .container {
     letter-spacing: -0.02em;
 }
 
-/* Logo branco quando header tem fundo escuro */
-header[style*="background-color: var(--blue-dark)"],
-header[style*="background-color: #003366"],
+/* Header escuro unificado (igual à página inicial) */
 header {
     background-color: var(--blue-dark) !important;
+    color: var(--text-color);
 }
 
 header .logo {
     color: var(--text-color) !important;
+}
+
+header nav ul li a {
+    color: var(--text-color) !important;
+}
+
+header nav ul li a:hover {
+    color: var(--blue-light) !important;
 }
 
 /* Menu de Navegação */
@@ -330,12 +337,12 @@ main {
     margin-top: 10px;
 }
 
-/* Rodapé */
+/* Rodapé - mesma cor do header */
 footer {
-    background: #003366; /* Azul escuro */
+    background: var(--blue-dark);
     text-align: center;
     padding: 20px;
-    color: #ffffff; /* Branco */
+    color: var(--text-color);
     margin-top: 20px;
 }
 
