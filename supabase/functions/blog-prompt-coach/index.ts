@@ -31,6 +31,8 @@ FORMATO DE RESPOSTA OBRIGATÓRIO — responda SOMENTE com um único objeto JSON 
 Regras do JSON:
 - Se ainda precisar de informações: phase = "clarify", suggestedTitle e suggestedContent como "".
 - Quando entregar o prompt pronto: phase = "deliver", preencha suggestedTitle e suggestedContent.
+- CRÍTICO em phase = "deliver": o texto COMPLETO do prompt para colar na IA deve ir em suggestedContent (várias frases ou parágrafos). Não deixe suggestedContent vazio. assistantMessage deve ser CURTO (1–3 frases de encerramento); NÃO coloque o prompt longo só no assistantMessage.
+- NUNCA use "---" ou blocos markdown no lugar de suggestedContent; o prompt integral vai na string suggestedContent.
 - assistantMessage sempre preenchido.
 - IMPORTANTE: dentro de strings JSON, use \\n para quebra de linha. Nunca coloque quebra de linha literal entre as aspas.`;
 
@@ -59,6 +61,63 @@ function buildContents(messages: Msg[]) {
     });
   }
   return contents;
+}
+
+/** Se o modelo colocou o prompt só na mensagem ou após "---", recupera para suggestedContent. */
+function recoverSuggestedContent(
+  assistantMessage: string,
+  suggestedContent: string,
+): string {
+  const sc = (suggestedContent || "").trim();
+  if (sc.length >= 40) return sc;
+
+  const am = (assistantMessage || "").trim();
+  if (!am) return sc;
+
+  const afterSep = am.match(/\n-{3,}\n([\s\S]+)/);
+  if (afterSep && afterSep[1].trim().length >= 40) {
+    return afterSep[1].trim();
+  }
+
+  let body = am
+    .replace(/^[\s\S]*?(?:prompt pronto|aqui está o prompt|segue (?:o prompt|abaixo)|use o prompt abaixo)[^\n]*\n+/i, "")
+    .replace(/^---+[\s\n]*/m, "")
+    .trim();
+
+  if (body.length >= 40) return body;
+  if (am.length >= 120) return am;
+  return sc;
+}
+
+function finalizeCoachResponse(
+  phaseIn: "clarify" | "deliver",
+  assistantMessage: string,
+  suggestedTitle: string,
+  suggestedContent: string,
+) {
+  let phase: "clarify" | "deliver" = phaseIn;
+  let am = typeof assistantMessage === "string" ? assistantMessage : "";
+  let st = typeof suggestedTitle === "string" ? suggestedTitle : "";
+  let sc = typeof suggestedContent === "string" ? suggestedContent : "";
+
+  const recovered = recoverSuggestedContent(am, sc);
+  if (phase === "deliver" && recovered.trim().length > sc.trim().length) {
+    sc = recovered.trim();
+  }
+  if (phase === "deliver" && sc.trim().length >= 40 && am.length > 400) {
+    am =
+      "Prompt pronto. Use o botão «Aplicar ao campo de comando» para colar o texto completo no Estúdio.";
+  }
+  if (phase === "deliver" && sc.trim().length < 40) {
+    phase = "clarify";
+  }
+
+  return {
+    phase,
+    assistantMessage: am,
+    suggestedTitle: phase === "deliver" ? st.trim() : "",
+    suggestedContent: phase === "deliver" ? sc.trim() : "",
+  };
 }
 
 serve(async (req) => {
@@ -103,21 +162,57 @@ serve(async (req) => {
 
     const contents = buildContents(messages);
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents,
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          generationConfig: {
-            temperature: 0.35,
-            maxOutputTokens: 4096,
+    const url =
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API}`;
+
+    const payloadWithJsonSchema = {
+      contents,
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      generationConfig: {
+        temperature: 0.35,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            phase: { type: "string", enum: ["clarify", "deliver"] },
+            assistantMessage: { type: "string" },
+            suggestedTitle: { type: "string" },
+            suggestedContent: { type: "string" },
           },
-        }),
+          required: ["phase", "assistantMessage", "suggestedTitle", "suggestedContent"],
+        },
       },
-    );
+    };
+
+    const payloadPlain = {
+      contents,
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      generationConfig: {
+        temperature: 0.35,
+        maxOutputTokens: 8192,
+      },
+    };
+
+    let response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payloadWithJsonSchema),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      const retryPlain = response.status === 400 &&
+        /responseSchema|responseMimeType|JsonSchema|schema/i.test(errorText);
+      if (retryPlain) {
+        console.warn("blog-prompt-coach: retry sem JSON schema");
+        response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payloadPlain),
+        });
+      }
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -261,41 +356,39 @@ serve(async (req) => {
       const loose = parsePromptCoachLoose(rawText);
       if (loose && (loose.assistantMessage.trim() || loose.suggestedContent.trim())) {
         const phaseLoose = loose.phase === "deliver" ? "deliver" : "clarify";
-        return new Response(
-          JSON.stringify({
-            phase: phaseLoose,
-            assistantMessage: loose.assistantMessage,
-            suggestedTitle: phaseLoose === "deliver" ? loose.suggestedTitle.trim() : "",
-            suggestedContent: phaseLoose === "deliver" ? loose.suggestedContent.trim() : "",
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        const out = finalizeCoachResponse(
+          phaseLoose,
+          loose.assistantMessage,
+          loose.suggestedTitle,
+          loose.suggestedContent,
         );
+        return new Response(JSON.stringify(out), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
       return new Response(
         JSON.stringify({
-          error: "parse_failed",
-          rawText,
+          phase: "clarify",
+          assistantMessage:
+            "A resposta da IA veio em formato inesperado. Envie de novo: «Gere o JSON final com phase deliver e suggestedContent contendo o prompt completo para o Estúdio.»",
+          suggestedTitle: "",
+          suggestedContent: "",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const phase = parsed.phase === "deliver" ? "deliver" : "clarify";
+    const phase: "clarify" | "deliver" = parsed.phase === "deliver" ? "deliver" : "clarify";
     const assistantMessage = typeof parsed.assistantMessage === "string"
       ? parsed.assistantMessage
       : "Não consegui formatar a resposta. Tente reformular ou continuar a conversa.";
     const suggestedTitle = typeof parsed.suggestedTitle === "string" ? parsed.suggestedTitle : "";
     const suggestedContent = typeof parsed.suggestedContent === "string" ? parsed.suggestedContent : "";
 
-    return new Response(
-      JSON.stringify({
-        phase,
-        assistantMessage,
-        suggestedTitle: phase === "deliver" ? suggestedTitle.trim() : "",
-        suggestedContent: phase === "deliver" ? suggestedContent.trim() : "",
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    const out = finalizeCoachResponse(phase, assistantMessage, suggestedTitle, suggestedContent);
+    return new Response(JSON.stringify(out), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("blog-prompt-coach:", error);
     return new Response(

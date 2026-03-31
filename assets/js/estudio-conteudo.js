@@ -387,12 +387,16 @@
 
       const assistantMessage = data.assistantMessage || '';
       const phase = data.phase || 'clarify';
-      const suggestedContent = data.suggestedContent || '';
+      const suggestedContent = (data.suggestedContent || '').trim();
 
       coachMessages.push({ role: 'assistant', content: assistantMessage || suggestedContent || '…' });
       appendCoachLine('Assistente', assistantMessage, false);
 
-      if (phase === 'deliver' && suggestedContent) {
+      const canApply =
+        (phase === 'deliver' && suggestedContent.length >= 40) ||
+        suggestedContent.length >= 120;
+
+      if (canApply) {
         coachPendingContent = suggestedContent;
         $('coach-apply').disabled = false;
       } else {
