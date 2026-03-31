@@ -44,6 +44,20 @@
     return window.VITE_SUPABASE_URL || '';
   }
 
+  function getAnonKey() {
+    return window.VITE_SUPABASE_ANON_KEY || '';
+  }
+
+  function fnHeaders(session) {
+    const h = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    };
+    const k = getAnonKey();
+    if (k) h.apikey = k;
+    return h;
+  }
+
   async function getSession() {
     let c = window.supabaseClient;
     if (!c && typeof window.initSupabase === 'function') {
@@ -142,10 +156,7 @@
     try {
       const res = await fetch(`${getSupabaseUrl()}/functions/v1/generate-blog-studio-content`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers: fnHeaders(session),
         body: JSON.stringify({ type: contentType, prompt: prompt.trim(), temperature: 0.8 }),
       });
       const data = await res.json().catch(() => ({}));
@@ -270,10 +281,7 @@
     try {
       const res = await fetch(`${getSupabaseUrl()}/functions/v1/generate-blog-studio-image`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers: fnHeaders(session),
         body: JSON.stringify({ prompt: desc, format: fmt }),
       });
       const data = await res.json().catch(() => ({}));
@@ -371,10 +379,7 @@
     try {
       const res = await fetch(`${getSupabaseUrl()}/functions/v1/blog-prompt-coach`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers: fnHeaders(session),
         body: JSON.stringify({ messages: coachMessages }),
       });
       const data = await res.json().catch(() => ({}));
