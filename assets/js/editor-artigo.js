@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await checkAuthentication();
     initEditor();
     loadPostIfEditing();
+    applyBlog360EstudioPayload();
 });
 
 // Verificar autenticação
@@ -21,6 +22,68 @@ async function checkAuthentication() {
     if (!session) {
         console.warn('⚠️ Nenhuma sessão encontrada');
         window.location.href = 'admin-login.html';
+    }
+}
+
+/** Conteúdo vindo do Estúdio de conteúdo (sessionStorage blog360_estudio_payload) */
+function applyBlog360EstudioPayload() {
+    try {
+        const raw = sessionStorage.getItem('blog360_estudio_payload');
+        if (!raw) return;
+        sessionStorage.removeItem('blog360_estudio_payload');
+        const p = JSON.parse(raw);
+        if (!p || typeof p !== 'object') return;
+
+        if (p.title) document.getElementById('post-title').value = String(p.title).slice(0, 120);
+        if (p.excerpt) document.getElementById('post-excerpt').value = String(p.excerpt).slice(0, 200);
+
+        const body = p.body ? String(p.body) : '';
+        if (body) {
+            const md = document.getElementById('markdown-editor');
+            const htmlEd = document.getElementById('editor-content');
+            if (typeof isMarkdown === 'function' && isMarkdown(body)) {
+                md.value = body;
+                htmlEd.innerHTML = '';
+                if (typeof editorMode !== 'undefined' && editorMode === 'html') {
+                    toggleEditorMode();
+                } else {
+                    md.style.display = 'block';
+                    htmlEd.style.display = 'none';
+                    editorMode = 'markdown';
+                    document.getElementById('markdown-actions').style.display = 'block';
+                    document.getElementById('markdown-hint').style.display = 'inline';
+                    document.getElementById('btn-mode-switch').textContent = '🌐 HTML';
+                    const toolbarButtons = ['btn-bold', 'btn-italic', 'btn-underline', 'btn-h2', 'btn-h3', 'btn-link', 'btn-image'];
+                    toolbarButtons.forEach(function (id) {
+                        const b = document.getElementById(id);
+                        if (b) b.disabled = true;
+                    });
+                }
+            } else {
+                htmlEd.innerHTML = body;
+            }
+        }
+
+        if (p.imageDataUrl && String(p.imageDataUrl).startsWith('data:')) {
+            const urlInput = document.getElementById('image-url');
+            const preview = document.getElementById('image-preview');
+            if (urlInput) urlInput.value = p.imageDataUrl;
+            if (preview) {
+                preview.src = p.imageDataUrl;
+                preview.style.display = 'block';
+            }
+        }
+
+        updatePreview();
+        calculateSEOScore();
+        const wc = document.getElementById('content-count');
+        if (wc && body) {
+            const words = body.trim().split(/\s+/).filter(function (w) { return w.length > 0; }).length;
+            wc.textContent = words;
+        }
+        alert('Conteúdo do Estúdio aplicado ao artigo. Revise e publique quando estiver pronto.');
+    } catch (e) {
+        console.warn('applyBlog360EstudioPayload:', e);
     }
 }
 

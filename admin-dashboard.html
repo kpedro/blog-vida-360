@@ -191,6 +191,20 @@
             background: #C0392B;
         }
         
+        .btn-secondary {
+            background: #34495E;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .btn-secondary:hover {
+            background: #2C3E50;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -384,7 +398,10 @@
             <div class="table-container">
                 <div class="table-header">
                     <h2>📝 Gerenciar Postagens</h2>
-                    <button class="btn-primary" onclick="window.location.href='admin-editor-artigo.html'">+ Novo Artigo</button>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+                        <button class="btn-primary" onclick="window.location.href='admin-editor-artigo.html'">+ Novo Artigo</button>
+                        <button class="btn-secondary" onclick="window.location.href='admin-estudio-conteudo.html'" title="IA: landing, redes, rascunhos de artigo">✨ Estúdio de conteúdo</button>
+                    </div>
                 </div>
                 <table>
                     <thead>
