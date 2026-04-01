@@ -103,6 +103,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="assets/js/sanitize-article-html.js"></script>
     <style>
         /* Usa a mesma paleta da página inicial (variáveis em style.css) */
         #post-content {
@@ -461,17 +462,11 @@
                     if (typeof marked !== 'undefined' && raw && !/^\s*</.test(raw)) {
                         try { html = marked.parse(raw); } catch (e) { }
                     }
-                    if (typeof html === 'string' && (/html|<head|<!DOCTYPE|og:|\btwitter:|Favicon/i.test(html) || (/<\s*meta/i.test(html) && /<\s*link/i.test(html)))) {
-                        var bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-                        if (bodyMatch) {
-                            html = bodyMatch[1].trim();
-                        } else {
-                            html = html.replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '').replace(/<!DOCTYPE[^>]*>/gi, '').replace(/<html[^>]*>|<\/html>/gi, '').trim();
-                            if (/<\s*link|<\s*meta|og:|\btwitter:|Favicon/i.test(html)) {
-                                html = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<link[^>]*>/gi, '').replace(/<meta[^>]*>/gi, '').trim();
-                            }
-                        }
-                        if (!html || !html.replace(/\s/g, '')) html = '<p>Conteúdo indisponível.</p>';
+                    if (typeof window.sanitizeArticleHtml === 'function') {
+                        html = window.sanitizeArticleHtml(html);
+                    }
+                    if (!html || !String(html).replace(/\s/g, '')) {
+                        html = '<p>Conteúdo indisponível.</p>';
                     }
                     el.innerHTML = html;
                     el.classList.remove('post-content-loading');

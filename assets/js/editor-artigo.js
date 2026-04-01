@@ -181,18 +181,16 @@ async function loadPost(postId) {
         document.getElementById('image-url').value = data.imagem_destaque || data.image_url || '';
         
         // Carregar conteúdo (tentar Markdown primeiro, depois HTML)
-        const content = data.conteudo || data.content || '';
-        if (content && window.marked) {
-            // Tentar detectar se é Markdown
-            if (isMarkdown(content)) {
-                document.getElementById('markdown-editor').value = content;
-                if (editorMode === 'html') {
-                    toggleEditorMode(); // Mudar para modo Markdown
-                }
-            } else {
-                document.getElementById('editor-content').innerHTML = content;
+        let content = data.conteudo || data.content || data.conteudo_markdown || '';
+        if (content && window.marked && isMarkdown(content)) {
+            document.getElementById('markdown-editor').value = content;
+            if (editorMode === 'html') {
+                toggleEditorMode();
             }
-        } else {
+        } else if (content) {
+            if (typeof window.sanitizeArticleHtml === 'function') {
+                content = window.sanitizeArticleHtml(content);
+            }
             document.getElementById('editor-content').innerHTML = content;
         }
         
@@ -552,6 +550,10 @@ async function savePost(status) {
             }
         } else {
             contentHtml = document.getElementById('editor-content').innerHTML;
+        }
+
+        if (typeof window.sanitizeArticleHtml === 'function' && contentHtml) {
+            contentHtml = window.sanitizeArticleHtml(contentHtml);
         }
         
         if (!title || !category || !excerpt) {

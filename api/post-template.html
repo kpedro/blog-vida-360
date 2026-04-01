@@ -103,6 +103,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="assets/js/sanitize-article-html.js"></script>
     <style>
         /* Usa a mesma paleta da página inicial (variáveis em style.css) */
         #post-content {
@@ -111,7 +112,6 @@
             border-radius: 10px;
             margin-bottom: 30px;
         }
-        /* Evitar flash do código antes de renderizar */
         #post-content.post-content-loading {
             opacity: 0;
             min-height: 60px;
@@ -261,7 +261,7 @@
         <p id="article-byline" class="article-byline" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.95rem; color: var(--blue-primary);"></p>
         <p id="article-meta" class="article-meta" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.875rem; color: #666;"></p>
         <p id="article-meta-local" class="article-meta-local" style="display:none; margin-top: 0; margin-bottom: 1.5rem; font-size: 0.875rem; color: #444; font-weight: 500;"></p>
-        <!-- Área do Post (oculta até o conteúdo estar renderizado para não mostrar código) -->
+        <!-- Área do Post (oculta até renderizar para não mostrar código) -->
         <div id="post-content" class="post-content-loading">
             Carregando post...
         </div>
@@ -462,17 +462,11 @@
                     if (typeof marked !== 'undefined' && raw && !/^\s*</.test(raw)) {
                         try { html = marked.parse(raw); } catch (e) { }
                     }
-                    if (typeof html === 'string' && (/html|<head|<!DOCTYPE|og:|\btwitter:|Favicon/i.test(html) || (/<\s*meta/i.test(html) && /<\s*link/i.test(html)))) {
-                        var bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-                        if (bodyMatch) {
-                            html = bodyMatch[1].trim();
-                        } else {
-                            html = html.replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '').replace(/<!DOCTYPE[^>]*>/gi, '').replace(/<html[^>]*>|<\/html>/gi, '').trim();
-                            if (/<\s*link|<\s*meta|og:|\btwitter:|Favicon/i.test(html)) {
-                                html = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<link[^>]*>/gi, '').replace(/<meta[^>]*>/gi, '').trim();
-                            }
-                        }
-                        if (!html || !html.replace(/\s/g, '')) html = '<p>Conteúdo indisponível.</p>';
+                    if (typeof window.sanitizeArticleHtml === 'function') {
+                        html = window.sanitizeArticleHtml(html);
+                    }
+                    if (!html || !String(html).replace(/\s/g, '')) {
+                        html = '<p>Conteúdo indisponível.</p>';
                     }
                     el.innerHTML = html;
                     el.classList.remove('post-content-loading');
@@ -638,7 +632,7 @@
             console.error("Artigo não encontrado");
         }
     </script>
-    
+    <script src="assets/js/chat-widget.js"></script>
 </body>
 </html>
 
