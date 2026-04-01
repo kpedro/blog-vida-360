@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner da home - Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F5F7FA; color: #2C3E50; min-height: 100vh; }
+        .editor-header {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .editor-header a { color: #ECF0F1; text-decoration: none; font-weight: 600; }
+        .editor-header a:hover { color: white; }
+        .editor-container { max-width: 720px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 1.5rem; }
+        .form-ground { margin-bottom: 1.25rem; }
+        .form-ground label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        .form-ground input[type="text"], .form-ground input[type="url"] { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; }
+        .form-ground .hint { font-size: 12px; color: #7F8C8D; margin-top: 4px; }
+        .check-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+        .check-row input { width: 18px; height: 18px; }
+        .btn-primary { background: #E74C3C; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px; }
+        .btn-primary:hover { background: #C0392B; }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        #msg { margin-top: 1rem; padding: 12px; border-radius: 6px; font-size: 14px; display: none; }
+        #msg.ok { display: block; background: #D5F4E6; color: #1E8449; }
+        #msg.err { display: block; background: #FADBD8; color: #C0392B; }
+        .preview { margin-top: 1.5rem; padding: 1rem; background: #F8F9FA; border-radius: 8px; border: 1px dashed #BDC3C7; }
+        .preview img { max-width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <header class="editor-header">
+        <h1>Banner de produto (home)</h1>
+        <div style="display:flex;gap:16px;align-items:center;">
+            <a href="admin-dashboard.html">← Dashboard</a>
+            <a href="index.html">Ver blog</a>
+        </div>
+    </header>
+    <div class="editor-container">
+        <p style="margin-bottom:1rem;color:#5D6D7E;font-size:14px;">Um único destaque na página inicial. Só aparece para visitantes se estiver <strong>ativo</strong> e com imagem e link <strong>https</strong> válidos. Execute o SQL <code>supabase/BLOG360_SITE_SETTINGS.sql</code> no projeto se ainda não criou a tabela.</p>
+        <div class="card">
+            <div class="check-row">
+                <input type="checkbox" id="prodAtivo">
+                <label for="prodAtivo" style="margin:0;font-weight:600;">Exibir banner na home</label>
+            </div>
+            <div class="form-ground">
+                <label for="prodTitulo">Título acima do banner</label>
+                <input type="text" id="prodTitulo" placeholder="Ex.: Kit bem-estar que usamos">
+            </div>
+            <div class="form-ground">
+                <label for="prodImagem">URL da imagem (https)</label>
+                <input type="url" id="prodImagem" placeholder="https://...">
+                <p class="hint">Pode ser link do Supabase Storage ou CDN. Proporção larga: ~1200×400.</p>
+            </div>
+            <div class="form-ground">
+                <label for="prodLink">Link ao clicar (https)</label>
+                <input type="url" id="prodLink" placeholder="https://...">
+                <p class="hint">Link de afiliado ou página da oferta.</p>
+            </div>
+            <div class="form-ground">
+                <label for="prodLegenda">Legenda / transparência (opcional)</label>
+                <input type="text" id="prodLegenda" placeholder="Ex.: Indicação — você apoia o blog sem custo extra.">
+            </div>
+            <button type="button" class="btn-primary" id="btnSalvar">Salvar</button>
+            <div id="msg"></div>
+            <div class="preview" id="previewBox" style="display:none;">
+                <strong>Prévia</strong>
+                <div id="previewInner"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        function initClient() {
+            if (typeof initSupabase !== 'function') return null;
+            return initSupabase();
+        }
+
+        function showMsg(text, ok) {
+            var m = document.getElementById('msg');
+            m.textContent = text;
+            m.className = ok ? 'ok' : 'err';
+            m.style.display = 'block';
+        }
+
+        async function requireAuth() {
+            var client = window.supabaseClient || initClient();
+            window.supabaseClient = client;
+            if (!client || !client.auth) {
+                window.location.href = 'admin-login.html';
+                return null;
+            }
+            var sess = await client.auth.getSession();
+            if (!sess.data.session) {
+                var u = await client.auth.getUser();
+                if (!u.data.user) {
+                    window.location.href = 'admin-login.html';
+                    return null;
+                }
+            }
+            return client;
+        }
+
+        function updatePreview() {
+            var img = document.getElementById('prodImagem').value.trim();
+            var tit = document.getElementById('prodTitulo').value.trim() || 'Título';
+            var box = document.getElementById('previewBox');
+            var inner = document.getElementById('previewInner');
+            if (!/^https?:\/\//i.test(img)) {
+                box.style.display = 'none';
+                return;
+            }
+            inner.innerHTML = '<div style="font-weight:700;color:#2C3E50;">' + tit.replace(/</g, '&lt;') + '</div><img src="' + img.replace(/"/g, '') + '" alt="">';
+            box.style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            var client = await requireAuth();
+            if (!client) return;
+            window.supabaseClient = client;
+
+            var r = await client.getSiteSettings();
+            if (r.success && r.data) {
+                var d = r.data;
+                document.getElementById('prodAtivo').checked = !!d.produto_banner_ativo;
+                document.getElementById('prodTitulo').value = d.produto_banner_titulo || '';
+                document.getElementById('prodImagem').value = d.produto_banner_imagem_url || '';
+                document.getElementById('prodLink').value = d.produto_banner_link || '';
+                document.getElementById('prodLegenda').value = d.produto_banner_legenda || '';
+                updatePreview();
+            } else if (r.error && r.error.includes('does not exist')) {
+                showMsg('Tabela blog360_site_settings não encontrada. Rode BLOG360_SITE_SETTINGS.sql no Supabase.', false);
+            }
+
+            ['prodImagem', 'prodTitulo'].forEach(function(id) {
+                document.getElementById(id).addEventListener('input', updatePreview);
+            });
+
+            document.getElementById('btnSalvar').addEventListener('click', async function() {
+                var btn = this;
+                btn.disabled = true;
+                document.getElementById('msg').style.display = 'none';
+                var payload = {
+                    produto_banner_ativo: document.getElementById('prodAtivo').checked,
+                    produto_banner_titulo: document.getElementById('prodTitulo').value.trim() || null,
+                    produto_banner_imagem_url: document.getElementById('prodImagem').value.trim() || null,
+                    produto_banner_link: document.getElementById('prodLink').value.trim() || null,
+                    produto_banner_legenda: document.getElementById('prodLegenda').value.trim() || null
+                };
+                if (payload.produto_banner_ativo) {
+                    if (!payload.produto_banner_imagem_url || !/^https?:\/\//i.test(payload.produto_banner_imagem_url)) {
+                        showMsg('Com banner ativo, informe URL da imagem começando com http(s).', false);
+                        btn.disabled = false;
+                        return;
+                    }
+                    if (!payload.produto_banner_link || !/^https?:\/\//i.test(payload.produto_banner_link)) {
+                        showMsg('Com banner ativo, informe o link de destino começando com http(s).', false);
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+                var save = await client.saveSiteSettings(payload);
+                if (save.success) {
+                    showMsg('Salvo. Atualize a home para ver o banner.', true);
+                } else {
+                    showMsg(save.error || 'Erro ao salvar. Verifique sessão e se o SQL foi aplicado.', false);
+                }
+                btn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

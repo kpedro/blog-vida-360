@@ -522,6 +522,38 @@ function initSupabase() {
     }
   };
 
+  // Configurações do site (banner global na home; leitura pública, escrita autenticada)
+  client.getSiteSettings = async function() {
+    try {
+      const { data, error } = await this
+        .from('blog360_site_settings')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle();
+      if (error) throw error;
+      return { success: true, data: data || null };
+    } catch (error) {
+      console.error('Erro ao buscar configurações do site:', error);
+      return { success: false, data: null, error: error.message };
+    }
+  };
+
+  client.saveSiteSettings = async function(fields) {
+    try {
+      const row = Object.assign({ id: 1 }, fields);
+      const { data, error } = await this
+        .from('blog360_site_settings')
+        .upsert(row, { onConflict: 'id' })
+        .select()
+        .single();
+      if (error) throw error;
+      return { success: true, data };
+    } catch (error) {
+      console.error('Erro ao salvar configurações do site:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   // Listar quizzes (admin: todos; blog: só ativos via RLS)
   client.getQuizzes = async function(activeOnly) {
     try {
@@ -586,7 +618,7 @@ function initSupabase() {
   };
 
   supabaseClient = client;
-  console.log('✅ Cliente Supabase criado (getPosts/getPostBySlug/getProtocols/getQuizzes/getQuizBySlug/getQuizById)');
+  console.log('✅ Cliente Supabase criado (getPosts/getPostBySlug/getProtocols/getSiteSettings/saveSiteSettings/getQuizzes/getQuizBySlug/getQuizById)');
   
   return supabaseClient;
 }

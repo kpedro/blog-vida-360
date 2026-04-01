@@ -93,6 +93,41 @@
             border-radius: 0 0 var(--radius-md) var(--radius-md);
         }
 
+        .home-product-banner-wrap {
+            margin: var(--spacing-lg) 0;
+            padding: var(--spacing-md);
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .home-product-banner-wrap.is-hidden { display: none; }
+        .home-product-banner-wrap h3 {
+            color: var(--blue-primary);
+            font-size: 1.1rem;
+            margin: 0 0 var(--spacing-sm);
+        }
+        .home-product-banner-wrap .banner-legal {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: var(--spacing-sm) 0 0;
+        }
+        .home-product-banner-wrap a.banner-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        .home-product-banner-wrap img {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            display: block;
+            vertical-align: middle;
+        }
+
         footer {
             margin-top: var(--spacing-xl);
         }
@@ -138,6 +173,9 @@
                 <p style="margin: 0 0 var(--spacing-sm); color: var(--text-color); font-size: 1rem;">🧪 Descubra se sua rotina indica que vale avaliar suplementação.</p>
                 <a href="quiz.html" class="btn-secondary" style="background: var(--accent); color: #fff;">Fazer o quiz →</a>
             </div>
+
+            <!-- Banner de produto (global — painel admin; oculto até ativar no Supabase) -->
+            <div id="home-product-banner-wrap" class="home-product-banner-wrap is-hidden" aria-live="polite"></div>
 
             <!-- Barra de Busca -->
             <div id="search-container" class="search-container">
@@ -337,9 +375,46 @@
                 }
             }
             
+            async function loadHomeProductBanner() {
+                var client = window.supabaseClient;
+                var attempts = 0;
+                while ((!client || !client.getSiteSettings) && attempts < 12) {
+                    await new Promise(function(resolve) { setTimeout(resolve, 200); });
+                    client = window.supabaseClient;
+                    attempts++;
+                }
+                var wrap = document.getElementById('home-product-banner-wrap');
+                if (!wrap || !client || !client.getSiteSettings) return;
+                var res = await client.getSiteSettings();
+                if (!res.success || !res.data) return;
+                var s = res.data;
+                if (!s.produto_banner_ativo || !s.produto_banner_imagem_url) return;
+                var link = (s.produto_banner_link || '').trim();
+                var imgUrl = (s.produto_banner_imagem_url || '').trim();
+                if (!/^https?:\/\//i.test(link) || !/^https?:\/\//i.test(imgUrl)) return;
+                var title = (s.produto_banner_titulo || 'Destaque').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                var legenda = (s.produto_banner_legenda || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                function escAttr(t) {
+                    return String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+                }
+                var inner = '<h3>' + title + '</h3>';
+                inner += '<a class="banner-link" href="' + escAttr(link) + '" target="_blank" rel="noopener noreferrer sponsored">';
+                inner += '<img src="' + escAttr(imgUrl) + '" alt="' + escAttr(s.produto_banner_titulo || 'Destaque') + '" loading="lazy" width="1200" height="400">';
+                inner += '</a>';
+                inner += '<p class="banner-legal">' + (legenda || 'Pode ser link de indicação. Ao utilizar, você apoia o blog sem custo adicional onde aplicável.') + '</p>';
+                wrap.innerHTML = inner;
+                wrap.classList.remove('is-hidden');
+                var imgEl = wrap.querySelector('img');
+                if (imgEl) {
+                    imgEl.addEventListener('error', function() {
+                        wrap.classList.add('is-hidden');
+                    });
+                }
+            }
+
             // Aguardar DOM e Supabase estarem prontos
             document.addEventListener('DOMContentLoaded', function() {
-                // Aguardar um pouco mais para garantir que initSupabase foi executado
+                setTimeout(loadHomeProductBanner, 350);
                 setTimeout(loadPostsFromSupabase, 500);
             });
         })();
