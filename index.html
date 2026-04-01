@@ -43,6 +43,17 @@
             margin-bottom: var(--spacing-xl);
         }
 
+        /* Newsletter, quiz e banner: mesma largura, padding, cantos e sombra */
+        #home .home-stack-card {
+            max-width: 640px;
+            width: 100%;
+            margin: var(--spacing-md) auto;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-lg);
+            box-sizing: border-box;
+            box-shadow: var(--shadow-md);
+        }
+
         #posts-container {
             background-color: var(--blue-light);
             padding: var(--spacing-lg);
@@ -93,15 +104,9 @@
             border-radius: 0 0 var(--radius-md) var(--radius-md);
         }
 
-        /* Bloco quiz (home) — mesma escala da newsletter */
         .home-quiz-cta {
-            margin: var(--spacing-md) auto;
-            padding: var(--spacing-sm) var(--spacing-md);
-            max-width: 640px;
             background: linear-gradient(135deg, var(--blue-dark) 0%, var(--primary-light) 100%);
-            border-radius: var(--radius-md);
             text-align: center;
-            box-sizing: border-box;
         }
         .home-quiz-cta p {
             margin: 0 0 var(--spacing-xs);
@@ -127,15 +132,9 @@
         }
 
         .home-product-banner-wrap {
-            margin: var(--spacing-md) auto;
-            padding: var(--spacing-sm) var(--spacing-md);
-            max-width: 640px;
             background: var(--white);
             border: 1px solid var(--gray-200);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow);
             text-align: center;
-            box-sizing: border-box;
         }
         .home-product-banner-wrap.is-hidden { display: none; }
         .home-product-banner-wrap h3 {
@@ -203,7 +202,7 @@
             <p>Explore conteúdos exclusivos sobre <strong>saúde, bem-estar, produtividade, mentalidade e equilíbrio</strong> para uma vida mais plena.</p>
             
             <!-- CTA Newsletter - Topo -->
-            <div class="cta-newsletter">
+            <div class="cta-newsletter home-stack-card">
                 <h3>📧 Receba Conteúdo Exclusivo!</h3>
                 <p>Cadastre-se e receba nosso <strong>Guia Completo de Bem-Estar</strong> grátis!</p>
                 <form class="newsletter-form" data-origem="form_topo">
@@ -213,13 +212,13 @@
             </div>
             
             <!-- Destaque Quiz -->
-            <div class="home-quiz-cta">
+            <div class="home-quiz-cta home-stack-card">
                 <p>🧪 Descubra se sua rotina indica que vale avaliar suplementação.</p>
                 <a href="quiz.html" class="btn-secondary home-quiz-cta__btn">Fazer o quiz →</a>
             </div>
 
             <!-- Banner de produto (global — painel admin; oculto até ativar no Supabase) -->
-            <div id="home-product-banner-wrap" class="home-product-banner-wrap is-hidden" aria-live="polite"></div>
+            <div id="home-product-banner-wrap" class="home-product-banner-wrap home-stack-card is-hidden" aria-live="polite"></div>
 
             <!-- Barra de Busca -->
             <div id="search-container" class="search-container">
