@@ -406,6 +406,8 @@
 
       if (canApply) {
         coachPendingContent = suggestedContent;
+        const sp = $('studio-prompt');
+        if (sp) sp.value = suggestedContent;
         $('coach-apply').disabled = false;
       } else {
         coachPendingContent = '';
@@ -439,9 +441,9 @@
 
   function applyCoach() {
     if (!coachPendingContent) return;
-    $('studio-prompt').value = coachPendingContent;
+    const sp = $('studio-prompt');
+    if (sp) sp.value = coachPendingContent;
     closeCoach();
-    window.alert('Prompt aplicado ao campo de comando. Ajuste se quiser e clique em Gerar.');
   }
 
   /* ---- Snippets ---- */
