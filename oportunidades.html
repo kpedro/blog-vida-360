@@ -5,35 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oportunidades e Parcerias - Vida 360º</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    <meta name="description" content="Saiba mais sobre o Blog Vida 360º, conteúdo para leitores e oportunidades de negócio. Parcerias e contato pelo WhatsApp.">
+    <link rel="canonical" href="https://blog-vida-360.vercel.app/oportunidades.html">
+    <meta name="description" content="Conteúdo para leitores, transparência em indicações e canal para parcerias e oportunidades de negócio no Blog Vida 360º. Contato pelo WhatsApp.">
+    <meta name="robots" content="index, follow">
     <meta property="og:title" content="Oportunidades e Parcerias - Vida 360º">
-    <meta property="og:description" content="Conteúdo, transparência com leitores e canal para oportunidades de negócio.">
+    <meta property="og:description" content="Leitores, marcas e parcerias: saiba como falamos com cada público e entre em contato para oportunidades alinhadas ao blog.">
     <meta property="og:image" content="https://blog-vida-360.vercel.app/assets/images/og-banner.png">
     <meta property="og:url" content="https://blog-vida-360.vercel.app/oportunidades.html">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Oportunidades e Parcerias - Vida 360º">
+    <meta name="twitter:description" content="Canal para leitores e para parcerias de negócio no Vida 360º.">
+    <meta name="twitter:image" content="https://blog-vida-360.vercel.app/assets/images/og-banner.png">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        .opp-page {
+            padding-bottom: 3rem;
+        }
         .opp-hero {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.75rem;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .opp-hero h1 { color: var(--blue-primary); margin-bottom: 0.5rem; }
-        .opp-hero p { color: #555; max-width: 640px; margin: 0 auto; line-height: 1.6; }
+        .opp-hero h1 {
+            color: var(--blue-primary);
+            margin-bottom: 0.75rem;
+            font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+            font-weight: 700;
+            line-height: 1.25;
+        }
+        .opp-hero p {
+            color: #555;
+            margin: 0 auto;
+            line-height: 1.65;
+            font-size: 1rem;
+        }
 
         .opp-tabs {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
             justify-content: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             border-bottom: 2px solid var(--gray-200, #e8e8e8);
             padding-bottom: 0.5rem;
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .opp-tabs button {
             font-family: 'Poppins', sans-serif;
-            padding: 0.65rem 1.25rem;
+            padding: 0.6rem 1.15rem;
             border: none;
             background: transparent;
             color: #555;
@@ -41,8 +68,13 @@
             cursor: pointer;
             border-radius: 8px 8px 0 0;
             transition: background 0.2s, color 0.2s;
+            font-size: 0.95rem;
         }
         .opp-tabs button:hover { background: var(--blue-light, #e8f0fe); color: var(--blue-primary); }
+        .opp-tabs button:focus-visible {
+            outline: 2px solid var(--blue-primary);
+            outline-offset: 2px;
+        }
         .opp-tabs button[aria-selected="true"] {
             background: var(--blue-primary);
             color: #fff;
@@ -51,16 +83,41 @@
         .opp-panel {
             display: none;
             background: var(--blue-light, #eef4ff);
-            padding: 1.75rem;
+            padding: 1.5rem 1.35rem;
             border-radius: 12px;
-            max-width: 720px;
+            max-width: 640px;
             margin: 0 auto;
             line-height: 1.65;
             color: #333;
+            text-align: left;
+            box-shadow: var(--shadow, 0 4px 6px rgba(0,0,0,0.06));
         }
         .opp-panel[aria-hidden="false"] { display: block; }
-        .opp-panel h2 { color: var(--blue-primary); font-size: 1.2rem; margin-top: 0; }
-        .opp-panel ul { margin: 1rem 0; padding-left: 1.25rem; }
+        .opp-panel h2 {
+            color: var(--blue-primary);
+            font-size: 1.15rem;
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+        }
+        .opp-panel p { margin: 0 0 0.85rem; }
+        .opp-panel p:last-child { margin-bottom: 0; }
+        .opp-panel ul {
+            margin: 0.5rem 0 1rem;
+            padding-left: 1.25rem;
+        }
+        .opp-panel li { margin-bottom: 0.35rem; }
+        .opp-panel a:not(.btn-wa) {
+            color: var(--blue-primary);
+            font-weight: 600;
+        }
+        .opp-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
 
         .btn-wa {
             display: inline-flex;
@@ -68,29 +125,44 @@
             gap: 10px;
             background: #25D366;
             color: #fff !important;
-            padding: 12px 22px;
+            padding: 0.65rem 1.25rem;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            margin-top: 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.95rem;
             transition: background 0.2s;
         }
         .btn-wa:hover { background: #20BA5A; color: #fff; }
+        .btn-wa:focus-visible {
+            outline: 2px solid #128C7E;
+            outline-offset: 2px;
+        }
+
+        .opp-note {
+            font-size: 0.88rem;
+            color: #555;
+            background: rgba(255,255,255,0.65);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid var(--blue-secondary, #3498db);
+        }
 
         footer {
             background-color: var(--blue-dark);
             color: var(--text-color);
             text-align: center;
             padding: 15px 0;
-            margin-top: 40px;
+            margin-top: 2rem;
         }
     </style>
 </head>
 <body>
-    <header>
+    <header role="banner">
         <div class="container">
             <div class="logo">Vida 360º</div>
-            <nav aria-label="Menu principal">
+            <nav role="navigation" aria-label="Menu principal">
                 <ul>
                     <li><a href="index.html">Início</a></li>
                     <li><a href="artigos.html">Artigos</a></li>
@@ -106,48 +178,64 @@
         </div>
     </header>
 
-    <main class="container">
+    <main class="container opp-page">
         <div class="opp-hero">
-            <h1>Compartilhando com você</h1>
-            <p>Duas frentes do Vida 360º: conteúdo para quem nos acompanha e um canal direto para quem quer explorar <strong>parcerias e oportunidades</strong> alinhadas ao propósito do blog.</p>
+            <h1>Oportunidades e parcerias</h1>
+            <p>O Vida 360º é um blog sobre <strong>saúde, bem-estar e desenvolvimento pessoal</strong>. Aqui você entende como falamos com <strong>leitores</strong> e como marcas ou parceiros podem <strong>entrar em contato</strong> para propostas alinhadas ao propósito do projeto.</p>
         </div>
 
-        <div class="opp-tabs" role="tablist" aria-label="Seções">
+        <div class="opp-tabs" role="tablist" aria-label="Escolha o perfil">
             <button type="button" role="tab" id="tab-leitores" aria-selected="true" aria-controls="panel-leitores">Para leitores</button>
-            <button type="button" role="tab" id="tab-negocios" aria-selected="false" aria-controls="panel-negocios">Oportunidades e WhatsApp</button>
+            <button type="button" role="tab" id="tab-negocios" aria-selected="false" aria-controls="panel-negocios" tabindex="-1">Oportunidades de negócio</button>
         </div>
 
         <div id="panel-leitores" class="opp-panel" role="tabpanel" aria-labelledby="tab-leitores" aria-hidden="false">
-            <h2>O que você encontra aqui</h2>
-            <p>Artigos sobre saúde, bem-estar, produtividade e equilíbrio. Protocolos, ebooks e o quiz ajudam você a agir no dia a dia com mais clareza.</p>
-            <p>Quando faz sentido, indicamos produtos ou serviços — sempre com transparência. Veja também nossos artigos e a <a href="politica.html">política de privacidade</a>.</p>
-            <p style="margin-bottom:0;"><a href="artigos.html" class="btn-secondary" style="display:inline-block;padding:10px 20px;border-radius:8px;text-decoration:none;">Ver artigos →</a></p>
+            <h2>O que você encontra no blog</h2>
+            <p>Artigos, protocolos em PDF, ebooks e o quiz de suplementação ajudam você a refletir e agir com mais clareza no dia a dia.</p>
+            <p>Quando indicamos produtos ou serviços, sinalizamos de forma transparente — inclusive no rodapé do site e nos artigos, quando couber. A <a href="politica.html">política de privacidade</a> explica como tratamos dados nos formulários.</p>
+            <div class="opp-links">
+                <a href="artigos.html">Artigos</a>
+                <a href="protocolos.html">Protocolos</a>
+                <a href="quiz.html">Quiz</a>
+                <a href="contato.html">Contato geral</a>
+            </div>
         </div>
 
         <div id="panel-negocios" class="opp-panel" role="tabpanel" aria-labelledby="tab-negocios" aria-hidden="true" hidden>
-            <h2>Oportunidades de negócio</h2>
-            <p>Se você representa uma marca, tem produto alinhado ao nosso público ou quer conversar sobre <strong>parcerias, conteúdo patrocinado ou afiliações</strong>, fale com a gente pelo WhatsApp.</p>
+            <h2>Fale sobre parcerias pelo WhatsApp</h2>
+            <p>Se você representa uma marca, atua com produtos ou serviços alinhados ao nosso público (saúde, bem-estar, produtividade, equilíbrio) ou quer conversar sobre <strong>parcerias, conteúdo patrocinado ou afiliações</strong>, use o botão abaixo. Envie uma mensagem objetiva (marca, proposta e, se quiser, site ou perfil).</p>
             <ul>
-                <li>Propostas alinhadas ao tema saúde, bem-estar e desenvolvimento pessoal.</li>
-                <li>Resposta objetiva sobre viabilidade e próximos passos.</li>
+                <li>Analisamos se o tema combina com a linha editorial do blog.</li>
+                <li>Respondemos com próximos passos quando houver encaixe.</li>
             </ul>
-            <p style="margin-bottom:0;"><strong>Não utiliza este botão para pedidos de protocolo ou suporte de leitura</strong> — para isso, use o contato do site e o fluxo de protocolos.</p>
-            <a class="btn-wa" href="https://wa.me/5592994314016?text=Ol%C3%A1%21%20Gostaria%20de%20saber%20mais%20sobre%20oportunidades%20de%20neg%C3%B3cio%20e%20parcerias%20com%20o%20Blog%20Vida%20360%C2%BA." target="_blank" rel="noopener noreferrer">WhatsApp — oportunidades</a>
+            <p class="opp-note"><strong>Atenção:</strong> este canal é para <strong>negócios e parcerias</strong>. Para solicitar <strong>protocolos de rotinas de saúde</strong> ou dúvidas de leitura, use o <a href="contato.html">formulário de contato</a> ou o fluxo em <a href="protocolos.html">Protocolos</a> — assim sua mensagem chega no fluxo certo.</p>
+            <a class="btn-wa" href="https://wa.me/5592994314016?text=Ol%C3%A1%21%20Gostaria%20de%20saber%20mais%20sobre%20oportunidades%20de%20neg%C3%B3cio%20e%20parcerias%20com%20o%20Blog%20Vida%20360%C2%BA." target="_blank" rel="noopener">WhatsApp — oportunidades e parcerias</a>
         </div>
     </main>
 
-    <footer>
+    <a href="https://wa.me/5592994314016?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20o%20protocolo%20de%20rotinas%20de%20sa%C3%BAde." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp para solicitar protocolo de rotinas de saúde">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+
+    <footer role="contentinfo">
         <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
-        <p style="margin-top:8px;font-size:0.85rem;opacity:0.9;"><a href="index.html" style="color:var(--blue-light);">Início</a></p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">
+            <a href="feed.xml" style="color: var(--blue-light); text-decoration: none;">📡 RSS Feed</a> |
+            <a href="sitemap.xml" style="color: var(--blue-light); text-decoration: none;">🗺️ Sitemap</a> |
+            <a href="admin-login.html" style="color: var(--blue-light); text-decoration: none; font-weight: 600;">🔐 Painel Admin</a>
+        </p>
+        <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.9;">Alguns artigos podem conter links de indicação. Ao utilizá-los, você apoia o blog sem custo adicional.</p>
     </footer>
 
     <script>
         (function() {
             var tabs = document.querySelectorAll('.opp-tabs [role="tab"]');
+            var panelIds = ['tab-leitores', 'tab-negocios'];
             var panels = {
                 'tab-leitores': document.getElementById('panel-leitores'),
                 'tab-negocios': document.getElementById('panel-negocios')
             };
+
             function showTab(id) {
                 tabs.forEach(function(btn) {
                     var on = btn.id === id;
@@ -162,8 +250,31 @@
                     if (show) { p.removeAttribute('hidden'); } else { p.setAttribute('hidden', ''); }
                 });
             }
-            tabs.forEach(function(btn) {
+
+            tabs.forEach(function(btn, index) {
                 btn.addEventListener('click', function() { showTab(btn.id); });
+                btn.addEventListener('keydown', function(e) {
+                    var i = panelIds.indexOf(btn.id);
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        var next = panelIds[(i + 1) % panelIds.length];
+                        showTab(next);
+                        document.getElementById(next).focus();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        var prev = panelIds[(i - 1 + panelIds.length) % panelIds.length];
+                        showTab(prev);
+                        document.getElementById(prev).focus();
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        showTab(panelIds[0]);
+                        document.getElementById(panelIds[0]).focus();
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        showTab(panelIds[panelIds.length - 1]);
+                        document.getElementById(panelIds[panelIds.length - 1]).focus();
+                    }
+                });
             });
         })();
     </script>
