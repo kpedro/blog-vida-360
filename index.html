@@ -93,25 +93,63 @@
             border-radius: 0 0 var(--radius-md) var(--radius-md);
         }
 
+        /* Bloco quiz (home) — mesma escala da newsletter */
+        .home-quiz-cta {
+            margin: var(--spacing-md) auto;
+            padding: var(--spacing-sm) var(--spacing-md);
+            max-width: 640px;
+            background: linear-gradient(135deg, var(--blue-dark) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-md);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .home-quiz-cta p {
+            margin: 0 0 var(--spacing-xs);
+            color: var(--text-color);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .home-quiz-cta .home-quiz-cta__btn {
+            background: var(--accent);
+            color: #fff;
+            padding: 0.45rem 1.1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            display: inline-block;
+        }
+        .home-quiz-cta .home-quiz-cta__btn:hover,
+        .home-quiz-cta .home-quiz-cta__btn:focus {
+            background-color: var(--accent-light);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
         .home-product-banner-wrap {
-            margin: var(--spacing-lg) 0;
-            padding: var(--spacing-md);
+            margin: var(--spacing-md) auto;
+            padding: var(--spacing-sm) var(--spacing-md);
+            max-width: 640px;
             background: var(--white);
             border: 1px solid var(--gray-200);
             border-radius: var(--radius-md);
             box-shadow: var(--shadow);
             text-align: center;
+            box-sizing: border-box;
         }
         .home-product-banner-wrap.is-hidden { display: none; }
         .home-product-banner-wrap h3 {
             color: var(--blue-primary);
-            font-size: 1.1rem;
-            margin: 0 0 var(--spacing-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 var(--spacing-xs);
+            line-height: 1.3;
         }
         .home-product-banner-wrap .banner-legal {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--gray-600);
-            margin: var(--spacing-sm) 0 0;
+            margin: var(--spacing-xs) 0 0;
+            line-height: 1.35;
         }
         .home-product-banner-wrap a.banner-link {
             display: flex;
@@ -127,7 +165,7 @@
             max-width: 100%;
             width: auto;
             height: auto;
-            max-height: min(320px, 42vw);
+            max-height: min(220px, 34vw);
             object-fit: contain;
             object-position: center;
             display: block;
@@ -175,9 +213,9 @@
             </div>
             
             <!-- Destaque Quiz -->
-            <div style="margin: var(--spacing-lg) 0; padding: var(--spacing-md); background: linear-gradient(135deg, var(--blue-dark) 0%, var(--primary-light) 100%); border-radius: var(--radius-md); text-align: center;">
-                <p style="margin: 0 0 var(--spacing-sm); color: var(--text-color); font-size: 1rem;">🧪 Descubra se sua rotina indica que vale avaliar suplementação.</p>
-                <a href="quiz.html" class="btn-secondary" style="background: var(--accent); color: #fff;">Fazer o quiz →</a>
+            <div class="home-quiz-cta">
+                <p>🧪 Descubra se sua rotina indica que vale avaliar suplementação.</p>
+                <a href="quiz.html" class="btn-secondary home-quiz-cta__btn">Fazer o quiz →</a>
             </div>
 
             <!-- Banner de produto (global — painel admin; oculto até ativar no Supabase) -->
