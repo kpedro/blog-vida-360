@@ -68,6 +68,11 @@ html = html.replace(
   '<title id="page-title">___OG_TITLE___ - Vida 360º</title>'
 );
 
+html = html.replace(
+  /<link rel="canonical" href="[^"]*"/,
+  '<link rel="canonical" href="___OG_URL___"'
+);
+
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, html);
 console.log('✅ api/post-template.html gerado com placeholders OG.');

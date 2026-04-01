@@ -35,6 +35,32 @@ function resolveOgImage(raw, siteBase) {
   return img.startsWith('/') ? siteBase + img : siteBase + '/' + img;
 }
 
+/**
+ * Facebook exige imagem acessível e leve; URLs Unsplash sem parâmetros podem apontar para ficheiros enormes (>5MB),
+ * o que faz o crawler desistir. Imgix aceita w/h/fit para pré-visualização estável.
+ */
+function optimizeOgImageUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  const s = url.trim();
+  if (!s.startsWith('http')) return s;
+  try {
+    const u = new URL(s);
+    if (u.hostname === 'images.unsplash.com' || u.hostname === 'unsplash.com') {
+      if (!u.searchParams.has('w')) {
+        u.searchParams.set('w', '1200');
+        u.searchParams.set('h', '630');
+        u.searchParams.set('fit', 'crop');
+        u.searchParams.set('auto', 'format');
+        u.searchParams.set('q', '85');
+      }
+      return u.toString();
+    }
+  } catch (e) {
+    /* manter URL original */
+  }
+  return s;
+}
+
 function loadTemplate() {
   const templatePath = path.join(__dirname, 'post-template.html');
   try {
@@ -73,12 +99,18 @@ async function fetchPost(slug) {
 }
 
 function applyMeta(html, meta) {
+  const rawImage = optimizeOgImageUrl(meta.image);
+  const imgEsc = escapeHtml(rawImage);
+  const urlEsc = escapeHtml(meta.url);
   let out = html;
   out = out.replace(/___OG_TITLE___/g, escapeHtml(meta.title));
   out = out.replace(/___OG_DESCRIPTION___/g, escapeHtml(meta.description));
-  out = out.replace(/___OG_IMAGE___/g, meta.image);
+  out = out.replace(/___OG_IMAGE___/g, imgEsc);
   out = out.replace(/___OG_IMAGE_ALT___/g, escapeHtml(meta.title));
-  out = out.replace(/___OG_URL___/g, meta.url);
+  out = out.replace(/___OG_URL___/g, urlEsc);
+  if (rawImage && String(rawImage).startsWith('https://')) {
+    out = out.replace('</head>', `    <meta property="og:image:secure_url" content="${imgEsc}">\n</head>`);
+  }
   return out;
 }
 

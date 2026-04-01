@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +8,12 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <link rel="canonical" href="___OG_URL___" id="canonical-link">
     
     <!-- Open Graph Metatags Dinâmicos -->
     <meta property="og:title" content="___OG_TITLE___" id="og-title">
     <meta property="og:description" content="___OG_DESCRIPTION___" id="og-description">
     <meta property="og:image" content="___OG_IMAGE___" id="og-image">
-    <meta property="og:image:width" content="1200" id="og-image-width">
-    <meta property="og:image:height" content="630" id="og-image-height">
     <meta property="og:image:alt" content="___OG_IMAGE_ALT___" id="og-image-alt">
     <meta property="og:url" content="___OG_URL___" id="og-url">
     <meta property="og:type" content="article">
@@ -82,6 +81,8 @@
                                 
                                 var ogUrl = document.getElementById('og-url');
                                 if (ogUrl) ogUrl.setAttribute('content', url);
+                                var canonLink = document.getElementById('canonical-link');
+                                if (canonLink) canonLink.setAttribute('href', url);
                                 
                                 var twTitle = document.getElementById('twitter-title');
                                 if (twTitle) twTitle.setAttribute('content', titulo);
@@ -415,6 +416,8 @@
                 
                 var ogUrl = document.getElementById('og-url'); 
                 if (ogUrl) ogUrl.setAttribute('content', url);
+                var canonLink2 = document.getElementById('canonical-link');
+                if (canonLink2) canonLink2.setAttribute('href', url);
                 
                 // Atualizar Twitter Cards
                 var twTitle = document.getElementById('twitter-title'); 
