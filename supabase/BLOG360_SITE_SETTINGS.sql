@@ -2,7 +2,17 @@
 -- BLOG VIDA 360º – Configurações do site (banner global na home)
 -- ============================================
 -- Execute no SQL Editor do Supabase (pode rodar mais de uma vez).
+-- A função abaixo também existe em BLOG360_TABELAS_COMPLETO.sql; aqui
+-- garantimos que o trigger de updated_at funcione se você rodar só este arquivo.
 -- ============================================
+
+CREATE OR REPLACE FUNCTION public.blog360_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS public.blog360_site_settings (
   id SMALLINT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
