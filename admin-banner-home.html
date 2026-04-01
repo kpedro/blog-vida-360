@@ -61,7 +61,7 @@
             <div class="form-ground">
                 <label for="prodLink">Link ao clicar (https)</label>
                 <input type="url" id="prodLink" placeholder="https://...">
-                <p class="hint">Link de afiliado ou página da oferta.</p>
+                <p class="hint">Cole o mesmo URL que abre na barra do navegador. Ao salvar, removemos um segmento final duplicado (ex.: <code>…/60338539204/60338539204</code>) se for cópia errada.</p>
             </div>
             <div class="form-ground">
                 <label for="prodLegenda">Legenda / transparência (opcional)</label>
@@ -148,15 +148,43 @@
                 document.getElementById(id).addEventListener('input', updatePreview);
             });
 
+            function normalizeBannerDestinationUrl(url) {
+                var u = (url || '').trim();
+                if (!u) return u;
+                try {
+                    var parsed = new URL(u);
+                    var hadTrailing = /\/$/.test(parsed.pathname);
+                    var segs = parsed.pathname.split('/').filter(function(s) { return s.length; });
+                    if (segs.length >= 2 && segs[segs.length - 1] === segs[segs.length - 2]) {
+                        segs.pop();
+                        parsed.pathname = '/' + segs.join('/') + (hadTrailing ? '/' : '');
+                    }
+                    u = parsed.href;
+                } catch (e) {}
+                if (/%25[0-9A-Fa-f]{2}/.test(u)) {
+                    try {
+                        var fixed = u.replace(/%25([0-9A-Fa-f]{2})/g, '%$1');
+                        new URL(fixed);
+                        u = fixed;
+                    } catch (err) {}
+                }
+                return u;
+            }
+
             document.getElementById('btnSalvar').addEventListener('click', async function() {
                 var btn = this;
                 btn.disabled = true;
                 document.getElementById('msg').style.display = 'none';
+                var linkRaw = document.getElementById('prodLink').value.trim() || null;
+                var linkNorm = linkRaw ? normalizeBannerDestinationUrl(linkRaw) : null;
+                if (linkNorm && linkNorm !== linkRaw) {
+                    document.getElementById('prodLink').value = linkNorm;
+                }
                 var payload = {
                     produto_banner_ativo: document.getElementById('prodAtivo').checked,
                     produto_banner_titulo: document.getElementById('prodTitulo').value.trim() || null,
                     produto_banner_imagem_url: document.getElementById('prodImagem').value.trim() || null,
-                    produto_banner_link: document.getElementById('prodLink').value.trim() || null,
+                    produto_banner_link: linkNorm,
                     produto_banner_legenda: document.getElementById('prodLegenda').value.trim() || null
                 };
                 if (payload.produto_banner_ativo) {

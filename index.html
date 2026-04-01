@@ -381,6 +381,29 @@
                 }
             }
             
+            function normalizeBannerDestinationUrl(url) {
+                var u = (url || '').trim();
+                if (!u) return u;
+                try {
+                    var parsed = new URL(u);
+                    var hadTrailing = /\/$/.test(parsed.pathname);
+                    var segs = parsed.pathname.split('/').filter(function(s) { return s.length; });
+                    if (segs.length >= 2 && segs[segs.length - 1] === segs[segs.length - 2]) {
+                        segs.pop();
+                        parsed.pathname = '/' + segs.join('/') + (hadTrailing ? '/' : '');
+                    }
+                    u = parsed.href;
+                } catch (e) {}
+                if (/%25[0-9A-Fa-f]{2}/.test(u)) {
+                    try {
+                        var fixed = u.replace(/%25([0-9A-Fa-f]{2})/g, '%$1');
+                        new URL(fixed);
+                        u = fixed;
+                    } catch (err) {}
+                }
+                return u;
+            }
+
             async function loadHomeProductBanner() {
                 var client = window.supabaseClient;
                 var attempts = 0;
@@ -397,6 +420,7 @@
                 if (!s.produto_banner_ativo || !s.produto_banner_imagem_url) return;
                 var link = (s.produto_banner_link || '').trim();
                 var imgUrl = (s.produto_banner_imagem_url || '').trim();
+                link = normalizeBannerDestinationUrl(link);
                 if (!/^https?:\/\//i.test(link) || !/^https?:\/\//i.test(imgUrl)) return;
                 var title = (s.produto_banner_titulo || 'Destaque').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 var legenda = (s.produto_banner_legenda || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -404,7 +428,7 @@
                     return String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
                 }
                 var inner = '<h3>' + title + '</h3>';
-                inner += '<a class="banner-link" href="' + escAttr(link) + '" target="_blank" rel="noopener noreferrer sponsored">';
+                inner += '<a class="banner-link" href="' + escAttr(link) + '" target="_blank" rel="noopener sponsored">';
                 inner += '<img src="' + escAttr(imgUrl) + '" alt="' + escAttr(s.produto_banner_titulo || 'Destaque') + '" loading="lazy">';
                 inner += '</a>';
                 inner += '<p class="banner-legal">' + (legenda || 'Pode ser link de indicação. Ao utilizar, você apoia o blog sem custo adicional onde aplicável.') + '</p>';
