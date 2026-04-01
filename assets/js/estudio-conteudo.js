@@ -389,8 +389,16 @@
       const phase = data.phase || 'clarify';
       const suggestedContent = (data.suggestedContent || '').trim();
 
-      coachMessages.push({ role: 'assistant', content: assistantMessage || suggestedContent || '…' });
+      const historyAssistant =
+        phase === 'deliver' && suggestedContent.length >= 40
+          ? `${assistantMessage}\n\n---\n${suggestedContent}`
+          : assistantMessage || suggestedContent || '…';
+      coachMessages.push({ role: 'assistant', content: historyAssistant });
+
       appendCoachLine('Assistente', assistantMessage, false);
+      if (suggestedContent.length >= 40) {
+        appendCoachPromptBlock(suggestedContent);
+      }
 
       const canApply =
         (phase === 'deliver' && suggestedContent.length >= 40) ||
@@ -415,6 +423,16 @@
     const div = document.createElement('div');
     div.className = 'chat-msg' + (isUser ? ' user' : '');
     div.innerHTML = `<div class="who">${escapeHtml(who)}</div><div>${escapeHtml(text).replace(/\n/g, '<br>')}</div>`;
+    $('coach-chat').appendChild(div);
+    $('coach-chat').scrollTop = $('coach-chat').scrollHeight;
+  }
+
+  function appendCoachPromptBlock(text) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg coach-prompt-block';
+    div.innerHTML =
+      '<div class="who">Prompt para o Estúdio (também em «Aplicar»)</div>' +
+      `<pre class="coach-prompt-pre">${escapeHtml(text)}</pre>`;
     $('coach-chat').appendChild(div);
     $('coach-chat').scrollTop = $('coach-chat').scrollHeight;
   }

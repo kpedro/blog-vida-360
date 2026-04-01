@@ -31,7 +31,8 @@ FORMATO DE RESPOSTA OBRIGATÓRIO — responda SOMENTE com um único objeto JSON 
 Regras do JSON:
 - Se ainda precisar de informações: phase = "clarify", suggestedTitle e suggestedContent como "".
 - Quando entregar o prompt pronto: phase = "deliver", preencha suggestedTitle e suggestedContent.
-- CRÍTICO em phase = "deliver": o texto COMPLETO do prompt para colar na IA deve ir em suggestedContent (várias frases ou parágrafos). Não deixe suggestedContent vazio. assistantMessage deve ser CURTO (1–3 frases de encerramento); NÃO coloque o prompt longo só no assistantMessage.
+- CRÍTICO em phase = "deliver": suggestedContent DEVE ter no MÍNIMO 400 caracteres com o prompt completo (instruções para a IA do Estúdio: tema, público, tom, estrutura, tamanho, o que evitar, tom de divulgação sutil se o usuário pediu). NUNCA deixe suggestedContent vazio, "..." ou só uma frase. assistantMessage = no máximo 2 frases curtas de encerramento; o prompt longo vai SOMENTE em suggestedContent.
+- É PROIBIDO dizer que "montou o prompt" sem preencher suggestedContent com o texto integral. Se faltar espaço, seja mais conciso no assistantMessage, nunca no suggestedContent.
 - NUNCA use "---" ou blocos markdown no lugar de suggestedContent; o prompt integral vai na string suggestedContent.
 - assistantMessage sempre preenchido.
 - IMPORTANTE: dentro de strings JSON, use \\n para quebra de linha. Nunca coloque quebra de linha literal entre as aspas.`;
@@ -104,7 +105,7 @@ function finalizeCoachResponse(
   if (phase === "deliver" && recovered.trim().length > sc.trim().length) {
     sc = recovered.trim();
   }
-  if (phase === "deliver" && sc.trim().length >= 40 && am.length > 400) {
+  if (phase === "deliver" && sc.trim().length >= 80 && am.length > 500) {
     am =
       "Prompt pronto. Use o botão «Aplicar ao campo de comando» para colar o texto completo no Estúdio.";
   }
@@ -343,24 +344,105 @@ serve(async (req) => {
       };
     };
 
-    let parsed: {
+    const MIN_DELIVER_CHARS = 120;
+
+    type CoachParsed = {
       phase?: string;
       assistantMessage?: string;
       suggestedTitle?: string;
       suggestedContent?: string;
     };
+
+    async function runRepairIfNeeded(p: CoachParsed): Promise<CoachParsed> {
+      const sc0 = typeof p.suggestedContent === "string" ? p.suggestedContent.trim() : "";
+      if (p.phase !== "deliver" || sc0.length >= MIN_DELIVER_CHARS) return p;
+
+      const repairText =
+        `CORREÇÃO OBRIGATÓRIA: Na última resposta, phase era "deliver" mas suggestedContent está vazio ou com menos de ${MIN_DELIVER_CHARS} caracteres (ou só frases genéricas sem o prompt).
+
+Responda APENAS um único objeto JSON no formato do sistema, com:
+- phase: "deliver"
+- assistantMessage: no máximo 2 frases curtas de encerramento
+- suggestedTitle: rótulo curto do modelo
+- suggestedContent: o texto INTEGRAL do prompt para colar na IA do Estúdio, reunindo TUDO que o usuário já disse (tema, público, tom, formato, extensão, restrições de marca/sigilo). Mínimo ${MIN_DELIVER_CHARS} caracteres.`;
+
+      const repairContents = [
+        ...contents,
+        { role: "user", parts: [{ text: repairText }] },
+      ];
+
+      const repairPayload = {
+        contents: repairContents,
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              phase: { type: "string", enum: ["clarify", "deliver"] },
+              assistantMessage: { type: "string" },
+              suggestedTitle: { type: "string" },
+              suggestedContent: { type: "string" },
+            },
+            required: ["phase", "assistantMessage", "suggestedTitle", "suggestedContent"],
+          },
+        },
+      };
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(repairPayload),
+        });
+        if (!res.ok) return p;
+        const d = await res.json();
+        const rt = d.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (!rt) return p;
+        let p2: CoachParsed;
+        try {
+          const jc = extractJsonObject(rt) ?? stripJsonFence(rt);
+          p2 = JSON.parse(jc) as CoachParsed;
+        } catch {
+          const loose = parsePromptCoachLoose(rt);
+          if (!loose) return p;
+          p2 = {
+            phase: loose.phase,
+            assistantMessage: loose.assistantMessage,
+            suggestedTitle: loose.suggestedTitle,
+            suggestedContent: loose.suggestedContent,
+          };
+        }
+        const sc2 = typeof p2.suggestedContent === "string" ? p2.suggestedContent.trim() : "";
+        if (sc2.length > sc0.length && sc2.length >= 40) return p2;
+      } catch (e) {
+        console.warn("blog-prompt-coach repair:", e);
+      }
+      return p;
+    }
+
+    let parsed: CoachParsed;
     const jsonCandidate = extractJsonObject(rawText) ?? stripJsonFence(rawText);
     try {
       parsed = JSON.parse(jsonCandidate);
     } catch {
       const loose = parsePromptCoachLoose(rawText);
       if (loose && (loose.assistantMessage.trim() || loose.suggestedContent.trim())) {
-        const phaseLoose = loose.phase === "deliver" ? "deliver" : "clarify";
+        let pLoose: CoachParsed = {
+          phase: loose.phase,
+          assistantMessage: loose.assistantMessage,
+          suggestedTitle: loose.suggestedTitle,
+          suggestedContent: loose.suggestedContent,
+        };
+        pLoose = await runRepairIfNeeded(pLoose);
+        const phaseLoose = pLoose.phase === "deliver" ? "deliver" : "clarify";
         const out = finalizeCoachResponse(
           phaseLoose,
-          loose.assistantMessage,
-          loose.suggestedTitle,
-          loose.suggestedContent,
+          pLoose.assistantMessage ?? "",
+          pLoose.suggestedTitle ?? "",
+          pLoose.suggestedContent ?? "",
         );
         return new Response(JSON.stringify(out), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -377,6 +459,8 @@ serve(async (req) => {
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+
+    parsed = await runRepairIfNeeded(parsed);
 
     const phase: "clarify" | "deliver" = parsed.phase === "deliver" ? "deliver" : "clarify";
     const assistantMessage = typeof parsed.assistantMessage === "string"
