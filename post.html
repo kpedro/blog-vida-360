@@ -185,37 +185,61 @@
 
         .comment-section {
             background-color: var(--blue-light);
-            padding: 20px;
+            padding: 1rem 1.25rem 1.5rem;
             border-radius: 10px;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 4rem;
+            box-sizing: border-box;
         }
 
         .comment-section h2 {
             color: var(--blue-primary);
+            font-size: 1.15rem;
+            margin: 0 0 0.75rem 0;
+            text-align: left;
+            font-weight: 700;
         }
 
         #comment-form label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 0.35rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: left;
         }
 
-        #comment-form input, #comment-form textarea {
+        #comment-form input,
+        #comment-form textarea {
             width: 100%;
-            margin-bottom: 15px;
-            padding: 10px;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0.65rem;
             border: 1px solid var(--blue-secondary);
-            border-radius: 5px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        #comment-form textarea {
+            min-height: 4.5rem;
+            resize: vertical;
         }
 
         #comment-form button {
             background-color: var(--blue-secondary);
             color: var(--text-color);
             border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 5px;
+            padding: 0.55rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s;
+            width: auto;
+            display: inline-block;
         }
 
         #comment-form button:hover {
@@ -303,7 +327,7 @@
                 <input type="text" id="name" name="name" placeholder="Digite seu nome" required>
 
                 <label for="comment">Comentário:</label>
-                <textarea id="comment" name="comment" rows="5" placeholder="Digite seu comentário" required></textarea>
+                <textarea id="comment" name="comment" rows="4" placeholder="Digite seu comentário" required></textarea>
 
                 <button type="submit">Enviar Comentário</button>
             </form>
