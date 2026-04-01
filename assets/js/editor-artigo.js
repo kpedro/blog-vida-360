@@ -540,6 +540,54 @@ async function publishPost() {
     }
 }
 
+const BLOG360_COVERS_BUCKET = 'blog360-covers';
+
+/**
+ * Envia capa em data URL ao Storage público; devolve URL https para og:image e para o artigo.
+ */
+async function tryUploadFeaturedDataUrl(supabaseClient, dataUrl, slug) {
+    if (!dataUrl || typeof dataUrl !== 'string' || !/^data:image\//i.test(dataUrl) || !/;base64,/i.test(dataUrl)) {
+        return { publicUrl: null, error: null };
+    }
+    const comma = dataUrl.indexOf(',');
+    if (comma < 0) return { publicUrl: null, error: 'Data URL inválida' };
+    const header = dataUrl.slice(0, comma);
+    const base64 = dataUrl.slice(comma + 1).replace(/\s/g, '');
+    const mimeMatch = header.match(/^data:(image\/[a-z0-9.+-]+)/i);
+    const mime = (mimeMatch ? mimeMatch[1] : 'image/png').toLowerCase();
+    let ext = 'png';
+    if (mime.includes('jpeg') || mime.includes('jpg')) ext = 'jpg';
+    else if (mime.includes('webp')) ext = 'webp';
+    else if (mime.includes('gif')) ext = 'gif';
+
+    let binary;
+    try {
+        binary = atob(base64);
+    } catch (e) {
+        return { publicUrl: null, error: 'Base64 inválido' };
+    }
+    if (binary.length > 4.5 * 1024 * 1024) {
+        return { publicUrl: null, error: 'Imagem demasiado grande (máx. ~4,5 MB)' };
+    }
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blobType = ext === 'jpg' ? 'image/jpeg' : mime;
+    const blob = new Blob([bytes], { type: blobType });
+
+    const safeSlug = (slug || 'post').replace(/[^a-z0-9-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'post';
+    const path = `posts/${safeSlug}-${Date.now()}.${ext}`;
+
+    const { error: upErr } = await supabaseClient.storage.from(BLOG360_COVERS_BUCKET).upload(path, blob, {
+        contentType: blob.type,
+        upsert: false,
+    });
+    if (upErr) {
+        return { publicUrl: null, error: upErr.message || String(upErr) };
+    }
+    const { data } = supabaseClient.storage.from(BLOG360_COVERS_BUCKET).getPublicUrl(path);
+    return { publicUrl: data && data.publicUrl ? data.publicUrl : null, error: null };
+}
+
 // Validar post
 function validatePost() {
     const title = document.getElementById('post-title').value;
@@ -593,6 +641,41 @@ async function savePost(status) {
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-+|-+$/g, '') || 'artigo';
         
+        let imageUrlFinal = imageUrl || null;
+        let socialUrlFinal = socialImageUrl || null;
+
+        if (imageUrlFinal && /^data:image\//i.test(imageUrlFinal)) {
+            const { publicUrl, error: upErr } = await tryUploadFeaturedDataUrl(supabaseClient, imageUrlFinal, slug);
+            if (publicUrl) {
+                imageUrlFinal = publicUrl;
+                if (!socialUrlFinal) socialUrlFinal = publicUrl;
+                const imgEl = document.getElementById('image-url');
+                if (imgEl) imgEl.value = publicUrl;
+                const sEl = document.getElementById('social-image-url');
+                if (sEl && !socialImageUrl.trim()) {
+                    sEl.value = publicUrl;
+                    const sPr = document.getElementById('social-image-preview');
+                    if (sPr) {
+                        sPr.src = publicUrl;
+                        sPr.style.display = 'block';
+                    }
+                }
+                const iPr = document.getElementById('image-preview');
+                if (iPr) {
+                    iPr.src = publicUrl;
+                    iPr.style.display = 'block';
+                }
+            } else if (upErr && status === 'published') {
+                console.warn('Upload capa Storage:', upErr);
+                alert(
+                    'A capa está em formato embutido (IA/upload). Para o Facebook mostrar essa imagem:\n\n' +
+                    '1) No Supabase, execute o script supabase/BLOG360_STORAGE_CAPAS.sql (bucket blog360-covers), ou\n' +
+                    '2) Cole um link https no campo «Imagem para redes».\n\n' +
+                    'Detalhe: ' + upErr
+                );
+            }
+        }
+
         const tagsArray = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
         const publishedAt = status === 'published' ? new Date().toISOString() : null;
         
@@ -603,8 +686,8 @@ async function savePost(status) {
             resumo: excerpt || null,
             categoria: category || null,
             tags: tagsArray,
-            imagem_destaque: imageUrl || null,
-            imagem_social_url: socialImageUrl || null,
+            imagem_destaque: imageUrlFinal || null,
+            imagem_social_url: socialUrlFinal || null,
             publicado: status === 'published',
             status: status,
             published_at: publishedAt,
