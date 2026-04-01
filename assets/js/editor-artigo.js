@@ -73,6 +73,16 @@ function applyBlog360EstudioPayload() {
                 preview.style.display = 'block';
             }
         }
+        const socialU = p.socialImageUrl && String(p.socialImageUrl).trim();
+        if (socialU && /^https?:\/\//i.test(socialU)) {
+            const si = document.getElementById('social-image-url');
+            const sp = document.getElementById('social-image-preview');
+            if (si) si.value = socialU;
+            if (sp) {
+                sp.src = socialU;
+                sp.style.display = 'block';
+            }
+        }
 
         updatePreview();
         calculateSEOScore();
@@ -137,12 +147,28 @@ function initEditor() {
     // Preview da imagem
     document.getElementById('image-url').addEventListener('input', (e) => {
         const url = e.target.value;
-        if (url) {
-            const preview = document.getElementById('image-preview');
+        const preview = document.getElementById('image-preview');
+        if (url && preview) {
             preview.src = url;
             preview.style.display = 'block';
+        } else if (preview) {
+            preview.style.display = 'none';
         }
     });
+
+    const socialIn = document.getElementById('social-image-url');
+    if (socialIn) {
+        socialIn.addEventListener('input', (e) => {
+            const url = (e.target.value || '').trim();
+            const preview = document.getElementById('social-image-preview');
+            if (url && preview && /^https?:\/\//i.test(url)) {
+                preview.src = url;
+                preview.style.display = 'block';
+            } else if (preview) {
+                preview.style.display = 'none';
+            }
+        });
+    }
     
     // Atualizar preview ao mudar categoria
     document.getElementById('post-category').addEventListener('change', updatePreview);
@@ -538,6 +564,7 @@ async function savePost(status) {
         const excerpt = document.getElementById('post-excerpt').value.trim();
         const tagsStr = document.getElementById('post-tags').value.trim();
         const imageUrl = document.getElementById('image-url').value.trim();
+        const socialImageUrl = (document.getElementById('social-image-url') && document.getElementById('social-image-url').value.trim()) || '';
         
         // Obter conteúdo baseado no modo atual
         let contentHtml = '';
@@ -577,6 +604,7 @@ async function savePost(status) {
             categoria: category || null,
             tags: tagsArray,
             imagem_destaque: imageUrl || null,
+            imagem_social_url: socialImageUrl || null,
             publicado: status === 'published',
             status: status,
             published_at: publishedAt,

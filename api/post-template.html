@@ -45,7 +45,7 @@
                     
                     // Buscar post
                     client.from('blog360_posts')
-                        .select('titulo, resumo, imagem_destaque, slug')
+                        .select('titulo, resumo, imagem_destaque, imagem_social_url, slug')
                         .eq('slug', slug)
                         .or('status.eq.published,publicado.eq.true')
                         .maybeSingle()
@@ -57,7 +57,8 @@
                                 if (desc.length > 200) desc = desc.substring(0, 197) + '...';
                                 if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
                                 
-                                var img = p.imagem_destaque || '';
+                                var rawPick = (p.imagem_social_url && String(p.imagem_social_url).trim()) || (p.imagem_destaque || '');
+                                var img = rawPick;
                                 var ogBanner = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
                                 var canon = 'https://blog-vida-360.vercel.app';
                                 if (!img || /^data:/i.test(img) || /^blob:/i.test(img)) {
@@ -357,10 +358,11 @@
                 var desc = descCompleto.length > 200 ? descCompleto.substring(0, 197) + '...' : descCompleto;
                 if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
                 
-                // OG: Facebook exige URL https pública; data:/blob: não funcionam em og:image
+                // OG: prioridade imagem_social_url (link público), senão imagem_destaque; data:/blob: → banner
                 var ogBanner = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
                 var canon = 'https://blog-vida-360.vercel.app';
-                var img = p.imagem_destaque || p.image_url || '';
+                var rawPick = (p.imagem_social_url && String(p.imagem_social_url).trim()) || (p.imagem_destaque || p.image_url || '');
+                var img = rawPick;
                 if (!img || /^data:/i.test(img) || /^blob:/i.test(img)) {
                     img = ogBanner;
                 } else if (!img.startsWith('http://') && !img.startsWith('https://')) {

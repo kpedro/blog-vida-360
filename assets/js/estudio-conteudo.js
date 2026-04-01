@@ -312,7 +312,7 @@
   function copyImageDataUrl() {
     if (!lastImageDataUrl) return;
     navigator.clipboard.writeText(lastImageDataUrl);
-    window.alert('Data URL copiada. Cole no campo imagem de destaque do editor (ou use um host e substitua por URL).');
+    window.alert('Data URL copiada. Cole na capa do editor ou use o campo «Link público da imagem» (editor ou Estúdio) com um https hospedado para o preview no WhatsApp/Facebook.');
   }
 
   function useInEditor() {
@@ -335,11 +335,13 @@
       .trim()
       .slice(0, 180);
 
+    const socialUrl = ($('studio-social-image-url') && $('studio-social-image-url').value.trim()) || '';
     const payload = {
       title: title || 'Novo artigo',
       excerpt: excerpt || '',
       body: plain,
       imageDataUrl: lastImageDataUrl || '',
+      socialImageUrl: socialUrl,
     };
     try {
       sessionStorage.setItem('blog360_estudio_payload', JSON.stringify(payload));

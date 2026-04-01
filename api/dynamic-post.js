@@ -55,7 +55,7 @@ function escapeHtml(s) {
 }
 
 async function fetchPost(slug) {
-  const url = `${SUPABASE_URL}/rest/v1/blog360_posts?slug=eq.${encodeURIComponent(slug)}&select=titulo,resumo,imagem_destaque,slug,status,publicado,published_at&limit=1`;
+  const url = `${SUPABASE_URL}/rest/v1/blog360_posts?slug=eq.${encodeURIComponent(slug)}&select=titulo,resumo,imagem_destaque,imagem_social_url,slug,status,publicado,published_at&limit=1`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
@@ -99,7 +99,12 @@ module.exports = async (req, res) => {
   if (slug) {
     const post = await fetchPost(slug);
     if (post) {
-      const img = resolveOgImage(post.imagem_destaque || post.image_url, siteBase);
+      const rawOg =
+        (post.imagem_social_url && String(post.imagem_social_url).trim()) ||
+        post.imagem_destaque ||
+        post.image_url ||
+        '';
+      const img = resolveOgImage(rawOg, siteBase);
       let desc = (post.resumo || post.excerpt || '').trim();
       if (desc.length > 200) desc = desc.substring(0, 197) + '...';
       if (!desc) desc = 'Leia este artigo no Blog Vida 360º';

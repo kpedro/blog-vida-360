@@ -78,7 +78,7 @@
         .score-circle.score-bad { background: #FADBD8; color: #E74C3C; }
         .seo-score-wrap p { font-size: 12px; color: #7F8C8D; }
         
-        #image-preview { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 8px; display: none; }
+        #image-preview, #social-image-preview { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 8px; display: none; }
     </style>
 </head>
 <body>
@@ -167,10 +167,16 @@
                     <input type="text" id="post-tags" name="tags" placeholder="bem-estar, produtividade, hábitos">
                 </div>
                 <div class="form-group">
-                    <label for="image-url">🖼️ Imagem de destaque (para o artigo e redes sociais)</label>
-                    <input type="url" id="image-url" name="image_url" placeholder="https://exemplo.com/imagem.jpg">
-                    <div class="char-count" style="margin-top:6px;">Cole aqui a URL de uma imagem. Ela aparece no card do artigo e quando alguém compartilha o link (Facebook, WhatsApp, etc.). Tamanho sugerido: 1200×630 px.</div>
-                    <img id="image-preview" alt="Preview" src="">
+                    <label for="image-url">🖼️ Imagem de destaque do artigo</label>
+                    <input type="text" id="image-url" name="image_url" placeholder="https://… ou imagem gerada/upload (data URL)">
+                    <div class="char-count" style="margin-top:6px;">URL <strong>https</strong>, ou imagem gerada no Estúdio / upload (fica guardada como data no post). Esta imagem aparece nos cards do blog quando suportado.</div>
+                    <img id="image-preview" alt="Preview capa" src="">
+                </div>
+                <div class="form-group" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px 14px;">
+                    <label for="social-image-url">🔗 Imagem para redes sociais (opcional)</label>
+                    <input type="url" id="social-image-url" name="social_image_url" placeholder="https://exemplo.com/sua-capa-1200x630.jpg">
+                    <div class="char-count" style="margin-top:6px;">Use quando a capa acima for <strong>gerada ou upload</strong> (data URL): aqui coloque o <strong>link público direto da imagem</strong> (ex.: Supabase Storage, Imgur, CDN). WhatsApp, Facebook e Open Graph usam <em>só</em> este campo ou uma URL https na capa — não leem data URL.</div>
+                    <img id="social-image-preview" alt="Preview redes" src="">
                 </div>
                 
                 <div class="preview-card">
