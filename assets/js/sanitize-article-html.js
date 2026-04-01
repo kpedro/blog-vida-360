@@ -12,6 +12,13 @@
     if (t.indexOf('favicon.svg') >= 0 && (t.indexOf('og:') >= 0 || t.indexOf('twitter:') >= 0)) {
       return true;
     }
+    // Dump colado após mudança de domínio (canonical com blogvida360 + ids og-)
+    if (/blogvida360\.com\.br/i.test(t) && /canonical-link|id\s*=\s*["']canonical-link["']/i.test(t) && (/og:title|property\s*=\s*["']og:/i.test(t) || /id\s*=\s*["']og-/i.test(t))) {
+      return true;
+    }
+    if (/blogvida360\.com\.br\/post\.html\?post=/i.test(t) && (/Metatags\s+Dinâmicos|Open Graph|twitter:image/i.test(t))) {
+      return true;
+    }
     var hasOg = /property\s*=\s*["']og:|og:title|og:image|og:url|og:description/i.test(t);
     var hasTw = /twitter:(?:card|title|image|description)|name\s*=\s*["']twitter:/i.test(t);
     var hasSite = /favicon\.svg|og-banner\.png|Metatags\s+Dinâmicos|id\s*=\s*["']og-/i.test(t);
@@ -41,6 +48,19 @@
       /<link[^>]*favicon\.svg[^>]*>[\s\S]*?<meta[^>]*name\s*=\s*["']twitter:image["'][^>]*\/?>/gi,
       ''
     );
+    // Ordem com canonical antes do favicon (comum após copiar página com domínio novo)
+    out = out.replace(
+      /<link[^>]*rel\s*=\s*["']canonical["'][^>]*>[\s\S]*?<meta[^>]*name\s*=\s*["']twitter:image:alt["'][^>]*\/?>/gi,
+      ''
+    );
+    out = out.replace(
+      /<!--\s*Open Graph Metatags Dinâmicos\s*-->[\s\S]*?<meta[^>]*name\s*=\s*["']twitter:image:alt["'][^>]*\/?>/gi,
+      ''
+    );
+    out = out.replace(
+      /<!--\s*Twitter Card Metatags Dinâmicos\s*-->[\s\S]*?<meta[^>]*name\s*=\s*["']twitter:image:alt["'][^>]*\/?>/gi,
+      ''
+    );
     return out;
   }
 
@@ -56,7 +76,9 @@
       });
 
       root.querySelectorAll('pre, code, samp, kbd').forEach(function (el) {
-        if (looksLikeHeadDumpText(el.textContent || '')) el.remove();
+        var tx = el.textContent || '';
+        if (looksLikeHeadDumpText(tx)) el.remove();
+        else if (/blogvida360\.com\.br/i.test(tx) && /<(meta|link)\b/i.test(tx) && (/og:title|twitter:card|canonical-link/i.test(tx))) el.remove();
       });
 
       root.querySelectorAll('p').forEach(function (el) {
@@ -89,7 +111,8 @@
           looksLikeHeadDumpText(tx) ||
           (ih.indexOf('og-banner.png') >= 0 && ih.indexOf('id="og-title"') >= 0) ||
           (ih.indexOf('og-banner.png') >= 0 && ih.indexOf("id='og-title'") >= 0) ||
-          (ih.indexOf('property="og:title"') >= 0 && ih.indexOf('Vida 360º - Blog') >= 0 && ih.indexOf('og-banner') >= 0);
+          (ih.indexOf('property="og:title"') >= 0 && ih.indexOf('Vida 360º - Blog') >= 0 && ih.indexOf('og-banner') >= 0) ||
+          (ih.indexOf('canonical-link') >= 0 && ih.indexOf('blogvida360') >= 0 && ih.indexOf('og-title') >= 0);
         if (!kill) break;
         fe.remove();
       }
@@ -115,6 +138,9 @@
     h = h.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
 
     h = stripKnownHeadPasteBlock(h);
+
+    h = h.replace(/<pre\b[^>]*>[\s\S]*?canonical-link[\s\S]*?(?:twitter:image:alt|og:site_name)[\s\S]*?<\/pre>/gi, '');
+    h = h.replace(/<pre\b[^>]*>[\s\S]*?blogvida360\.com\.br\/post\.html[\s\S]*?Metatags Dinâmicos[\s\S]*?<\/pre>/gi, '');
 
     var domClean = sanitizeWithTemplate(h);
     if (domClean !== null) h = domClean;
