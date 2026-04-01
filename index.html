@@ -114,16 +114,22 @@
             margin: var(--spacing-sm) 0 0;
         }
         .home-product-banner-wrap a.banner-link {
-            display: block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-decoration: none;
             color: inherit;
             border-radius: var(--radius-md);
             overflow: hidden;
+            background: var(--blue-light, #eef4ff);
         }
         .home-product-banner-wrap img {
-            width: 100%;
-            max-height: 220px;
-            object-fit: cover;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            max-height: min(320px, 42vw);
+            object-fit: contain;
+            object-position: center;
             display: block;
             vertical-align: middle;
         }
@@ -399,7 +405,7 @@
                 }
                 var inner = '<h3>' + title + '</h3>';
                 inner += '<a class="banner-link" href="' + escAttr(link) + '" target="_blank" rel="noopener noreferrer sponsored">';
-                inner += '<img src="' + escAttr(imgUrl) + '" alt="' + escAttr(s.produto_banner_titulo || 'Destaque') + '" loading="lazy" width="1200" height="400">';
+                inner += '<img src="' + escAttr(imgUrl) + '" alt="' + escAttr(s.produto_banner_titulo || 'Destaque') + '" loading="lazy">';
                 inner += '</a>';
                 inner += '<p class="banner-legal">' + (legenda || 'Pode ser link de indicação. Ao utilizar, você apoia o blog sem custo adicional onde aplicável.') + '</p>';
                 wrap.innerHTML = inner;
