@@ -58,10 +58,13 @@
                                 if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
                                 
                                 var img = p.imagem_destaque || '';
-                                if (img && !img.startsWith('http://') && !img.startsWith('https://')) {
-                                    img = window.location.origin + (img.startsWith('/') ? '' : '/') + img;
+                                var ogBanner = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
+                                var canon = 'https://blog-vida-360.vercel.app';
+                                if (!img || /^data:/i.test(img) || /^blob:/i.test(img)) {
+                                    img = ogBanner;
+                                } else if (!img.startsWith('http://') && !img.startsWith('https://')) {
+                                    img = canon + (img.startsWith('/') ? '' : '/') + img;
                                 }
-                                if (!img) img = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
                                 
                                 var url = window.location.href;
                                 
@@ -354,26 +357,17 @@
                 var desc = descCompleto.length > 200 ? descCompleto.substring(0, 197) + '...' : descCompleto;
                 if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
                 
-                // Garantir URL absoluta para imagem
+                // OG: Facebook exige URL https pública; data:/blob: não funcionam em og:image
+                var ogBanner = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
+                var canon = 'https://blog-vida-360.vercel.app';
                 var img = p.imagem_destaque || p.image_url || '';
-                if (img) {
-                    // Se a imagem não começa com http/https, tornar absoluta
-                    if (!img.startsWith('http://') && !img.startsWith('https://')) {
-                        var baseUrl = window.location.origin;
-                        var basePath = window.location.pathname.replace(/\/[^/]*$/, '');
-                        if (!img.startsWith('/')) {
-                            img = baseUrl + basePath + '/' + img;
-                        } else {
-                            img = baseUrl + img;
-                        }
-                    }
-                } else {
-                    // Fallback para imagem padrão
-                    img = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
+                if (!img || /^data:/i.test(img) || /^blob:/i.test(img)) {
+                    img = ogBanner;
+                } else if (!img.startsWith('http://') && !img.startsWith('https://')) {
+                    img = canon + (img.startsWith('/') ? '' : '/') + img;
                 }
                 
-                var base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-                var url = base + 'post.html?post=' + encodeURIComponent(p.slug || slug);
+                var url = canon + '/post.html?post=' + encodeURIComponent(p.slug || slug);
                 
                 // Atualizar título da página
                 document.title = titulo + ' - Vida 360º';

@@ -10,6 +10,31 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfd
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
 const DEFAULT_IMAGE = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
 
+/** Domínio canônico do site (OG e caminhos relativos); evita preview URL da Vercel nas meta tags. */
+function canonicalSiteBase() {
+  const fromEnv = process.env.PUBLIC_SITE_URL || process.env.SITE_URL;
+  if (fromEnv) {
+    return String(fromEnv)
+      .trim()
+      .replace(/\/$/, '')
+      .replace(/^http:\/\//i, 'https://');
+  }
+  const prod = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (prod) return 'https://' + String(prod).replace(/^https?:\/\//, '');
+  return 'https://blog-vida-360.vercel.app';
+}
+
+/**
+ * Facebook e outros crawlers exigem URL HTTP(S) pública. data:/blob: não são aceitos em og:image.
+ */
+function resolveOgImage(raw, siteBase) {
+  const img = (raw && String(raw).trim()) || '';
+  if (!img) return DEFAULT_IMAGE;
+  if (/^data:/i.test(img) || /^blob:/i.test(img)) return DEFAULT_IMAGE;
+  if (img.startsWith('http://') || img.startsWith('https://')) return img;
+  return img.startsWith('/') ? siteBase + img : siteBase + '/' + img;
+}
+
 function loadTemplate() {
   const templatePath = path.join(__dirname, 'post-template.html');
   try {
@@ -59,10 +84,10 @@ function applyMeta(html, meta) {
 
 module.exports = async (req, res) => {
   const slug = (req.query && req.query.post) || '';
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'https://blog-vida-360.vercel.app';
-  const postUrl = slug ? `${baseUrl}/post.html?post=${encodeURIComponent(slug)}` : baseUrl + '/post.html';
+  const siteBase = canonicalSiteBase();
+  const postUrl = slug
+    ? `${siteBase}/post.html?post=${encodeURIComponent(slug)}`
+    : `${siteBase}/post.html`;
 
   let meta = {
     title: 'Vida 360º - Blog',
@@ -74,11 +99,7 @@ module.exports = async (req, res) => {
   if (slug) {
     const post = await fetchPost(slug);
     if (post) {
-      let img = post.imagem_destaque || post.image_url || '';
-      if (img && !img.startsWith('http://') && !img.startsWith('https://')) {
-        img = img.startsWith('/') ? baseUrl + img : baseUrl + '/' + img;
-      }
-      if (!img) img = DEFAULT_IMAGE;
+      const img = resolveOgImage(post.imagem_destaque || post.image_url, siteBase);
       let desc = (post.resumo || post.excerpt || '').trim();
       if (desc.length > 200) desc = desc.substring(0, 197) + '...';
       if (!desc) desc = 'Leia este artigo no Blog Vida 360º';
