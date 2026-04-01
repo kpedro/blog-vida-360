@@ -8,7 +8,7 @@ const path = require('path');
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
-const DEFAULT_IMAGE = 'https://blog-vida-360.vercel.app/assets/images/og-banner.png';
+const DEFAULT_IMAGE = 'https://www.blogvida360.com.br/assets/images/og-banner.png';
 
 /** Domínio canônico do site (OG e caminhos relativos); evita preview URL da Vercel nas meta tags. */
 function canonicalSiteBase() {
@@ -21,7 +21,7 @@ function canonicalSiteBase() {
   }
   const prod = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   if (prod) return 'https://' + String(prod).replace(/^https?:\/\//, '');
-  return 'https://blog-vida-360.vercel.app';
+  return 'https://www.blogvida360.com.br';
 }
 
 /**

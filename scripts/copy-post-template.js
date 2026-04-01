@@ -20,7 +20,7 @@ let html = fs.readFileSync(postPath, 'utf8');
 const defaults = {
   ogTitle: 'Vida 360º - Blog',
   ogDescription: 'Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio',
-  ogImage: 'https://blog-vida-360.vercel.app/assets/images/og-banner.png',
+  ogImage: 'https://www.blogvida360.com.br/assets/images/og-banner.png',
   ogUrl: '',
   ogImageAlt: 'Vida 360º Blog',
 };

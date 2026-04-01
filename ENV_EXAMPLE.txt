@@ -26,5 +26,5 @@ VITE_STRIPE_SECRET_KEY=sk_test_sua-chave-secreta
 VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 # URLs
-VITE_SITE_URL=https://kpedro.github.io/blog-vida-360
-VITE_API_URL=https://seu-projeto.vercel.app/api
+VITE_SITE_URL=https://www.blogvida360.com.br
+VITE_API_URL=https://www.blogvida360.com.br/api

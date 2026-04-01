@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://kpedro.github.io/blog-vida-360/sitemap.xml
+Sitemap: https://www.blogvida360.com.br/sitemap.xml
 
 # Bloquear arquivos desnecessários
 Disallow: /posts/
