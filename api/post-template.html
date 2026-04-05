@@ -109,7 +109,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="assets/js/sanitize-article-html.js?v=6"></script>
+    <script src="assets/js/sanitize-article-html.js?v=7"></script>
     <style>
         /* Usa a mesma paleta da página inicial (variáveis em style.css) */
         #post-content {
@@ -479,7 +479,10 @@
                 }
                 var el = document.getElementById('post-content');
                 if (el) {
-                    var raw = (p.conteudo || p.content || p.conteudo_markdown || '').trim() || '<p>Conteúdo indisponível.</p>';
+                    var raw = typeof window.pickBlog360PostBodyRaw === 'function'
+                        ? window.pickBlog360PostBodyRaw(p)
+                        : String(p.conteudo || p.content || p.conteudo_markdown || '').trim();
+                    if (!raw) raw = '<p>Conteúdo indisponível.</p>';
                     var html = raw;
                     if (typeof marked !== 'undefined' && raw && !/^\s*</.test(raw)) {
                         try { html = marked.parse(raw); } catch (e) { }

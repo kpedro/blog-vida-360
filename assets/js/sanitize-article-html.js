@@ -64,6 +64,23 @@
     return out;
   }
 
+  /** Remove bloco colado do <head> da post.html em texto/Markdown (antes do parse). */
+  function stripHeadPastePreamble(str) {
+    if (!str || typeof str !== 'string') return str;
+    var s = str.replace(/\r\n/g, '\n');
+    var patterns = [
+      /(?:^|\n)\s*<!--\s*Favicon\s*-->[\s\S]*?<meta[^>]*\bname=["']twitter:image:alt["'][^>]*\/?>/gi,
+      /(?:^|\n)\s*<!--\s*Favicon\s*-->[\s\S]*?<meta[^>]*\bname=["']twitter:image["'][^>]*\/?>/gi,
+      /(?:^|\n)\s*<link[^>]*favicon\.svg[^>]*>[\s\S]*?<meta[^>]*\bname=["']twitter:image:alt["'][^>]*\/?>/gi,
+      /(?:^|\n)\s*<link[^>]*favicon\.svg[^>]*>[\s\S]*?<meta[^>]*\bname=["']twitter:image["'][^>]*\/?>/gi,
+      /(?:^|\n)\s*<link[^>]*rel=["']canonical["'][^>]*>[\s\S]*?<meta[^>]*\bname=["']twitter:image:alt["'][^>]*\/?>/gi
+    ];
+    for (var i = 0; i < patterns.length; i++) {
+      s = s.replace(patterns[i], '\n');
+    }
+    return s.replace(/^\n+/, '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+
   function sanitizeWithTemplate(html) {
     if (typeof document === 'undefined' || !document.createElement) return null;
     try {
@@ -125,7 +142,7 @@
 
   function sanitizeArticleHtml(html) {
     if (!html || typeof html !== 'string') return html;
-    var h = html;
+    var h = stripHeadPastePreamble(html);
 
     h = h.replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, '');
     h = h.replace(/<!DOCTYPE[^>]*>/gi, '');
@@ -175,5 +192,34 @@
     return h.replace(/^\s+|\s+$/g, '').replace(/(?:\s*<br\s*\/?>\s*){4,}/gi, '<br><br><br>');
   }
 
+  function scoreSanitizedBodyLen(s) {
+    var cleaned = sanitizeArticleHtml(s);
+    return (cleaned || '').replace(/\s/g, '').length;
+  }
+
+  /** Prioriza content / conteudo_markdown (gravados pelo editor) e evita conteudo legado só com metatags. */
+  function pickBlog360PostBodyRaw(p) {
+    if (!p || typeof p !== 'object') return '';
+    var order = ['content', 'conteudo_markdown', 'conteudo'];
+    var candidates = [];
+    for (var i = 0; i < order.length; i++) {
+      var v = p[order[i]];
+      if (v != null && String(v).trim()) candidates.push(String(v).trim());
+    }
+    if (candidates.length === 0) return '';
+    if (candidates.length === 1) return candidates[0];
+    var best = candidates[0];
+    var bestScore = scoreSanitizedBodyLen(best);
+    for (var j = 1; j < candidates.length; j++) {
+      var sc = scoreSanitizedBodyLen(candidates[j]);
+      if (sc > bestScore) {
+        bestScore = sc;
+        best = candidates[j];
+      }
+    }
+    return best;
+  }
+
   global.sanitizeArticleHtml = sanitizeArticleHtml;
+  global.pickBlog360PostBodyRaw = pickBlog360PostBodyRaw;
 })(typeof window !== 'undefined' ? window : globalThis);

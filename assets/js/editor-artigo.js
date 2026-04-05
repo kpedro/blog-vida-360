@@ -206,8 +206,10 @@ async function loadPost(postId) {
         document.getElementById('post-tags').value = Array.isArray(data.tags) ? data.tags.join(', ') : (data.tags || '');
         document.getElementById('image-url').value = data.imagem_destaque || data.image_url || '';
         
-        // Carregar conteúdo (tentar Markdown primeiro, depois HTML)
-        let content = data.conteudo || data.content || data.conteudo_markdown || '';
+        // Carregar conteúdo: mesma prioridade que post.html (evita conteudo legado com metatags)
+        let content = typeof window.pickBlog360PostBodyRaw === 'function'
+            ? window.pickBlog360PostBodyRaw(data)
+            : (data.conteudo || data.content || data.conteudo_markdown || '');
         if (content && window.marked && isMarkdown(content)) {
             document.getElementById('markdown-editor').value = content;
             if (editorMode === 'html') {
@@ -682,6 +684,7 @@ async function savePost(status) {
         const postData = {
             titulo: title,
             slug,
+            conteudo: contentHtml || '',
             conteudo_markdown: contentHtml || '', // NOT NULL no Supabase
             resumo: excerpt || null,
             categoria: category || null,
