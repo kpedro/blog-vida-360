@@ -43,21 +43,58 @@
             margin-bottom: var(--spacing-xl);
         }
 
-        /* Newsletter, quiz e banner: mesma largura, padding, cantos e sombra */
-        #home .home-stack-card {
+        /* Newsletter (card abaixo dos artigos na home) */
+        #posts-container #home-newsletter-below {
             max-width: 640px;
             width: 100%;
-            margin: var(--spacing-md) auto;
+            margin: var(--spacing-xl) auto 0;
             padding: var(--spacing-md);
             border-radius: var(--radius-lg);
             box-sizing: border-box;
             box-shadow: var(--shadow-md);
+            text-align: center;
         }
 
         #posts-container {
             background-color: var(--blue-light);
             padding: var(--spacing-lg);
             border-radius: var(--radius-md);
+        }
+
+        /* Artigos + banner de produto lado a lado (desktop) */
+        .home-posts-with-sidebar {
+            display: grid;
+            gap: var(--spacing-lg);
+            align-items: start;
+        }
+        @media (min-width: 960px) {
+            .home-posts-with-sidebar {
+                grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+            }
+            .home-posts-with-sidebar:has(#home-product-banner-wrap.is-hidden) {
+                grid-template-columns: 1fr;
+            }
+            .home-posts-with-sidebar:has(#home-product-banner-wrap.is-hidden) .home-posts-sidebar {
+                display: none;
+            }
+            .home-posts-sidebar {
+                position: sticky;
+                top: 1rem;
+            }
+        }
+        .posts-main {
+            min-width: 0;
+        }
+
+        #posts-container .home-posts-sidebar .home-product-banner-wrap {
+            margin: 0;
+            max-width: none;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+        #posts-container .home-posts-sidebar .home-product-banner-wrap img {
+            max-height: min(320px, 50vh);
         }
 
         #posts-container .posts-grid {
@@ -102,33 +139,6 @@
             text-align: center;
             margin: 0;
             border-radius: 0 0 var(--radius-md) var(--radius-md);
-        }
-
-        .home-quiz-cta {
-            background: linear-gradient(135deg, var(--blue-dark) 0%, var(--primary-light) 100%);
-            text-align: center;
-        }
-        .home-quiz-cta p {
-            margin: 0 0 var(--spacing-xs);
-            color: var(--text-color);
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-        .home-quiz-cta .home-quiz-cta__btn {
-            background: var(--accent);
-            color: #fff;
-            padding: 0.45rem 1.1rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            display: inline-block;
-        }
-        .home-quiz-cta .home-quiz-cta__btn:hover,
-        .home-quiz-cta .home-quiz-cta__btn:focus {
-            background-color: var(--accent-light);
-            color: #fff;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
         }
 
         .home-product-banner-wrap {
@@ -201,27 +211,8 @@
         <section id="home">
             <h2>Bem-vindo ao Blog "Vida 360º"</h2>
             <p>Explore conteúdos exclusivos sobre <strong>saúde, bem-estar, produtividade, mentalidade e equilíbrio</strong> para uma vida mais plena.</p>
-            
-            <!-- CTA Newsletter - Topo -->
-            <div class="cta-newsletter home-stack-card">
-                <h3>📧 Receba Conteúdo Exclusivo!</h3>
-                <p>Cadastre-se e receba nosso <strong>Guia Completo de Bem-Estar</strong> grátis!</p>
-                <form class="newsletter-form" data-origem="form_topo">
-                    <input type="email" name="email" placeholder="Seu melhor email" required aria-label="Email para newsletter">
-                    <button type="submit">Quero Receber Grátis</button>
-                </form>
-            </div>
-            
-            <!-- Destaque Quiz -->
-            <div class="home-quiz-cta home-stack-card">
-                <p>🧪 Descubra se sua rotina indica que vale avaliar suplementação.</p>
-                <a href="quiz.html" class="btn-secondary home-quiz-cta__btn">Fazer o quiz →</a>
-            </div>
 
-            <!-- Banner de produto (global — painel admin; oculto até ativar no Supabase) -->
-            <div id="home-product-banner-wrap" class="home-product-banner-wrap home-stack-card is-hidden" aria-live="polite"></div>
-
-            <!-- Barra de Busca -->
+            <!-- Barra de Busca (acima dos artigos) -->
             <div id="search-container" class="search-container">
                 <input type="search" id="search-input" placeholder="🔍 Buscar posts...">
                 <div id="search-results"></div>
@@ -233,7 +224,9 @@
                 <h2>📚 Últimos Artigos</h2>
                 <a href="artigos.html" class="btn-secondary">Ver Todos os Artigos →</a>
             </div>
-            <div class="posts-grid" id="posts-grid">
+            <div class="home-posts-with-sidebar">
+                <div class="posts-main">
+                    <div class="posts-grid" id="posts-grid">
                 <!-- Posts estáticos (fallback); substituídos por JS se houver posts no Supabase -->
                 <article class="post">
                     <img src="assets/images/saude-mental.jpg" alt="Saúde Mental" class="post-image" loading="lazy">
@@ -265,6 +258,22 @@
                     <p>Aprenda como construir relações sólidas que geram resultados duradouros no seu negócio.</p>
                     <a href="post.html?post=marketing-relacionamento" class="read-more" aria-label="Ler artigo sobre marketing de relacionamento">Leia mais...</a>
                 </article>
+                    </div>
+                </div>
+                <aside class="home-posts-sidebar" aria-label="Destaque do blog">
+                    <!-- Banner de produto (global — painel admin; ao lado dos artigos no desktop) -->
+                    <div id="home-product-banner-wrap" class="home-product-banner-wrap is-hidden" aria-live="polite"></div>
+                </aside>
+            </div>
+
+            <!-- Newsletter abaixo dos artigos (id usado para inserir "Ver mais" antes deste bloco) -->
+            <div id="home-newsletter-below" class="cta-newsletter home-stack-card">
+                <h3>📧 Receba Conteúdo Exclusivo!</h3>
+                <p>Cadastre-se e receba nosso <strong>Guia Completo de Bem-Estar</strong> grátis!</p>
+                <form class="newsletter-form" data-origem="form_abaixo_artigos">
+                    <input type="email" name="email" placeholder="Seu melhor email" required aria-label="Email para newsletter">
+                    <button type="submit">Quero Receber Grátis</button>
+                </form>
             </div>
         </section>
     </main>
@@ -414,7 +423,12 @@
                         btn.onmouseover = function() { this.style.backgroundColor = 'var(--blue-primary)'; };
                         btn.onmouseout = function() { this.style.backgroundColor = 'var(--blue-secondary)'; };
                         btnDiv.appendChild(btn);
-                        container.appendChild(btnDiv);
+                        var newsletterEl = document.getElementById('home-newsletter-below');
+                        if (newsletterEl && newsletterEl.parentNode === container) {
+                            container.insertBefore(btnDiv, newsletterEl);
+                        } else {
+                            container.appendChild(btnDiv);
+                        }
                     }
                 }
             }
