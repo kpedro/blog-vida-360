@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banner da home - Vida 360º</title>
+    <title>Banner e faixa do site - Vida 360º</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,11 +16,13 @@
         }
         .editor-header a { color: #ECF0F1; text-decoration: none; font-weight: 600; }
         .editor-header a:hover { color: white; }
-        .editor-container { max-width: 720px; margin: 0 auto; padding: 2rem; }
+        .editor-container { max-width: 760px; margin: 0 auto; padding: 2rem; }
         .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 1.5rem; }
         .form-ground { margin-bottom: 1.25rem; }
         .form-ground label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        .form-ground input[type="text"], .form-ground input[type="url"] { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; }
+        .form-ground input[type="text"], .form-ground input[type="url"], .form-ground textarea { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; font-family: inherit; }
+        .form-ground textarea { min-height: 72px; resize: vertical; }
+        .card + .card { margin-top: 1.75rem; }
         .form-ground .hint { font-size: 12px; color: #7F8C8D; margin-top: 4px; }
         .check-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
         .check-row input { width: 18px; height: 18px; }
@@ -36,14 +38,14 @@
 </head>
 <body>
     <header class="editor-header">
-        <h1>Banner de produto (home)</h1>
+        <h1>Banner e faixa do site</h1>
         <div style="display:flex;gap:16px;align-items:center;">
             <a href="admin-dashboard.html">← Dashboard</a>
             <a href="index.html">Ver blog</a>
         </div>
     </header>
     <div class="editor-container">
-        <p style="margin-bottom:1rem;color:#5D6D7E;font-size:14px;">Um único destaque na página inicial. Só aparece para visitantes se estiver <strong>ativo</strong> e com imagem e link <strong>https</strong> válidos. Execute o SQL <code>supabase/BLOG360_SITE_SETTINGS.sql</code> no projeto se ainda não criou a tabela.</p>
+        <p style="margin-bottom:1rem;color:#5D6D7E;font-size:14px;">Banner lateral na home e <strong>faixa no topo</strong> (todas as páginas onde o script está incluído: início, lista de artigos, post). Rode <code>supabase/BLOG360_SITE_SETTINGS.sql</code> e, se a tabela já existia antes, <code>supabase/BLOG360_SITE_SETTINGS_FAIXA_OPORTUNIDADE.sql</code> (ou rode o SQL completo de novo — os <code>ADD COLUMN IF NOT EXISTS</code> são seguros).</p>
         <div class="card">
             <div class="check-row">
                 <input type="checkbox" id="prodAtivo">
@@ -67,13 +69,37 @@
                 <label for="prodLegenda">Legenda / transparência (opcional)</label>
                 <input type="text" id="prodLegenda" placeholder="Ex.: Indicação — você apoia o blog sem custo extra.">
             </div>
-            <button type="button" class="btn-primary" id="btnSalvar">Salvar</button>
-            <div id="msg"></div>
             <div class="preview" id="previewBox" style="display:none;">
                 <strong>Prévia</strong>
                 <div id="previewInner"></div>
             </div>
         </div>
+
+        <div class="card">
+            <h2 style="font-size:1.1rem;margin-bottom:1rem;color:#2C3E50;">Faixa de oportunidade (topo do site)</h2>
+            <p style="margin-bottom:1rem;color:#5D6D7E;font-size:13px;line-height:1.45;">Estilo “announcement bar” usado em blogs e lojas: uma linha chamativa abaixo do menu, com texto curto e botão opcional (ex.: prospectar distribuidores, parceria Amway ou outra empresa). Evitamos flash rápido; há apenas um brilho suave na borda para chamar atenção sem prejudicar acessibilidade.</p>
+            <div class="check-row">
+                <input type="checkbox" id="faixaAtivo">
+                <label for="faixaAtivo" style="margin:0;font-weight:600;">Exibir faixa no topo</label>
+            </div>
+            <div class="form-ground">
+                <label for="faixaTexto">Mensagem (obrigatória se ativo)</label>
+                <textarea id="faixaTexto" maxlength="400" placeholder="Ex.: Quer construir renda extra com produtos de bem-estar? Fale com a nossa equipe."></textarea>
+                <p class="hint">Uma ou duas frases. Em telas pequenas o texto quebra em várias linhas.</p>
+            </div>
+            <div class="form-ground">
+                <label for="faixaLink">Link do botão (https, opcional)</label>
+                <input type="url" id="faixaLink" placeholder="https://wa.me/... ou página de cadastro">
+                <p class="hint">Se vazio, só a mensagem aparece (sem botão).</p>
+            </div>
+            <div class="form-ground">
+                <label for="faixaCta">Texto do botão</label>
+                <input type="text" id="faixaCta" placeholder="Saiba mais" maxlength="80">
+            </div>
+        </div>
+
+        <p style="margin-top:1.25rem;"><button type="button" class="btn-primary" id="btnSalvar">Salvar tudo</button></p>
+        <div id="msg"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -139,6 +165,10 @@
                 document.getElementById('prodImagem').value = d.produto_banner_imagem_url || '';
                 document.getElementById('prodLink').value = d.produto_banner_link || '';
                 document.getElementById('prodLegenda').value = d.produto_banner_legenda || '';
+                document.getElementById('faixaAtivo').checked = !!d.faixa_oportunidade_ativo;
+                document.getElementById('faixaTexto').value = d.faixa_oportunidade_texto || '';
+                document.getElementById('faixaLink').value = d.faixa_oportunidade_link || '';
+                document.getElementById('faixaCta').value = d.faixa_oportunidade_cta || '';
                 updatePreview();
             } else if (r.error && r.error.includes('does not exist')) {
                 showMsg('Tabela blog360_site_settings não encontrada. Rode BLOG360_SITE_SETTINGS.sql no Supabase.', false);
@@ -180,12 +210,21 @@
                 if (linkNorm && linkNorm !== linkRaw) {
                     document.getElementById('prodLink').value = linkNorm;
                 }
+                var faixaLinkRaw = document.getElementById('faixaLink').value.trim() || null;
+                var faixaLinkNorm = faixaLinkRaw ? normalizeBannerDestinationUrl(faixaLinkRaw) : null;
+                if (faixaLinkNorm && faixaLinkNorm !== faixaLinkRaw) {
+                    document.getElementById('faixaLink').value = faixaLinkNorm;
+                }
                 var payload = {
                     produto_banner_ativo: document.getElementById('prodAtivo').checked,
                     produto_banner_titulo: document.getElementById('prodTitulo').value.trim() || null,
                     produto_banner_imagem_url: document.getElementById('prodImagem').value.trim() || null,
                     produto_banner_link: linkNorm,
-                    produto_banner_legenda: document.getElementById('prodLegenda').value.trim() || null
+                    produto_banner_legenda: document.getElementById('prodLegenda').value.trim() || null,
+                    faixa_oportunidade_ativo: document.getElementById('faixaAtivo').checked,
+                    faixa_oportunidade_texto: document.getElementById('faixaTexto').value.trim() || null,
+                    faixa_oportunidade_link: faixaLinkNorm,
+                    faixa_oportunidade_cta: document.getElementById('faixaCta').value.trim() || null
                 };
                 if (payload.produto_banner_ativo) {
                     if (!payload.produto_banner_imagem_url || !/^https?:\/\//i.test(payload.produto_banner_imagem_url)) {
@@ -199,9 +238,21 @@
                         return;
                     }
                 }
+                if (payload.faixa_oportunidade_ativo) {
+                    if (!payload.faixa_oportunidade_texto) {
+                        showMsg('Com a faixa ativa, preencha a mensagem.', false);
+                        btn.disabled = false;
+                        return;
+                    }
+                    if (payload.faixa_oportunidade_link && !/^https?:\/\//i.test(payload.faixa_oportunidade_link)) {
+                        showMsg('Link da faixa deve começar com http(s) ou fique vazio.', false);
+                        btn.disabled = false;
+                        return;
+                    }
+                }
                 var save = await client.saveSiteSettings(payload);
                 if (save.success) {
-                    showMsg('Salvo. Atualize a home para ver o banner.', true);
+                    showMsg('Salvo. Atualize o blog para ver o banner e a faixa.', true);
                 } else {
                     showMsg(save.error || 'Erro ao salvar. Verifique sessão e se o SQL foi aplicado.', false);
                 }

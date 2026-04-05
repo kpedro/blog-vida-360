@@ -28,6 +28,13 @@ INSERT INTO public.blog360_site_settings (id, produto_banner_ativo)
 VALUES (1, false)
 ON CONFLICT (id) DO NOTHING;
 
+-- Faixa de oportunidade no topo (parceria / distribuidor); idempotente
+ALTER TABLE public.blog360_site_settings
+  ADD COLUMN IF NOT EXISTS faixa_oportunidade_ativo BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS faixa_oportunidade_texto TEXT,
+  ADD COLUMN IF NOT EXISTS faixa_oportunidade_link TEXT,
+  ADD COLUMN IF NOT EXISTS faixa_oportunidade_cta TEXT;
+
 DROP TRIGGER IF EXISTS blog360_site_settings_updated_at ON public.blog360_site_settings;
 CREATE TRIGGER blog360_site_settings_updated_at
   BEFORE UPDATE ON public.blog360_site_settings

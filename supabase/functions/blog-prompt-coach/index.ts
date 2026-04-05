@@ -9,7 +9,7 @@ const corsHeaders = {
 const MAX_MESSAGES = 24;
 const MAX_MSG_CHARS = 8000;
 
-const SYSTEM_PROMPT = `Você é um assistente de engenharia de prompts para redatores do Blog Vida 360º (saúde integral, bem-estar, saúde mental, hábitos e equilíbrio).
+const ARTICLE_SYSTEM_PROMPT = `Você é um assistente de engenharia de prompts para redatores do Blog Vida 360º (saúde integral, bem-estar, saúde mental, hábitos e equilíbrio).
 
 Objetivo: ajudar o usuário a montar um PROMPT reutilizável para o Estúdio de conteúdo ou para outras ferramentas de IA (estrutura de artigo, tom, público, SEO, outline, seções).
 
@@ -36,6 +36,42 @@ Regras do JSON:
 - NUNCA use "---" ou blocos markdown no lugar de suggestedContent; o prompt integral vai na string suggestedContent.
 - assistantMessage sempre preenchido.
 - IMPORTANTE: dentro de strings JSON, use \\n para quebra de linha. Nunca coloque quebra de linha literal entre as aspas.`;
+
+const MARKETING_SYSTEM_PROMPT = `Você é um assistente de copywriting e divulgação para o time do Blog Vida 360º.
+
+Objetivo: produzir TEXTO PRONTO PARA USO em materiais de marketing e divulgação: faixa no topo do site, banners curtos, convites por WhatsApp, chamadas para reunião de oportunidade (Zoom/Meet), legendas em redes sociais, rótulos de botão (CTA), trechos de newsletter ou e-mail de convite, folders digitais curtos.
+
+Escopo permitido (NÃO recuse pedidos legítimos nesta área):
+- Convites comerciais, parcerias, cadastro, lista de espera, eventos ao vivo ou online.
+- Oportunidade de negócio, modelo de revenda ou distribuição, prospecção de novos consultores/parceiros — quando o usuário pedir, ajude com copy clara e respeitosa.
+- Incluir menção a WhatsApp, link de reunião, horário, tom acolhedor ou profissional conforme pedido.
+
+Cumprimento e limites éticos:
+- Não prometa cura de doenças, resultados médicos garantidos nem "milagres" de saúde.
+- Não garanta renda fixa ou lucro certo; evite números inventados de ganhos.
+- Para produtos de bem-estar: tom de convite e informação, sem substituir orientação de profissional de saúde.
+- Português brasileiro, ortografia correta.
+
+Como conduzir:
+- Faça 1 ou 2 perguntas objetivas se faltar canal (faixa / WhatsApp / rede), público, tom ou tamanho do texto.
+- Quando houver contexto suficiente, entregue na primeira resposta útil possível (às vezes em 1 troca).
+
+FORMATO DE RESPOSTA OBRIGATÓRIO — responda SOMENTE com um único objeto JSON válido (sem markdown fora do JSON), com esta estrutura:
+{
+  "phase": "clarify" | "deliver",
+  "assistantMessage": "texto curto para o usuário (pergunta, feedback ou encerramento)",
+  "suggestedTitle": "rótulo curto ex.: Faixa reunião | WhatsApp convite",
+  "suggestedContent": "texto final pronto para colar; vazio \"\" enquanto phase for clarify"
+}
+
+Regras do JSON:
+- Em phase = "deliver", suggestedContent é o TEXTO FINAL (não é prompt para outra IA). Pode ser curto (ex.: 25–120 caracteres para faixa do site) ou mais longo (WhatsApp, legenda).
+- Se o usuário precisar de TEXTO DA FAIXA + TEXTO DO BOTÃO, use linhas assim dentro de suggestedContent:
+TEXTO_DA_FAIXA: uma linha
+TEXTO_DO_BOTAO: até 4 palavras
+- NUNCA diga que só ajuda com "artigos do blog" ou recuse copy de oportunidade/parceria: este modo é especificamente para marketing e divulgação.
+- assistantMessage sempre preenchido. Em deliver: no máximo 2 frases curtas; o conteúdo utilizável vai em suggestedContent.
+- Dentro de strings JSON use \\n para quebra de linha.`;
 
 type Msg = { role: string; content: string };
 
@@ -90,12 +126,17 @@ function recoverSuggestedContent(
   return sc;
 }
 
+type CoachMode = "article" | "marketing";
+
 function finalizeCoachResponse(
   phaseIn: "clarify" | "deliver",
   assistantMessage: string,
   suggestedTitle: string,
   suggestedContent: string,
+  opts?: { minDeliverChars?: number; mode?: CoachMode },
 ) {
+  const minDeliver = opts?.minDeliverChars ?? 40;
+  const mode = opts?.mode ?? "article";
   let phase: "clarify" | "deliver" = phaseIn;
   let am = typeof assistantMessage === "string" ? assistantMessage : "";
   let st = typeof suggestedTitle === "string" ? suggestedTitle : "";
@@ -106,10 +147,11 @@ function finalizeCoachResponse(
     sc = recovered.trim();
   }
   if (phase === "deliver" && sc.trim().length >= 80 && am.length > 500) {
-    am =
-      "Prompt pronto. Use o botão «Aplicar ao campo de comando» para colar o texto completo no Estúdio.";
+    am = mode === "marketing"
+      ? "Texto pronto abaixo. Use «Copiar» na Central de marketing para colar no site ou no WhatsApp."
+      : "Prompt pronto. Use o botão «Aplicar ao campo de comando» para colar o texto completo no Estúdio.";
   }
-  if (phase === "deliver" && sc.trim().length < 40) {
+  if (phase === "deliver" && sc.trim().length < minDeliver) {
     phase = "clarify";
   }
 
@@ -148,6 +190,13 @@ serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
+    const coachMode: CoachMode = body.mode === "marketing" ? "marketing" : "article";
+    const systemPromptText = coachMode === "marketing"
+      ? MARKETING_SYSTEM_PROMPT
+      : ARTICLE_SYSTEM_PROMPT;
+    const minDeliverChars = coachMode === "marketing" ? 22 : 40;
+    const minRepairChars = coachMode === "marketing" ? 45 : 120;
+
     const messages = normalizeMessages(body.messages);
     if (messages.length === 0 || messages[messages.length - 1].role !== "user") {
       return new Response(JSON.stringify({ error: "Envie ao menos uma mensagem do usuário." }), {
@@ -168,7 +217,7 @@ serve(async (req) => {
 
     const payloadWithJsonSchema = {
       contents,
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      systemInstruction: { parts: [{ text: systemPromptText }] },
       generationConfig: {
         temperature: 0.35,
         maxOutputTokens: 8192,
@@ -188,7 +237,7 @@ serve(async (req) => {
 
     const payloadPlain = {
       contents,
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      systemInstruction: { parts: [{ text: systemPromptText }] },
       generationConfig: {
         temperature: 0.35,
         maxOutputTokens: 8192,
@@ -344,8 +393,6 @@ serve(async (req) => {
       };
     };
 
-    const MIN_DELIVER_CHARS = 120;
-
     type CoachParsed = {
       phase?: string;
       assistantMessage?: string;
@@ -355,16 +402,23 @@ serve(async (req) => {
 
     async function runRepairIfNeeded(p: CoachParsed): Promise<CoachParsed> {
       const sc0 = typeof p.suggestedContent === "string" ? p.suggestedContent.trim() : "";
-      if (p.phase !== "deliver" || sc0.length >= MIN_DELIVER_CHARS) return p;
+      if (p.phase !== "deliver" || sc0.length >= minRepairChars) return p;
 
-      const repairText =
-        `CORREÇÃO OBRIGATÓRIA: Na última resposta, phase era "deliver" mas suggestedContent está vazio ou com menos de ${MIN_DELIVER_CHARS} caracteres (ou só frases genéricas sem o prompt).
+      const repairText = coachMode === "marketing"
+        ? `CORREÇÃO OBRIGATÓRIA: phase era "deliver" mas suggestedContent está vazio ou muito curto.
+
+Responda APENAS um único objeto JSON no formato do sistema, com:
+- phase: "deliver"
+- assistantMessage: no máximo 2 frases curtas
+- suggestedTitle: rótulo curto
+- suggestedContent: o TEXTO FINAL de divulgação pronto para colar (faixa, WhatsApp, legenda, etc.), mínimo ${minRepairChars} caracteres, reunindo o que o usuário pediu.`
+        : `CORREÇÃO OBRIGATÓRIA: Na última resposta, phase era "deliver" mas suggestedContent está vazio ou com menos de ${minRepairChars} caracteres (ou só frases genéricas sem o prompt).
 
 Responda APENAS um único objeto JSON no formato do sistema, com:
 - phase: "deliver"
 - assistantMessage: no máximo 2 frases curtas de encerramento
 - suggestedTitle: rótulo curto do modelo
-- suggestedContent: o texto INTEGRAL do prompt para colar na IA do Estúdio, reunindo TUDO que o usuário já disse (tema, público, tom, formato, extensão, restrições de marca/sigilo). Mínimo ${MIN_DELIVER_CHARS} caracteres.`;
+- suggestedContent: o texto INTEGRAL do prompt para colar na IA do Estúdio, reunindo TUDO que o usuário já disse (tema, público, tom, formato, extensão, restrições de marca/sigilo). Mínimo ${minRepairChars} caracteres.`;
 
       const repairContents = [
         ...contents,
@@ -373,7 +427,7 @@ Responda APENAS um único objeto JSON no formato do sistema, com:
 
       const repairPayload = {
         contents: repairContents,
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        systemInstruction: { parts: [{ text: systemPromptText }] },
         generationConfig: {
           temperature: 0.2,
           maxOutputTokens: 8192,
@@ -416,7 +470,7 @@ Responda APENAS um único objeto JSON no formato do sistema, com:
           };
         }
         const sc2 = typeof p2.suggestedContent === "string" ? p2.suggestedContent.trim() : "";
-        if (sc2.length > sc0.length && sc2.length >= 40) return p2;
+        if (sc2.length > sc0.length && sc2.length >= minDeliverChars) return p2;
       } catch (e) {
         console.warn("blog-prompt-coach repair:", e);
       }
@@ -443,6 +497,7 @@ Responda APENAS um único objeto JSON no formato do sistema, com:
           pLoose.assistantMessage ?? "",
           pLoose.suggestedTitle ?? "",
           pLoose.suggestedContent ?? "",
+          { minDeliverChars, mode: coachMode },
         );
         return new Response(JSON.stringify(out), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -451,8 +506,9 @@ Responda APENAS um único objeto JSON no formato do sistema, com:
       return new Response(
         JSON.stringify({
           phase: "clarify",
-          assistantMessage:
-            "A resposta da IA veio em formato inesperado. Envie de novo: «Gere o JSON final com phase deliver e suggestedContent contendo o prompt completo para o Estúdio.»",
+          assistantMessage: coachMode === "marketing"
+            ? "A resposta da IA veio em formato inesperado. Envie de novo pedindo o texto final de divulgação em JSON (phase deliver + suggestedContent)."
+            : "A resposta da IA veio em formato inesperado. Envie de novo: «Gere o JSON final com phase deliver e suggestedContent contendo o prompt completo para o Estúdio.»",
           suggestedTitle: "",
           suggestedContent: "",
         }),
@@ -469,7 +525,10 @@ Responda APENAS um único objeto JSON no formato do sistema, com:
     const suggestedTitle = typeof parsed.suggestedTitle === "string" ? parsed.suggestedTitle : "";
     const suggestedContent = typeof parsed.suggestedContent === "string" ? parsed.suggestedContent : "";
 
-    const out = finalizeCoachResponse(phase, assistantMessage, suggestedTitle, suggestedContent);
+    const out = finalizeCoachResponse(phase, assistantMessage, suggestedTitle, suggestedContent, {
+      minDeliverChars,
+      mode: coachMode,
+    });
     return new Response(JSON.stringify(out), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

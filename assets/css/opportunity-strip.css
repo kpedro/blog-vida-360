@@ -1,0 +1,86 @@
+/**
+ * Faixa de oportunidade no topo (abaixo do header) — Blog Vida 360º
+ * Animação suave (sem flash rápido) para respeitar prefers-reduced-motion e WCAG.
+ */
+
+.site-opportunity-strip {
+    width: 100%;
+    box-sizing: border-box;
+    background: linear-gradient(100deg, #1a2f4a 0%, #243b55 45%, #1e3a5f 100%);
+    color: #fff;
+    border-bottom: 2px solid rgba(231, 76, 60, 0.65);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.site-opportunity-strip.is-hidden {
+    display: none !important;
+}
+
+.site-opportunity-strip__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0.55rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem 1rem;
+    text-align: center;
+}
+
+.site-opportunity-strip__text {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    font-weight: 500;
+    flex: 1 1 220px;
+    max-width: 100%;
+}
+
+.site-opportunity-strip__cta {
+    flex-shrink: 0;
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    background: var(--accent, #e74c3c);
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.82rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.site-opportunity-strip__cta:hover,
+.site-opportunity-strip__cta:focus {
+    background: var(--accent-light, #c0392b);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(231, 76, 60, 0.45);
+    outline: none;
+}
+
+/* Atenção suave: brilho na borda inferior (não é “pisca-pisca”) */
+@media (prefers-reduced-motion: no-preference) {
+    .site-opportunity-strip[data-active="true"] {
+        animation: opportunity-strip-glow 3.2s ease-in-out infinite;
+    }
+}
+
+@keyframes opportunity-strip-glow {
+    0%, 100% {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        border-bottom-color: rgba(231, 76, 60, 0.55);
+    }
+    50% {
+        box-shadow: 0 2px 18px rgba(231, 76, 60, 0.35);
+        border-bottom-color: rgba(255, 193, 7, 0.75);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-opportunity-strip[data-active="true"] {
+        animation: none;
+    }
+}

@@ -354,10 +354,18 @@
 
             <div class="table-container" style="margin-bottom: 1.5rem;">
                 <div class="table-header" style="flex-wrap: wrap; gap: 12px;">
-                    <h2>🖼️ Banner de produto na home</h2>
+                    <h2>🖼️ Banner da home e faixa do topo</h2>
                     <button type="button" class="btn-secondary" onclick="window.location.href='admin-banner-home.html'">Configurar</button>
                 </div>
-                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Destaque global (uma imagem + link). Requer SQL <code style="font-size:12px;">blog360_site_settings</code> no Supabase.</p>
+                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Banner lateral (imagem + link) e faixa de oportunidade no topo. Tabela <code style="font-size:12px;">blog360_site_settings</code> no Supabase; colunas da faixa em <code style="font-size:12px;">BLOG360_SITE_SETTINGS_FAIXA_OPORTUNIDADE.sql</code>.</p>
+            </div>
+
+            <div class="table-container" style="margin-bottom: 1.5rem;">
+                <div class="table-header" style="flex-wrap: wrap; gap: 12px;">
+                    <h2>📣 Central de marketing</h2>
+                    <button type="button" class="btn-secondary" onclick="window.location.href='admin-marketing-studio.html'">Abrir</button>
+                </div>
+                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Assistente de IA para copy de divulgação (faixa, WhatsApp, convites, CTAs). Separado do Estúdio, que permanece focado em artigos do blog. Requer deploy da Edge Function <code style="font-size:12px;">blog-prompt-coach</code> com suporte a <code style="font-size:12px;">mode: marketing</code>.</p>
             </div>
             
             <div class="table-container">

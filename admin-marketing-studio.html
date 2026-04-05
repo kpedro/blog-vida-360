@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de marketing — Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1419;
+            color: #e8eaed;
+            min-height: 100vh;
+        }
+        .top-bar {
+            background: linear-gradient(135deg, #1e3a2f 0%, #121820 100%);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            border-bottom: 1px solid #2d3748;
+        }
+        .top-bar h1 { font-size: 1.1rem; font-weight: 600; }
+        .top-bar a {
+            color: #86efac;
+            text-decoration: none;
+            font-size: 0.88rem;
+            padding: 0.4rem 0.75rem;
+            border: 1px solid #3d4f6f;
+            border-radius: 6px;
+        }
+        .top-bar a:hover { background: #1e293b; }
+        .wrap { max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+        .lead { color: #94a3b8; font-size: 0.92rem; line-height: 1.55; margin-bottom: 1rem; }
+        .card {
+            background: #161e2a;
+            border: 1px solid #2d3748;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .presets { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+        .preset {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.78rem;
+            border-radius: 999px;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+        .preset:hover { background: #334155; color: #fff; }
+        #mk-chat {
+            min-height: 200px;
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 0.75rem;
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            margin-bottom: 0.75rem;
+        }
+        .mk-msg { margin-bottom: 0.85rem; }
+        .mk-msg-who { font-size: 0.72rem; color: #64748b; margin-bottom: 0.2rem; }
+        .mk-msg-user .mk-msg-who { color: #93c5fd; }
+        .mk-msg-bot .mk-msg-who { color: #86efac; }
+        .mk-msg-body { font-size: 0.88rem; line-height: 1.45; white-space: pre-wrap; }
+        .mk-msg-tip .mk-msg-body { color: #94a3b8; }
+        .mk-prompt-block {
+            margin-top: 0.5rem;
+            padding: 0.65rem;
+            background: #14532d33;
+            border: 1px solid #166534;
+            border-radius: 8px;
+            font-size: 0.82rem;
+        }
+        .mk-prompt-block pre {
+            margin-top: 0.35rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: inherit;
+            color: #dcfce7;
+        }
+        .input-lg {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+        .out-lg {
+            width: 100%;
+            min-height: 120px;
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #fef3c7;
+            font-size: 0.88rem;
+            resize: vertical;
+        }
+        .hint { font-size: 0.75rem; color: #64748b; margin-top: 0.35rem; line-height: 1.4; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.65rem; align-items: center; }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+        .btn:hover:not(:disabled) { background: #334155; }
+        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn-primary {
+            background: #16a34a;
+            border-color: #22c55e;
+            color: #fff;
+        }
+        .btn-primary:hover:not(:disabled) { background: #15803d; }
+        .error-banner {
+            background: #450a0a;
+            border: 1px solid #991b1b;
+            color: #fecaca;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .error-banner.show { display: block; }
+        .section-title { font-size: 0.8rem; color: #94a3b8; margin: 1rem 0 0.35rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    </style>
+</head>
+<body>
+    <header class="top-bar">
+        <h1>📣 Central de marketing e divulgação</h1>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <a href="admin-banner-home.html">Faixa e banner</a>
+            <a href="admin-estudio-conteudo.html">Estúdio (artigos)</a>
+            <a href="admin-dashboard.html">Painel</a>
+            <a href="index.html">Ver blog</a>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <p class="lead">
+            Assistente focado em <strong>copy comercial</strong>: faixa do topo do site, WhatsApp, convites (Zoom/Meet), legendas, CTAs.
+            O Estúdio de conteúdo continua dedicado a <strong>prompts para artigos</strong> do blog.
+        </p>
+        <p class="lead" style="font-size:0.85rem;color:#64748b;">
+            Após atualizar o projeto, faça <strong>deploy</strong> da Edge Function <code style="background:#1e293b;padding:0.1rem 0.35rem;border-radius:4px;">blog-prompt-coach</code> no Supabase para o modo marketing ativar.
+        </p>
+
+        <div id="mk-error" class="error-banner"></div>
+
+        <div class="card">
+            <p class="section-title">Modelos rápidos (clique para colar no campo)</p>
+            <div class="presets">
+                <button type="button" class="preset" data-mk-preset="Preciso de uma frase curta para a faixa no topo do site: convite a uma reunião de oportunidade de negócio em [DATA/HORA], tom acolhedor. Quem tiver interesse fala comigo no WhatsApp [número ou link]. Máximo ~140 caracteres na faixa. Sugira também texto curto para o botão.">Faixa + botão</button>
+                <button type="button" class="preset" data-mk-preset="Mensagem para WhatsApp convidando para apresentação online sobre oportunidade de parceria com produtos de bem-estar; incluir link da reunião [COLE O LINK]; tom profissional e amigável; sem prometer ganhos.">WhatsApp convite</button>
+                <button type="button" class="preset" data-mk-preset="Legenda para Instagram sobre convite à reunião de oportunidade; até 300 caracteres + sugestão de hashtags; sem alegações de saúde.">Legenda Instagram</button>
+                <button type="button" class="preset" data-mk-preset="E-mail curto (assunto + corpo) convidando contatos para conhecer o plano de negócios; CTA claro; sem promessas de renda.">E-mail curto</button>
+            </div>
+
+            <div id="mk-chat"></div>
+            <textarea id="mk-input" class="input-lg" placeholder="Descreva o material (canal, público, tom) ou use um modelo acima. Ctrl+Enter para enviar."></textarea>
+            <div class="toolbar">
+                <button type="button" class="btn btn-primary" id="mk-send">Enviar</button>
+            </div>
+            <p class="hint">Se a resposta vier com TEXTO_DA_FAIXA e TEXTO_DO_BOTÃO, copie cada parte para o painel «Faixa e banner».</p>
+        </div>
+
+        <div class="card">
+            <p class="section-title">Texto para colar (editável)</p>
+            <textarea id="mk-output" class="out-lg" placeholder="O último texto pronto sugerido pelo assistente aparece aqui…"></textarea>
+            <div class="toolbar">
+                <button type="button" class="btn btn-primary" id="mk-copy" disabled>📋 Copiar</button>
+                <a class="btn" href="admin-banner-home.html" style="text-decoration:none;display:inline-block;">Abrir faixa e banner</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof initSupabase === 'function') window.supabaseClient = initSupabase();
+        });
+    </script>
+    <script src="assets/js/marketing-studio.js"></script>
+</body>
+</html>

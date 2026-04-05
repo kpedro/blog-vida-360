@@ -30,6 +30,7 @@
     <meta name="twitter:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/leads.css">
+    <link rel="stylesheet" href="assets/css/opportunity-strip.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="alternate" type="application/rss+xml" title="RSS Feed - Vida 360º" href="feed.xml">
@@ -207,6 +208,9 @@
         </div>
     </header>
 
+    <!-- Faixa de oportunidade (parceria / distribuidor) — preenchida via Supabase + opportunity-strip.js -->
+    <div id="site-opportunity-strip" class="site-opportunity-strip is-hidden" role="region" aria-label="Oportunidade"></div>
+
     <main class="container">
         <section id="home">
             <h2>Bem-vindo ao Blog "Vida 360º"</h2>
@@ -329,6 +333,7 @@
             }
         });
     </script>
+    <script src="assets/js/opportunity-strip.js"></script>
     
     <script src="assets/js/leads.js"></script>
     <script src="assets/js/performance.js"></script>
