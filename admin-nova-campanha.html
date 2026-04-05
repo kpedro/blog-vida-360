@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova Campanha - Vida 360º</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <link rel="stylesheet" href="assets/css/admin-theme.css">
     
     <style>
         * {
@@ -15,11 +16,11 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #F5F7FA;
+            background: var(--admin-page-bg);
         }
         
         .admin-header {
-            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            background: var(--admin-header-gradient);
             color: white;
             padding: 1rem 2rem;
             display: flex;
@@ -48,20 +49,20 @@
         
         .btn-secondary {
             background: white;
-            color: #2C3E50;
+            color: var(--admin-text-strong);
         }
         
         .btn-secondary:hover {
-            background: #ECF0F1;
+            background: var(--admin-surface-tint);
         }
         
         .btn-primary {
-            background: #E74C3C;
+            background: var(--admin-btn-cta);
             color: white;
         }
         
         .btn-primary:hover {
-            background: #C0392B;
+            background: var(--admin-btn-cta-hover);
         }
         
         .btn-success {
@@ -94,7 +95,7 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #2C3E50;
+            color: var(--admin-text-strong);
             font-weight: 600;
         }
         
@@ -114,7 +115,7 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #3498DB;
+            border-color: var(--admin-accent);
         }
         
         .form-row {
@@ -139,7 +140,7 @@
         
         .email-preview h3 {
             margin-bottom: 1rem;
-            color: #2C3E50;
+            color: var(--admin-text-strong);
         }
         
         .preview-box {
@@ -166,7 +167,7 @@
         .stat-item .number {
             font-size: 24px;
             font-weight: bold;
-            color: #2C3E50;
+            color: var(--admin-text-strong);
         }
         
         .stat-item .label {
@@ -192,13 +193,13 @@
         }
         
         .template-card:hover {
-            border-color: #3498DB;
-            background: #F8F9FA;
+            border-color: var(--admin-accent);
+            background: var(--admin-surface-tint);
         }
         
         .template-card.selected {
-            border-color: #E74C3C;
-            background: #FDF6F5;
+            border-color: var(--admin-accent-dark);
+            background: var(--admin-surface-tint);
         }
         
         .toolbar {

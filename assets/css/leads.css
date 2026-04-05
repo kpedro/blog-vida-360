@@ -33,7 +33,7 @@
 .newsletter-form input[name="nome"]:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
 }
 
 .newsletter-form button[type="submit"] {
@@ -76,9 +76,9 @@
 }
 
 .form-message-error {
-    background-color: rgba(231, 76, 60, 0.1);
-    color: var(--accent);
-    border: 1px solid rgba(231, 76, 60, 0.2);
+    background-color: rgba(220, 38, 38, 0.08);
+    color: #b91c1c;
+    border: 1px solid rgba(220, 38, 38, 0.22);
 }
 
 @keyframes slideDown {
@@ -228,14 +228,18 @@
 
 .cta-newsletter .newsletter-form input[type="email"],
 .cta-newsletter .newsletter-form input[name="nome"] {
-    padding: 0.55rem 0.75rem;
+    padding: 0.42rem 0.95rem;
     font-size: var(--font-size-sm);
+    line-height: 1.35;
+    border-radius: var(--radius-sm);
     background-color: rgba(255, 255, 255, 0.95);
 }
 
 .cta-newsletter .newsletter-form button[type="submit"] {
-    padding: 0.55rem 1.1rem;
+    padding: 0.42rem 1rem;
     font-size: var(--font-size-sm);
+    line-height: 1.35;
+    border-radius: var(--radius-sm);
 }
 
 /* Home: email + botão lado a lado em telas médias+ (menos altura na dobra) */
@@ -249,8 +253,9 @@
     }
 
     .cta-newsletter .newsletter-form input[type="email"] {
-        flex: 1 1 auto;
+        flex: 1 1 0;
         min-width: 0;
+        max-width: none;
     }
 
     .cta-newsletter .newsletter-form button[type="submit"] {

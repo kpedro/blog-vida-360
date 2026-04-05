@@ -7,6 +7,7 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <link rel="stylesheet" href="assets/css/admin-theme.css">
     
     <style>
         * {
@@ -17,12 +18,12 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #F5F7FA;
+            background: var(--admin-page-bg, #faf5ff);
         }
         
         /* Header */
         .admin-header {
-            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            background: var(--admin-header-gradient);
             color: white;
             padding: 1rem 2rem;
             display: flex;
@@ -42,7 +43,7 @@
         }
         
         .btn-logout {
-            background: #E74C3C;
+            background: var(--admin-btn-logout);
             color: white;
             border: none;
             padding: 8px 16px;
@@ -52,7 +53,7 @@
         }
         
         .btn-logout:hover {
-            background: #C0392B;
+            background: var(--admin-btn-logout-hover);
         }
         
         .link-blog {
@@ -90,7 +91,7 @@
             display: block;
             padding: 1rem;
             text-decoration: none;
-            color: #2C3E50;
+            color: var(--admin-text-strong);
             font-weight: 600;
             text-align: center;
             border-bottom: 3px solid transparent;
@@ -99,9 +100,9 @@
         
         .admin-nav a:hover,
         .admin-nav a.active {
-            color: #E74C3C;
-            border-bottom-color: #E74C3C;
-            background: #FDF6F5;
+            color: var(--admin-accent);
+            border-bottom-color: var(--admin-accent);
+            background: var(--admin-surface-tint);
         }
         
         /* Container */
@@ -145,7 +146,7 @@
         .stat-card .number {
             font-size: 36px;
             font-weight: 700;
-            color: #2C3E50;
+            color: var(--admin-text-strong);
             margin-bottom: 5px;
         }
         
@@ -172,37 +173,41 @@
         }
         
         .table-header h2 {
-            color: #2C3E50;
+            color: var(--admin-text-strong);
             font-size: 20px;
         }
         
         .btn-primary {
-            background: #E74C3C;
+            background: var(--admin-btn-cta);
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            transition: background 0.3s;
+            transition: filter 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(91, 33, 182, 0.25);
         }
         
         .btn-primary:hover {
-            background: #C0392B;
+            background: var(--admin-btn-cta-hover);
+            filter: brightness(1.02);
         }
         
         .btn-secondary {
-            background: #34495E;
+            background: var(--admin-btn-cta);
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            transition: background 0.3s;
+            transition: filter 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(91, 33, 182, 0.2);
         }
         .btn-secondary:hover {
-            background: #2C3E50;
+            background: var(--admin-btn-cta-hover);
+            filter: brightness(1.02);
         }
         
         .table-header-actions {
@@ -233,7 +238,7 @@
         td {
             padding: 15px 20px;
             border-bottom: 1px solid #ECF0F1;
-            color: #2C3E50;
+            color: var(--admin-text);
         }
         
         tbody tr:hover {
@@ -365,7 +370,7 @@
                     <h2>📣 Central de marketing</h2>
                     <button type="button" class="btn-secondary" onclick="window.location.href='admin-marketing-studio.html'">Abrir</button>
                 </div>
-                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Assistente de IA para copy de divulgação (faixa, WhatsApp, convites, CTAs). Separado do Estúdio, que permanece focado em artigos do blog. Requer deploy da Edge Function <code style="font-size:12px;">blog-prompt-coach</code> com suporte a <code style="font-size:12px;">mode: marketing</code>.</p>
+                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Assistente de IA para copy de divulgação (faixa, WhatsApp, convites, CTAs) com histórico reutilizável. SQL <code style="font-size:12px;">BLOG360_MARKETING_HISTORY.sql</code>. Deploy da Edge <code style="font-size:12px;">blog-prompt-coach</code> com <code style="font-size:12px;">mode: marketing</code>.</p>
             </div>
             
             <div class="table-container">

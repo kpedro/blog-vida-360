@@ -3,6 +3,8 @@
  */
 (function () {
   let mkMessages = [];
+  /** @type {Map<string, string>} */
+  const mkHistoryContentById = new Map();
 
   function $(id) {
     return document.getElementById(id);
@@ -71,6 +73,189 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  function fmtHistDate(iso) {
+    try {
+      return new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    } catch {
+      return String(iso || '');
+    }
+  }
+
+  async function saveMarketingHistory(payload) {
+    const title = (payload.title || '').trim().slice(0, 200) || null;
+    const promptText = (payload.promptText || '').slice(0, 8000);
+    const content = (payload.content || '').trim();
+    if (content.length < 5) return false;
+
+    let c = window.supabaseClient;
+    if (!c && typeof window.initSupabase === 'function') {
+      c = window.initSupabase();
+      window.supabaseClient = c;
+    }
+    const session = await getSession();
+    if (!c || !session?.user) return false;
+
+    try {
+      const { error } = await c.from('blog360_marketing_history').insert({
+        user_id: session.user.id,
+        title,
+        prompt: promptText,
+        content: content.slice(0, 50000),
+      });
+      if (error) throw error;
+      await loadMarketingHistory();
+      return true;
+    } catch (e) {
+      console.warn('Histórico marketing não guardado:', e);
+      return false;
+    }
+  }
+
+  function useHistoryRow(id) {
+    const content = mkHistoryContentById.get(id) || '';
+    const out = $('mk-output');
+    if (out) out.value = content;
+    const copyMain = $('mk-copy');
+    if (copyMain) copyMain.disabled = !content.trim();
+    if (out) out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function copyHistoryRow(id) {
+    const content = mkHistoryContentById.get(id) || '';
+    if (!content) return;
+    try {
+      await navigator.clipboard.writeText(content);
+    } catch {
+      showError('Não foi possível copiar.');
+    }
+  }
+
+  async function deleteHistoryRow(id) {
+    if (!confirm('Remover esta entrada do histórico?')) return;
+    let c = window.supabaseClient;
+    if (!c && typeof window.initSupabase === 'function') {
+      c = window.initSupabase();
+      window.supabaseClient = c;
+    }
+    const session = await getSession();
+    if (!c || !session) return;
+    const { error } = await c.from('blog360_marketing_history').delete().eq('id', id);
+    if (error) {
+      showError(error.message || 'Erro ao apagar.');
+      return;
+    }
+    mkHistoryContentById.delete(id);
+    await loadMarketingHistory();
+  }
+
+  async function loadMarketingHistory() {
+    const tbody = $('mk-history-body');
+    const empty = $('mk-history-empty');
+    const table = $('mk-history-table');
+    if (!tbody || !empty || !table) return;
+
+    let c = window.supabaseClient;
+    if (!c && typeof window.initSupabase === 'function') {
+      c = window.initSupabase();
+      window.supabaseClient = c;
+    }
+    const session = await getSession();
+    if (!c || !session) {
+      empty.textContent = 'Faça login para ver o histórico.';
+      empty.style.display = 'block';
+      table.style.display = 'none';
+      tbody.innerHTML = '';
+      return;
+    }
+
+    empty.style.display = 'block';
+    empty.textContent = 'Carregando…';
+    table.style.display = 'none';
+    tbody.innerHTML = '';
+
+    const { data, error } = await c
+      .from('blog360_marketing_history')
+      .select('id, title, prompt, content, created_at')
+      .order('created_at', { ascending: false })
+      .limit(60);
+
+    if (error) {
+      console.warn('Carregar histórico marketing:', error);
+      empty.textContent =
+        'Não foi possível carregar. Execute supabase/BLOG360_MARKETING_HISTORY.sql no projeto Supabase.';
+      return;
+    }
+
+    const rows = data || [];
+    mkHistoryContentById.clear();
+
+    if (rows.length === 0) {
+      empty.textContent = 'Nenhuma entrada ainda. Gere copy com o assistente ou use «Guardar no histórico».';
+      empty.style.display = 'block';
+      table.style.display = 'none';
+      return;
+    }
+
+    empty.style.display = 'none';
+    table.style.display = 'table';
+
+    rows.forEach((r) => {
+      const content = r.content || '';
+      mkHistoryContentById.set(r.id, content);
+      const previewRaw =
+        (r.title && String(r.title).trim()) ||
+        (r.prompt && String(r.prompt).trim().slice(0, 100)) ||
+        content.slice(0, 80) ||
+        '—';
+      const preview = previewRaw.length > 100 ? previewRaw.slice(0, 100) + '…' : previewRaw;
+
+      const tr = document.createElement('tr');
+      const tdDate = document.createElement('td');
+      tdDate.textContent = fmtHistDate(r.created_at);
+      const tdPrev = document.createElement('td');
+      tdPrev.className = 'mk-h-preview';
+      tdPrev.textContent = preview;
+      tdPrev.title = content.length > 200 ? content.slice(0, 400) + (content.length > 400 ? '…' : '') : content;
+
+      const tdAct = document.createElement('td');
+      const wrap = document.createElement('div');
+      wrap.className = 'mk-history-actions';
+
+      const bUse = document.createElement('button');
+      bUse.type = 'button';
+      bUse.className = 'btn';
+      bUse.textContent = 'Colar';
+      bUse.addEventListener('click', function () {
+        useHistoryRow(r.id);
+      });
+
+      const bCopy = document.createElement('button');
+      bCopy.type = 'button';
+      bCopy.className = 'btn';
+      bCopy.textContent = 'Copiar';
+      bCopy.addEventListener('click', function () {
+        copyHistoryRow(r.id);
+      });
+
+      const bDel = document.createElement('button');
+      bDel.type = 'button';
+      bDel.className = 'btn';
+      bDel.textContent = 'Apagar';
+      bDel.addEventListener('click', function () {
+        deleteHistoryRow(r.id);
+      });
+
+      wrap.appendChild(bUse);
+      wrap.appendChild(bCopy);
+      wrap.appendChild(bDel);
+      tdAct.appendChild(wrap);
+      tr.appendChild(tdDate);
+      tr.appendChild(tdPrev);
+      tr.appendChild(tdAct);
+      tbody.appendChild(tr);
+    });
+  }
+
   function appendBlock(title, content) {
     const log = $('mk-chat');
     if (!log) return;
@@ -112,6 +297,7 @@
       const assistantMessage = data.assistantMessage || '';
       const phase = data.phase || 'clarify';
       const suggestedContent = (data.suggestedContent || '').trim();
+      const suggestedTitle = (data.suggestedTitle || '').trim();
 
       const historyAssistant =
         phase === 'deliver' && suggestedContent.length >= 20
@@ -130,6 +316,14 @@
       }
       const copyMain = $('mk-copy');
       if (copyMain) copyMain.disabled = suggestedContent.length < 20;
+
+      if (suggestedContent.length >= 20) {
+        saveMarketingHistory({
+          title: suggestedTitle || text.slice(0, 100),
+          promptText: text,
+          content: suggestedContent,
+        });
+      }
     } catch (e) {
       appendLine('Sistema', e.message || 'Erro', false);
       showError(e.message || 'Erro. Faça deploy da Edge Function blog-prompt-coach atualizada.');
@@ -192,5 +386,40 @@
 
     const copyBtn = $('mk-copy');
     if (copyBtn) copyBtn.addEventListener('click', copyOutput);
+
+    const saveManual = $('mk-save-manual');
+    if (saveManual) {
+      saveManual.addEventListener('click', async function () {
+        const out = $('mk-output');
+        const raw = (out && out.value.trim()) || '';
+        if (raw.length < 5) {
+          showError('Escreva ou gere texto no campo «Texto para colar» antes de guardar.');
+          return;
+        }
+        const firstLine = raw.split('\n')[0].trim().slice(0, 120);
+        const ok = await saveMarketingHistory({
+          title: firstLine || 'Texto manual',
+          promptText: 'Guardado manualmente na Central de marketing',
+          content: raw,
+        });
+        if (ok) {
+          const b = saveManual;
+          const prev = b.textContent;
+          b.textContent = 'Guardado!';
+          setTimeout(function () {
+            b.textContent = prev;
+          }, 2000);
+        } else {
+          showError('Não foi possível guardar. Confirme login e a tabela blog360_marketing_history no Supabase.');
+        }
+      });
+    }
+
+    const refreshHist = $('mk-history-refresh');
+    if (refreshHist) refreshHist.addEventListener('click', function () {
+      loadMarketingHistory();
+    });
+
+    loadMarketingHistory();
   });
 })();

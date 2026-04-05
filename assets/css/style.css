@@ -1,13 +1,23 @@
 /* ============================================
    Variáveis CSS - Design Minimalista e Profissional
-   Blog Vida 360º - Nova Paleta
+   Blog Vida 360º — matizes violeta (cor da sorte)
    ============================================ */
 :root {
-    /* Cores Principais - Minimalista e Sofisticado */
-    --primary: #2C3E50;        /* Azul acinzentado escuro */
-    --primary-light: #34495E;  /* Azul acinzentado médio */
-    --accent: #E74C3C;         /* Vermelho coral (CTAs) */
-    --accent-light: #EC7063;   /* Vermelho coral claro */
+    /* Violeta / índigo (identidade principal) */
+    --violet-deep: #1e1b4b;    /* Base escura (header, contraste) */
+    --violet-dark: #4c1d95;
+    --violet-core: #5b21b6;
+    --violet-bright: #7c3aed;
+    --violet-soft: #8b5cf6;
+    --violet-glow: #a78bfa;
+    --violet-mist: #ede9fe;    /* Fundos suaves */
+    --violet-blush: #f5f3ff;
+
+    /* Cores principais (compatível com componentes que usam --primary / --accent) */
+    --primary: #4c1d95;
+    --primary-light: #6d28d9;
+    --accent: #7c3aed;
+    --accent-light: #8b5cf6;
     
     /* Neutros */
     --white: #FFFFFF;
@@ -20,7 +30,7 @@
     
     /* Sucesso/Confiança */
     --success: #27AE60;        /* Verde sucesso */
-    --info: #3498DB;           /* Azul informação */
+    --info: #6366f1;           /* Índigo (informação, alinhado à paleta) */
     
     /* Sombras - Sutis e Elegantes */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -54,12 +64,12 @@
     --radius-md: 0.75rem;
     --radius-lg: 1rem;
     
-    /* Cores Antigas (compatibilidade) */
-    --blue-dark: #2C3E50;
-    --blue-primary: #2C3E50;
-    --blue-secondary: #3498DB;
-    --blue-light: #ECF0F1;
-    --blue-background: #FAFAFA;
+    /* Aliases “blue-*” (legado) — agora tons violeta para não quebrar páginas */
+    --blue-dark: #2e1065;
+    --blue-primary: #5b21b6;
+    --blue-secondary: #7c3aed;
+    --blue-light: #ede9fe;
+    --blue-background: #faf5ff;
     --text-color: #FFFFFF;
     --text-dark: #212121;
     --shadow-hover: 0 8px 12px rgba(0, 0, 0, 0.2);
@@ -104,14 +114,14 @@ body {
    Cabeçalho - Escuro unificado (todas as páginas)
    ============================================ */
 header {
-    background-color: var(--blue-dark);
+    background: linear-gradient(135deg, var(--violet-deep) 0%, var(--violet-dark) 42%, var(--violet-core) 100%);
     color: var(--text-color);
     padding: var(--spacing-md) 0;
     box-shadow: var(--shadow-sm);
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(167, 139, 250, 0.22);
 }
 
 header .container {
@@ -132,7 +142,7 @@ header nav ul li a {
 }
 
 header nav ul li a:hover {
-    color: var(--blue-light);
+    color: #e9d5ff;
 }
 
 /* Menu de Navegação */
@@ -209,11 +219,11 @@ main {
     margin-bottom: 15px;
 }
 
-/* Botão Leia Mais */
+/* Botão Leia Mais — mesmo espírito do CTA “Reescrever com IA” */
 .read-more {
     display: inline-block;
     padding: 10px 18px;
-    background-color: var(--blue-secondary);
+    background: linear-gradient(135deg, var(--violet-core) 0%, var(--violet-bright) 100%);
     color: var(--text-color);
     text-decoration: none;
     border-radius: var(--radius);
@@ -223,7 +233,7 @@ main {
 }
 
 .read-more:hover {
-    background-color: var(--primary-light);
+    background: linear-gradient(135deg, var(--violet-dark) 0%, var(--primary-light) 100%);
     color: var(--text-color);
     transform: translateY(-1px);
     box-shadow: var(--shadow);
@@ -337,13 +347,14 @@ main {
     transform: translateX(4px);
 }
 
-/* Rodapé - mesma cor do header */
+/* Rodapé — mesma família cromática do header */
 footer {
-    background: var(--blue-dark);
+    background: linear-gradient(135deg, var(--violet-deep) 0%, var(--violet-dark) 45%, var(--violet-core) 100%);
     text-align: center;
     padding: 20px;
     color: var(--text-color);
     margin-top: 20px;
+    border-top: 1px solid rgba(167, 139, 250, 0.2);
 }
 
 /* Acessibilidade */
@@ -396,17 +407,19 @@ footer {
 
 .search-container input[type="search"] {
     width: 100%;
-    padding: var(--spacing-md);
+    padding: 0.5rem 1rem;
     font-size: var(--font-size-base);
+    line-height: 1.35;
     border: 2px solid var(--blue-secondary);
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     box-sizing: border-box;
     font-family: var(--font-family);
 }
 
 .search-container input[type="search"]:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    border-color: var(--violet-bright);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22);
 }
 
 #search-results {
@@ -471,13 +484,13 @@ footer {
     60%, 100% { content: '...'; }
 }
 
-/* Error State */
+/* Error State (vermelho — não usar --accent, que é a cor de marca) */
 .error-message {
-    background: rgba(231, 76, 60, 0.1);
-    color: var(--accent);
+    background: rgba(220, 38, 38, 0.08);
+    color: #b91c1c;
     padding: var(--spacing-md);
     border-radius: var(--radius);
-    border-left: 4px solid var(--accent);
+    border-left: 4px solid #dc2626;
 }
 
 /* Success Message */
@@ -601,7 +614,7 @@ footer {
     .search-container input[type="search"],
     #search-input {
         font-size: 0.9rem;
-        padding: var(--spacing-sm);
+        padding: 0.45rem 0.8rem;
     }
 
     .section-header {

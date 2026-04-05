@@ -467,7 +467,7 @@
     container.innerHTML = list
       .map(
         (s, i) =>
-          `<div class="snippet-item" data-index="${i}"><strong>${escapeHtml(s.title)}</strong><span style="font-size:0.8rem;color:#94a3b8">${escapeHtml(s.content.slice(0, 100))}…</span></div>`
+          `<div class="snippet-item" data-index="${i}"><strong>${escapeHtml(s.title)}</strong><span class="snippet-preview">${escapeHtml(s.content.slice(0, 100))}…</span></div>`
       )
       .join('');
     container.querySelectorAll('.snippet-item').forEach((el) => {

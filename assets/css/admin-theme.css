@@ -1,0 +1,18 @@
+/**
+ * Tema admin — Vida 360º (alinhado ao blog público: violeta / índigo)
+ * Incluir nas páginas admin claras antes dos <style> locais.
+ */
+:root {
+    --admin-header-gradient: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 42%, #5b21b6 100%);
+    --admin-text: #3730a3;
+    --admin-text-strong: #312e81;
+    --admin-accent: #7c3aed;
+    --admin-accent-dark: #5b21b6;
+    --admin-accent-hover: #6d28d9;
+    --admin-surface-tint: #f5f3ff;
+    --admin-page-bg: #faf5ff;
+    --admin-btn-cta: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+    --admin-btn-cta-hover: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+    --admin-btn-logout: #6d28d9;
+    --admin-btn-logout-hover: #5b21b6;
+}
