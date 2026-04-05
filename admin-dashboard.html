@@ -205,6 +205,13 @@
             background: #2C3E50;
         }
         
+        .table-header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -406,9 +413,9 @@
             <div class="table-container">
                 <div class="table-header">
                     <h2>📝 Gerenciar Postagens</h2>
-                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
-                        <button class="btn-primary" onclick="window.location.href='admin-editor-artigo.html'">+ Novo Artigo</button>
-                        <button class="btn-secondary" onclick="window.location.href='admin-estudio-conteudo.html'" title="IA: landing, redes, rascunhos de artigo">✨ Estúdio de conteúdo</button>
+                    <div class="table-header-actions">
+                        <button type="button" class="btn-primary" onclick="window.location.href='admin-editor-artigo.html'">+ Novo Artigo</button>
+                        <button type="button" class="btn-secondary" onclick="window.location.href='admin-estudio-conteudo.html'" title="IA: landing, redes, rascunhos de artigo">✨ Estúdio de conteúdo</button>
                     </div>
                 </div>
                 <table>
