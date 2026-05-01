@@ -326,7 +326,7 @@
                 if (!client) {
                     console.error('âŒ Supabase client nÃ£o disponÃ­vel apÃ³s ' + maxAttempts + ' tentativas');
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>NÃ£o foi possÃ­vel conectar ao banco de dados. Por favor, recarregue a pÃ¡gina.</p></div>';
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>N\u00E3o foi poss\u00EDvel conectar ao banco de dados. Por favor, recarregue a p\u00E1gina.</p></div>';
                     return;
                 }
 
@@ -335,7 +335,7 @@
                     console.log('   Client disponÃ­vel:', !!client);
                     console.log('   MÃ©todos disponÃ­veis:', Object.keys(client));
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>Erro na configuraÃ§Ã£o do cliente. Por favor, recarregue a pÃ¡gina.</p></div>';
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>Erro na configura\u00E7\u00E3o do cliente. Por favor, recarregue a p\u00E1gina.</p></div>';
                     return;
                 }
                 
@@ -360,11 +360,11 @@
                 } else if (result.success && result.data && result.data.length === 0) {
                     console.warn('âš ï¸ Nenhum artigo encontrado');
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Nenhum artigo encontrado</h3><p>Ainda nÃ£o hÃ¡ artigos publicados.</p></div>';
+                        '<div class="no-posts"><h3>Nenhum artigo encontrado</h3><p>Ainda n\u00E3o h\u00E1 artigos publicados.</p></div>';
                 } else {
                     console.error('âŒ Erro ao buscar posts:', result.error);
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>' + (result.error || 'Erro desconhecido') + '</p><p>Por favor, recarregue a pÃ¡gina.</p></div>';
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>' + (result.error || 'Erro desconhecido') + '</p><p>Por favor, recarregue a p\u00E1gina.</p></div>';
                 }
             }
 
@@ -474,13 +474,13 @@
                     html += '<img src="' + img + '" alt="' + titulo.replace(/"/g, '&quot;') + '" class="post-image" loading="lazy" onerror="this.src=\'assets/images/equilibrio-vida.jpg\'">';
                     html += '<div class="post-content">';
                     if (categoria) {
-                        html += '<div class="post-meta">ðŸ“ ' + categoria + (dateStr ? ' â€¢ ' + dateStr : '') + '</div>';
+                        html += '<div class="post-meta">\uD83D\uDCC1 ' + categoria + (dateStr ? ' \u2022 ' + dateStr : '') + '</div>';
                     } else if (dateStr) {
-                        html += '<div class="post-meta">ðŸ“… ' + dateStr + '</div>';
+                        html += '<div class="post-meta">\uD83D\uDCC5 ' + dateStr + '</div>';
                     }
                     html += '<h3>' + titulo.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>';
                     html += '<p>' + (resumo || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>';
-                    html += '<a href="' + url + '" class="read-more">Leia mais â†’</a>';
+                    html += '<a href="' + url + '" class="read-more">Leia mais \u2192</a>';
                     html += '</div>';
                     html += '</article>';
                 });
@@ -506,9 +506,9 @@
 
                 // BotÃ£o Anterior
                 if (currentPage > 1) {
-                    html += '<button class="pagination-btn" onclick="goToPage(' + (currentPage - 1) + ')">â† Anterior</button>';
+                    html += '<button class="pagination-btn" onclick="goToPage(' + (currentPage - 1) + ')">\u2190 Anterior</button>';
                 } else {
-                    html += '<button class="pagination-btn disabled">â† Anterior</button>';
+                    html += '<button class="pagination-btn disabled">\u2190 Anterior</button>';
                 }
 
                 // NÃºmeros das pÃ¡ginas
@@ -539,9 +539,9 @@
 
                 // BotÃ£o PrÃ³ximo
                 if (currentPage < totalPages) {
-                    html += '<button class="pagination-btn" onclick="goToPage(' + (currentPage + 1) + ')">PrÃ³ximo â†’</button>';
+                    html += '<button class="pagination-btn" onclick="goToPage(' + (currentPage + 1) + ')">Pr\u00F3ximo \u2192</button>';
                 } else {
-                    html += '<button class="pagination-btn disabled">PrÃ³ximo â†’</button>';
+                    html += '<button class="pagination-btn disabled">Pr\u00F3ximo \u2192</button>';
                 }
 
                 pagination.innerHTML = html;
