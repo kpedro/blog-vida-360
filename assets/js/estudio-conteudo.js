@@ -32,12 +32,21 @@
     return document.getElementById(id);
   }
 
-  function showError(msg) {
+  function showError(msg, sticky = false) {
     const el = $('error-banner');
     if (!el) return;
     el.textContent = msg;
     el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 12000);
+    if (!sticky) {
+      setTimeout(() => el.classList.remove('show'), 12000);
+    }
+  }
+
+  function clearError() {
+    const el = $('error-banner');
+    if (!el) return;
+    el.textContent = '';
+    el.classList.remove('show');
   }
 
   function getSupabaseUrl() {
@@ -145,7 +154,7 @@
 
     const btn = $('btn-generate');
     if (btn) btn.disabled = true;
-    if ($('studio-output')) $('studio-output').value = '';
+    clearError();
     $('studio-image-prompt').value = '';
     lastImageDataUrl = '';
     if ($('studio-image-preview')) {
@@ -159,13 +168,20 @@
         headers: fnHeaders(session),
         body: JSON.stringify({ type: contentType, prompt: prompt.trim(), temperature: 0.8 }),
       });
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json().catch(() => null);
       if (!res.ok) {
-        throw new Error(data.details || data.error || res.statusText || 'Erro ao gerar');
+        const fallbackError = (data && (data.details || data.error)) || res.statusText || `Erro HTTP ${res.status}`;
+        throw new Error(fallbackError);
       }
-      if (!data.content) throw new Error('Resposta inválida da API');
 
-      const { copy, imageSuggestion } = parseGeneratedContent(data.content);
+      const generated =
+        (data && (data.content || data.generatedText || data.text || data.result || data.output)) ||
+        '';
+      if (!generated || !generated.trim()) {
+        throw new Error('A função respondeu, mas sem conteúdo gerado. Verifique a configuração da GEMINI_API no Supabase.');
+      }
+
+      const { copy, imageSuggestion } = parseGeneratedContent(generated);
       $('studio-output').value = copy;
       if (imageSuggestion && $('studio-image-prompt')) {
         $('studio-image-prompt').value = imageSuggestion;
@@ -175,7 +191,11 @@
 
       window.alert('Conteúdo gerado. Revise e copie ou envie ao editor.');
     } catch (e) {
-      showError(e.message || 'Erro ao gerar conteúdo. Verifique se as Edge Functions foram deployadas e se GEMINI_API está configurada.');
+      showError(
+        (e && e.message) ||
+          'Erro ao gerar conteúdo. Verifique se as Edge Functions foram deployadas e se GEMINI_API está configurada.',
+        true
+      );
     } finally {
       if (btn) btn.disabled = false;
     }

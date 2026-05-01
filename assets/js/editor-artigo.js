@@ -2,6 +2,46 @@
 let currentPostId = null;
 let editorMode = 'html'; // 'html' ou 'markdown'
 
+function extractMissingColumnFromError(err) {
+    const message = (err && (err.message || err.details || err.hint || String(err))) || '';
+    const match = message.match(/'([^']+)'\s+column/i);
+    return match ? match[1] : null;
+}
+
+async function saveWithSchemaFallback(supabaseClient, basePostData, postId) {
+    const payload = { ...basePostData };
+    const removed = [];
+
+    for (let attempt = 0; attempt < 8; attempt++) {
+        let result;
+        if (postId) {
+            result = await supabaseClient
+                .from('blog360_posts')
+                .update(payload)
+                .eq('id', postId)
+                .select();
+        } else {
+            result = await supabaseClient
+                .from('blog360_posts')
+                .insert([payload])
+                .select();
+        }
+
+        if (!result.error) return { result, removedColumns: removed };
+
+        const missingColumn = extractMissingColumnFromError(result.error);
+        if (missingColumn && Object.prototype.hasOwnProperty.call(payload, missingColumn)) {
+            delete payload[missingColumn];
+            removed.push(missingColumn);
+            continue;
+        }
+
+        throw result.error;
+    }
+
+    throw new Error('Não foi possível adaptar o payload ao schema atual da tabela blog360_posts.');
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     await checkAuthentication();
     initEditor();
@@ -684,7 +724,6 @@ async function savePost(status) {
         const postData = {
             titulo: title,
             slug,
-            conteudo: contentHtml || '',
             conteudo_markdown: contentHtml || '', // NOT NULL no Supabase
             resumo: excerpt || null,
             categoria: category || null,
@@ -698,25 +737,11 @@ async function savePost(status) {
             author: authorVal || null
         };
         
-        let result;
-        if (currentPostId) {
-            result = await supabaseClient
-                .from('blog360_posts')
-                .update(postData)
-                .eq('id', currentPostId)
-                .select();
-        } else {
-            result = await supabaseClient
-                .from('blog360_posts')
-                .insert([postData])
-                .select();
-            if (result.data && result.data[0]) currentPostId = result.data[0].id;
+        const { result, removedColumns } = await saveWithSchemaFallback(supabaseClient, postData, currentPostId);
+        if (removedColumns && removedColumns.length) {
+            console.warn('Colunas ausentes no schema atual, removidas automaticamente:', removedColumns.join(', '));
         }
-        
-        if (result.error) {
-            console.error('Erro do Supabase:', result.error);
-            throw result.error;
-        }
+        if (!currentPostId && result.data && result.data[0]) currentPostId = result.data[0].id;
         
         alert(status === 'published' ? '✅ Artigo publicado com sucesso!' : '💾 Rascunho salvo!');
         if (status === 'published') {
