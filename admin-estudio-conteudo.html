@@ -267,8 +267,8 @@
 
     <div class="wrap">
         <p class="lead">
-            Gere textos para landing, redes sociais e artigos alinhados ao tom do blog (sono, ansiedade leve, aromaterapia e produtividade com equilíbrio).
-            Use o assistente para montar o pedido e <strong>Prompts</strong> para modelos salvos neste navegador.
+            Gere textos para landing, <strong>redes (com foco em legenda para Instagram)</strong> e artigos, alinhados ao tom do blog.
+            Proporção <strong>4:5</strong> e descarregar a imagem em ficheiro são <strong>experimentais</strong> — se a API rejeitar 4:5, volte a 1:1 ou 9:16. Após alterar o backend, faça <strong>deploy</strong> das funções <code style="font-size:0.8rem">generate-blog-studio-content</code> e <code style="font-size:0.8rem">generate-blog-studio-image</code> no Supabase.
         </p>
 
         <div id="error-banner" class="error-banner"></div>
@@ -305,11 +305,12 @@
                 </div>
 
                 <p class="section-title">Imagem (opcional)</p>
-                <p class="hint">Usa a sugestão automática após gerar texto, ou descreva abaixo.</p>
+                <p class="hint">Usa a sugestão automática após gerar texto, ou descreva abaixo. Para Instagram em formato retrato clássico do feed, experimente <strong>4:5</strong>.</p>
                 <div class="image-row">
                     <select id="image-format" class="fmt" title="Proporção">
-                        <option value="1:1">1:1 (feed)</option>
-                        <option value="9:16">9:16 (story)</option>
+                        <option value="4:5">4:5 (Instagram feed)</option>
+                        <option value="1:1">1:1 (feed quadrado)</option>
+                        <option value="9:16">9:16 (Stories / Reels)</option>
                         <option value="16:9">16:9 (wide)</option>
                     </select>
                     <button type="button" class="btn btn-primary" id="btn-gen-image">🖼️ Gerar imagem</button>
@@ -320,6 +321,7 @@
                 <p class="hint">Se você gerou a imagem acima (data URL), redes sociais não mostram preview. Envie o arquivo para um local público (ex.: Storage do Supabase) e cole aqui o link <strong>https</strong> direto do arquivo. Também pode usar só este link e manter a geração apenas como referência visual.</p>
                 <input type="url" id="studio-social-image-url" placeholder="https://…/minha-capa.png" style="width:100%;padding:0.5rem 0.75rem;margin-top:0.35rem;border-radius:8px;border:1px solid #d7c2e6;background:#ffffff;color:#2d1f3d;font-size:0.9rem;" />
                 <div class="toolbar-bottom">
+                    <button type="button" class="btn btn-primary" id="btn-download-image" style="display:none" title="Guardar ficheiro no computador">⬇️ Descarregar imagem</button>
                     <button type="button" class="btn" id="btn-copy-image-url" style="display:none">📋 Copiar data URL</button>
                 </div>
             </div>
@@ -406,7 +408,7 @@
             initStudioSupabase();
         }
     </script>
-    <script src="assets/js/estudio-conteudo.js?v=20260501-1"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260501-instagram-exp"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

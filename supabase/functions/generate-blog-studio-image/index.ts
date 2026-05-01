@@ -23,7 +23,9 @@ serve(async (req) => {
 
     const bodyJson = await req.json();
     const { prompt, format: formatParam } = bodyJson;
-    const format = formatParam || "1:1";
+    const formatKey = typeof formatParam === "string" && formatParam.trim()
+      ? formatParam.trim()
+      : "1:1";
 
     if (!prompt || typeof prompt !== "string" || prompt.trim().length === 0) {
       return new Response(
@@ -32,12 +34,28 @@ serve(async (req) => {
       );
     }
 
-    const formatHint =
-      format === "9:16"
-        ? "Proporção VERTICAL 9:16 (story). Componha em retrato."
-        : format === "16:9"
-          ? "Proporção HORIZONTAL 16:9. Componha em paisagem."
-          : "Proporção QUADRADA 1:1 (feed). Componha em quadrado.";
+    const FORMAT_MAP: Record<string, { hint: string; aspectRatio: string }> = {
+      "1:1": {
+        hint: "Proporção QUADRADA 1:1 (feed Instagram/Facebook). Componha em quadrado.",
+        aspectRatio: "1:1",
+      },
+      "4:5": {
+        hint:
+          "Proporção VERTICAL 4:5 (feed Instagram — retrato clássico). Componha em retrato; sujeito principal na área central segura.",
+        aspectRatio: "4:5",
+      },
+      "9:16": {
+        hint: "Proporção VERTICAL 9:16 (Stories ou Reels). Componha em retrato.",
+        aspectRatio: "9:16",
+      },
+      "16:9": {
+        hint: "Proporção HORIZONTAL 16:9 (wide). Componha em paisagem.",
+        aspectRatio: "16:9",
+      },
+    };
+
+    const resolved = FORMAT_MAP[formatKey] ?? FORMAT_MAP["1:1"];
+    const formatHint = resolved.hint;
 
     const GEMINI_API = Deno.env.get("GEMINI_API");
     if (!GEMINI_API) {
@@ -60,7 +78,7 @@ ${formatHint}
 
 Tema: ${prompt.trim()}`;
 
-    const aspectRatio = format === "9:16" ? "9:16" : format === "16:9" ? "16:9" : "1:1";
+    const aspectRatio = resolved.aspectRatio;
 
     const body = {
       contents: [{ role: "user", parts: [{ text: userPrompt }] }],
@@ -142,6 +160,8 @@ Tema: ${prompt.trim()}`;
         imageBase64,
         mimeType,
         prompt: prompt.trim(),
+        format: formatKey,
+        aspectRatio,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );

@@ -48,18 +48,26 @@ Formate com quebras de linha e **negrito** se ajudar. Não inclua HTML.`
       return (
         base +
         `
-Para POSTS DE REDES SOCIAIS (Instagram, Facebook, LinkedIn) sobre o blog:
-- Gere 1 a 3 variações conforme o pedido (curta, média)
-- Hashtags relevantes (#saude #bemestar #vidasaudavel etc.)
-- Tom adequado à rede; emojis com moderação se fizer sentido
-- Não invente URLs; use "link na bio" ou "acesse o blog" quando for CTA
+Prioridade: INSTAGRAM (também pode incluir uma variante curta para Facebook/LinkedIn se o pedido pedir).
+
+Estrutura sugerida da LEGENDA para Instagram (na ordem):
+1) PRIMEIRA LINHA — gancho curto que pare na pré-visualização (sem click "ver mais" se possível).
+2) CORPO — 2 a 6 linhas com valor, tom acolhedor, sem promessas milagrosas de saúde.
+3) CTA — "link na bio", "comenta abaixo" ou convite honesto; não invente URLs nem links.
+4) HASHTAGS — bloco final com 5 a 12 hashtags em português relevantes (#bemestar #vidasaudavel etc.), sem repetir dezenas.
+
+Regras:
+- Limite total da legenda: até 2200 caracteres (incluindo hashtags e emojis).
+- Emojis só se combinarem com o tom; no máximo moderado.
+- Gere 1 a 3 variações (curta / média / alternativa) quando o pedido não especificar.
+- Não inclua HTML.
 
 No final, após o conteúdo, adicione exatamente este bloco (separado por ---):
 ---
 SUGESTÃO DE IMAGEM
-Descrição: [imagem ideal para o post]
-Dimensões: 1080x1080 ou 1200x630
-Onde usar: imagem do post, story`
+Descrição: [cena visual ideal para o post — sem texto longo na arte]
+Dimensões sugeridas: 1080x1350 (4:5 feed IG), 1080x1080 (1:1) ou 1080x1920 (9:16 Stories/Reels)
+Onde usar: imagem principal do post ou story`
       );
     case "article_copy":
       return (

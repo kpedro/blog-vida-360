@@ -6,7 +6,11 @@
   const STORAGE_SNIPPETS = 'blog360_prompt_snippets_v1';
   const CONTENT_TYPES = {
     landing: { label: 'Landing Page', desc: 'Headlines, benefícios e CTA para rotina, aromaterapia e bem-estar', gen: 'Gerar Landing Page' },
-    social_post: { label: 'Posts para redes', desc: 'Textos para Instagram, Facebook e LinkedIn com foco em sono e ansiedade leve', gen: 'Gerar posts para redes' },
+    social_post: {
+      label: 'Posts para redes',
+      desc: 'Legenda estilo Instagram (gancho, corpo, CTA, hashtags) + variante; foco em sono, ansiedade leve e aromaterapia',
+      gen: 'Gerar posts para redes',
+    },
     article_copy: { label: 'Artigos e copy', desc: 'Rascunhos de artigo, e-mail ou copy longa sobre aromaterapia prática', gen: 'Gerar artigo / copy' },
   };
 
@@ -19,7 +23,7 @@
     {
       title: 'Post Instagram curto',
       content:
-        'Post para Instagram sobre [TEMA] (sono, ansiedade leve ou aromaterapia), tom leve e confiável, até 400 caracteres na primeira versão e segunda versão um pouco mais longa. Inclua hashtags relevantes no final sem promessas exageradas. Sem links inventados.',
+        'Legenda para Instagram sobre [TEMA] (sono, ansiedade leve ou aromaterapia), tom leve e confiável. Estrutura: (1) primeira linha gancho, (2) corpo 2-5 linhas, (3) CTA "link na bio" se fizer sentido, (4) 5-10 hashtags. Limite total 2200 caracteres. Sem links inventados.',
     },
   ];
 
@@ -27,6 +31,7 @@
   let coachMessages = [];
   let coachPendingContent = '';
   let lastImageDataUrl = '';
+  let lastImageMimeType = '';
 
   function $(id) {
     return document.getElementById(id);
@@ -157,10 +162,13 @@
     clearError();
     $('studio-image-prompt').value = '';
     lastImageDataUrl = '';
+    lastImageMimeType = '';
     if ($('studio-image-preview')) {
       $('studio-image-preview').style.display = 'none';
       $('btn-copy-image-url').style.display = 'none';
     }
+    const dl = $('btn-download-image');
+    if (dl) dl.style.display = 'none';
 
     try {
       const res = await fetch(`${getSupabaseUrl()}/functions/v1/generate-blog-studio-content`, {
@@ -307,11 +315,14 @@
       const data = await res.json().catch(() => ({}));
 
       if (data.imageBase64 && data.mimeType) {
+        lastImageMimeType = data.mimeType;
         lastImageDataUrl = `data:${data.mimeType};base64,${data.imageBase64}`;
         const img = $('studio-image-preview');
         img.src = lastImageDataUrl;
         img.style.display = 'block';
         $('btn-copy-image-url').style.display = 'inline-flex';
+        const dl = $('btn-download-image');
+        if (dl) dl.style.display = 'inline-flex';
       } else {
         throw new Error(data.details || data.error || 'Nenhuma imagem retornada');
       }
@@ -333,6 +344,20 @@
     if (!lastImageDataUrl) return;
     navigator.clipboard.writeText(lastImageDataUrl);
     window.alert('Data URL copiada. Cole na capa do editor ou use o campo «Link público da imagem» (editor ou Estúdio) com um https hospedado para o preview no WhatsApp/Facebook.');
+  }
+
+  function downloadGeneratedImage() {
+    if (!lastImageDataUrl) return;
+    const mime = lastImageMimeType || 'image/png';
+    const ext =
+      /jpeg|jpg/i.test(mime) ? 'jpg' : /webp/i.test(mime) ? 'webp' : 'png';
+    const a = document.createElement('a');
+    a.href = lastImageDataUrl;
+    a.download = `vida360-estudio-${Date.now()}.${ext}`;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   function useInEditor() {
@@ -536,6 +561,8 @@
     $('btn-gen-image').addEventListener('click', generateImage);
     $('btn-copy').addEventListener('click', copyOutput);
     $('btn-copy-image-url').addEventListener('click', copyImageDataUrl);
+    const btnDl = $('btn-download-image');
+    if (btnDl) btnDl.addEventListener('click', downloadGeneratedImage);
     $('btn-to-editor').addEventListener('click', useInEditor);
 
     $('btn-coach').addEventListener('click', openCoach);
