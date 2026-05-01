@@ -346,6 +346,32 @@ footer {
     margin-top: 20px;
 }
 
+footer .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+    margin: 1rem 0;
+    text-align: left;
+}
+
+footer .footer-grid h3 {
+    margin: 0 0 0.6rem;
+    font-size: 0.95rem;
+    color: var(--blue-light);
+}
+
+footer .footer-grid a {
+    color: var(--blue-light);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin-bottom: 0.35rem;
+}
+
+footer .footer-grid a:hover {
+    text-decoration: underline;
+}
+
 /* Acessibilidade */
 *:focus {
     outline: 2px solid var(--blue-secondary);
@@ -582,6 +608,10 @@ footer {
     #post-content {
         padding: 15px;
         font-size: 0.95rem;
+    }
+
+    footer .footer-grid {
+        text-align: center;
     }
 }
 
