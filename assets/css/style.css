@@ -739,6 +739,78 @@ footer .footer-grid a:hover {
     margin-bottom: var(--spacing-lg);
 }
 
+.contact-text-block {
+    max-width: 32rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-intro-lead {
+    text-align: left;
+    color: var(--gray-600);
+    line-height: 1.65;
+    margin-bottom: var(--spacing-md);
+}
+
+.contact-channel-callout {
+    text-align: left;
+    max-width: 32rem;
+    margin: 0 auto var(--spacing-xl);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(159, 89, 182, 0.35);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+}
+
+.contact-channel-callout-title {
+    font-weight: 600;
+    color: var(--blue-dark);
+    margin: 0 0 var(--spacing-sm);
+}
+
+.contact-channel-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--gray-900);
+    line-height: 1.6;
+}
+
+.contact-channel-list li + li {
+    margin-top: var(--spacing-sm);
+}
+
+.contact-channel-callout a {
+    color: var(--blue-primary);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.contact-channel-callout a:hover {
+    color: var(--blue-secondary);
+}
+
+.contact-email-heading {
+    text-align: left;
+    font-size: var(--font-size-xl);
+    color: var(--blue-dark);
+    margin: var(--spacing-lg) auto var(--spacing-sm);
+    max-width: 32rem;
+}
+
+.contact-form-hint {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    text-align: left;
+}
+
+.contact-optional {
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
 .contact-form {
     display: flex;
     flex-direction: column;

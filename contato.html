@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contato - Vida 360º</title>
+    <meta name="description" content="Fale com o Vida 360º: assistente no site, WhatsApp com o consultor Kadson ou formulário por e-mail com resposta em dia útil.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
@@ -32,38 +33,48 @@
 
     <main class="container">
         <section class="contact-section">
-            <h1>Entre em Contato</h1>
-            <p>
-                Preencha o formulário abaixo e nossa equipe entrará em contato com você em breve. Adoraríamos saber mais sobre você e como podemos ajudá-lo a alcançar seus objetivos!
+            <h1>Como falar com o Vida 360º</h1>
+            <p class="contact-text-block contact-intro-lead">
+                Dependendo do que você precisa, pode usar o assistente pelo site, falar pelo WhatsApp com o Kadson ou deixar um pedido estruturado para resposta por e-mail — esses caminhos se complementam.
             </p>
-            <form 
-                action="https://formspree.io/f/mvggeazb" 
+
+            <div class="contact-channel-callout" role="complementary" aria-labelledby="contact-channels-heading">
+                <p id="contact-channels-heading" class="contact-channel-callout-title">Escolha o canal que faz mais sentido:</p>
+                <ul class="contact-channel-list">
+                    <li><strong>Dúvidas rápidas ou links (cliente preferencial, consultor, orientação sobre bem-estar e doTERRA):</strong> use o <strong>assistente</strong> pelo ícone fixo nesta página (quando configurado).</li>
+                    <li><strong>Conversa humana pelo WhatsApp com o Kadson:</strong>
+                        <a href="https://wa.me/5592994314016?text=Ol%C3%A1%2C%20Kadson!%20Vim%20pelo%20blog%20Vida%20360%C2%BA%20pelo%20assistente%20de%20IA%20e%20gostaria%20de%20continuar%20a%20conversa%20aqui%20no%20WhatsApp." target="_blank" rel="noopener noreferrer">abrir WhatsApp com mensagem sugerida</a>.
+                    </li>
+                </ul>
+            </div>
+
+            <h2 class="contact-email-heading contact-text-block">Pedido por e-mail (formulário)</h2>
+            <p class="contact-text-block contact-intro-lead">
+                Se prefere um contato por escrito, com nome e e-mail registrados, use o formulário abaixo. Respondemos quando possível, em dia útil. Este canal <strong>não</strong> substitui emergência médica nem consulta clínica individual.
+            </p>
+            <p id="contact-form-hint" class="contact-text-block contact-form-hint">Os campos nome, e-mail e mensagem são obrigatórios. O envio é processado pela Formspree.</p>
+            <form
+                action="https://formspree.io/f/mvggeazb"
                 method="POST"
-                class="contact-form">
-                
-                <label for="name">Nome Completo:</label>
-                <input type="text" id="name" name="name" placeholder="Digite seu nome" required>
+                class="contact-form"
+                aria-describedby="contact-form-hint">
 
-                <label for="email">E-mail:</label>
-                <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>
+                <label for="name">Nome completo</label>
+                <input type="text" id="name" name="name" placeholder="Seu nome" required autocomplete="name">
 
-                <label for="phone">Telefone:</label>
-                <input type="tel" id="phone" name="phone" placeholder="Digite seu telefone">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="email">
 
-                <label for="message">Mensagem:</label>
-                <textarea id="message" name="message" rows="5" placeholder="Digite sua mensagem" required></textarea>
+                <label for="phone">Telefone <span class="contact-optional">(opcional)</span></label>
+                <input type="tel" id="phone" name="phone" placeholder="Com DDD, se quiser retorno por telefone" autocomplete="tel">
 
-                <button type="submit">Enviar</button>
+                <label for="message">Mensagem</label>
+                <textarea id="message" name="message" rows="5" placeholder="Descreva com calma o que precisa ou em que podemos ajudar" required></textarea>
+
+                <button type="submit">Enviar pedido</button>
             </form>
         </section>
     </main>
-
-    <!-- Botão flutuante WhatsApp -->
-    <a href="https://www.instagram.com/vida360.bemestar/" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Acesse nosso Instagram para continuar esse trabalho">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.9 1.65a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/>
-    </svg>
-</a>
 
     <footer role="contentinfo">
     <div class="container">
@@ -96,7 +107,7 @@
         </p>
     </div>
 </footer>
-    <script src="assets/js/chat-widget.js?v=20260501-26"></script>
+    <script src="assets/js/chat-widget.js?v=20260501-contato"></script>
     <script src="assets/js/opportunity-strip.js"></script>
 </body>
 </html>
