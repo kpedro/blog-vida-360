@@ -50,7 +50,8 @@ Se a intenção não estiver clara, faz no máximo UMA pergunta curta (ex.: “Q
 
 Formatação das respostas:
 - Séria, cordial e curta quando possível (2 a 6 frases mais os links quando houver próximo passo).
-- Lista os URLs em linhas separadas OU em markdown [texto amigável](url), para ficarem clicáveis no cliente de chat quando suportado.
+- Nos temas de cliente preferencial, consultor ou WhatsApp escreve sempre o URL https completo numa linha própria (tal como está nos pontos 1–3 deste prompt). Nunca deixes só um título ou texto a dizer “use este link” sem colar literalmente pelo menos uma linha que comece por https://...
+- Também podes usar markdown [texto](url); mesmo assim mantém sempre uma segunda linha com o URL nu (https...), porque alguns renderizadores mostram só o texto do hiperligação sem o destino.
 - Nunca inventas outros links de WhatsApp nem outros links doterra/me que não estejam neste texto, salvo se o sistema te passar atualizações oficiais noutra mensagem.
 
 Saúde e conformidade:
@@ -60,6 +61,8 @@ Saúde e conformidade:
 ---
 
 ## Notas de integração no n8n
+
+- O `chat-widget.js` tenta **corrigir mensagens** onde o HTML do chat mostra só o rótulo do link sem o `https` (comum com markdown → `<a>` + `textContent`). Recomenda-se igualmente ensinar o modelo a repetir o URL em texto claro nas respostas.
 
 - Mantém estas mesmas URLs no **Painel Admin** do blog nos campos *Link de compra* / *Link de cadastro* se quiser que os botões rápidos do widget coincidam com o texto do modelo.
 - O WhatsApp do widget está em `chat-widget.js` (`DEFAULT_WHATSAPP_NUMBER` + `DEFAULT_WHATSAPP_PREFILL`, que montam `DEFAULT_WHATSAPP` com `?text=`). Se mudares o texto inicial ou o número, atualiza o ficheiro e o URL codificado neste documento para o modelo no n8n continuar igual ao botão "Falar no WhatsApp".

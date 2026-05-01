@@ -263,6 +263,13 @@
             '  height: 44px !important;',
             '}',
             '',
+            '.n8n-chat .chat-message .blog360-inline-chat-link,',
+            '.chat-message .blog360-inline-chat-link {',
+            '  color: #6d2d86 !important;',
+            '  text-decoration: underline !important;',
+            '  word-break: break-word !important;',
+            '}',
+            '',
             '.n8n-chat .chat-window-toggle, .chat-window-toggle {',
             '  background: linear-gradient(135deg, #7f3f98, #9b59b6) !important;',
             '  box-shadow: 0 10px 22px rgba(109, 45, 134, 0.28) !important;',
@@ -454,22 +461,149 @@
         observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     }
 
-    function normalizeBotMessageText() {
-        function cleanText(raw) {
-            if (!raw) return raw;
-            var text = raw;
-            // Converte quebras escapadas vindas do backend.
-            text = text.replace(/\\n/g, '\n');
-            // Remove aspas externas de bloco quando vier como string serializada.
-            text = text.replace(/^\s*["“]+/, '').replace(/["”]+\s*$/, '');
-            // Remove markdown comum.
-            text = text.replace(/\*\*(.*?)\*\*/g, '$1');
-            text = text.replace(/\*(.*?)\*/g, '$1');
-            // Padroniza listas.
-            text = text.replace(/^\s*[-*]\s+/gm, '• ');
-            // Limpa excesso de linhas.
-            text = text.replace(/\n{3,}/g, '\n\n');
-            return text.trim();
+    function normalizeBotMessageText(linkPack) {
+        linkPack = linkPack || {};
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        /** Ao ler só `textContent`, links renderizados em <a href> aparecem sem URL — recupera os href antes de limpar. */
+        function flattenDomAnchorsToPlain(root) {
+            if (!root) return '';
+            var out = '';
+            function walk(node) {
+                if (!node) return;
+                if (node.nodeType === Node.TEXT_NODE) {
+                    out += node.nodeValue || '';
+                    return;
+                }
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+                var tag = node.tagName.toUpperCase();
+                if (tag === 'SCRIPT' || tag === 'STYLE') return;
+                if (tag === 'BR') {
+                    out += '\n';
+                    return;
+                }
+                if (tag === 'A') {
+                    var href = (node.getAttribute('href') || '').trim().replace(/^javascript:/i, '');
+                    var label = (node.textContent || '').trim();
+                    if (/^https?:\/\//i.test(href)) {
+                        var block = '';
+                        if (label && label !== href) block += label + '\n';
+                        block += href;
+                        out += block + '\n\n';
+                        return;
+                    }
+                }
+                var ch = node.firstChild;
+                while (ch) {
+                    walk(ch);
+                    ch = ch.nextSibling;
+                }
+                if (/^P|DIV|LI|SECTION|HEADER|BLOCKQUOTE$/i.test(tag)) out += '\n';
+                if (/^H[1-6]$/i.test(tag)) out += '\n';
+            }
+            walk(root);
+            return out;
+        }
+
+        function expandMarkdownLinks(s) {
+            return s.replace(/\[([^\]]+)\]\(\s*(https?:\/\/[^)\\s]+)\s*\)/g, function (_m, label, url) {
+                var lbl = String(label || '').trim();
+                var u = String(url || '').trim();
+                if (!u) return _m;
+                if (lbl && lbl !== u) return lbl + '\n' + u + '\n\n';
+                return u + '\n\n';
+            });
+        }
+
+        function ensureMandatoryUrls(plainText, pack) {
+            var out = String(plainText || '');
+            function has(u) {
+                return !!(u && out.indexOf(u) !== -1);
+            }
+
+            function appendBlock(lines, url) {
+                if (!url || !/^https?:\/\//i.test(url) || has(url)) return;
+                var trimmed = out.replace(/\s+$/, '');
+                out = trimmed.length ? trimmed + '\n\n' + lines.join('\n') + '\n' + url : lines.join('\n') + '\n' + url;
+            }
+
+            var lc = out.toLowerCase();
+            var wantsPc =
+                /\b(cliente\s+preferencial|preferred\s+customer)\b/i.test(lc) ||
+                /\bcadastro\s+como\s+cliente\s+preferencial\b/i.test(lc);
+            var wantsConsultor =
+                /\b(cadastro|cadastrar-me|cadastrar|ser)\b[^\n]{0,80}\bconsultor/i.test(lc) ||
+                /\bconsultor[^\n]{0,40}\b(bem\s*-?\s*estar|doterra|oportunidade|cadastro)/i.test(lc);
+            var wantsWa =
+                /\bwhatsapp\b|\bwa\s*\.?\s*me\b|\bzap\b/i.test(lc) ||
+                (/\bkadson\b/i.test(lc) && /\b(contato|falar|mensagem)\b/i.test(lc));
+
+            if (wantsPc && pack.linkCompra) appendBlock(['Link (cliente preferencial doTERRA):'], pack.linkCompra);
+            if (wantsConsultor && pack.linkCadastro) appendBlock(['Link (cadastro consultor(a) de bem-estar):'], pack.linkCadastro);
+            if (wantsWa && pack.linkWhatsapp) appendBlock(['WhatsApp do Kadson (mensagem já sugerida):'], pack.linkWhatsapp);
+
+            return out.replace(/\n{3,}/g, '\n\n').trim();
+        }
+
+        function cleanPlainFromElement(el, pack) {
+            var merged = flattenDomAnchorsToPlain(el).trim();
+            if (!merged) merged = el.textContent || '';
+            merged = String(merged).replace(/\r\n/g, '\n');
+            merged = merged.replace(/\\n/g, '\n');
+            merged = merged.replace(/^\s*["“]+/, '').replace(/["”]+\s*$/, '');
+            merged = expandMarkdownLinks(merged);
+            merged = merged.replace(/\*\*([^*\n]+)\*\*/g, '$1');
+            merged = merged.replace(/\*([^*\n]+)\*/g, '$1');
+            merged = merged.replace(/^\s*[-*]\s+/gm, '• ');
+            merged = merged.replace(/\n{3,}/g, '\n\n');
+            merged = merged.trim();
+
+            merged = ensureMandatoryUrls(merged, pack);
+            return merged.trim();
+        }
+
+        /** Só permite links clicáveis para URLs exatamente iguais às configuradas (evita XSS). */
+        function trustedLinkifyHtml(s, pack) {
+            var urls = [];
+            ['linkWhatsapp', 'linkCadastro', 'linkCompra'].forEach(function (k) {
+                if (pack[k]) urls.push(pack[k]);
+            });
+            urls.sort(function (a, b) { return b.length - a.length; });
+            var segments = [{ type: 't', val: String(s || '') }];
+            urls.forEach(function (u) {
+                var next = [];
+                segments.forEach(function (seg) {
+                    if (seg.type === 'a') {
+                        next.push(seg);
+                        return;
+                    }
+                    var str = seg.val;
+                    var idx = 0;
+                    var pos = str.indexOf(u, idx);
+                    while ((pos = str.indexOf(u, idx)) !== -1) {
+                        if (pos > idx) next.push({ type: 't', val: str.slice(idx, pos) });
+                        next.push({ type: 'a', val: u });
+                        idx = pos + u.length;
+                    }
+                    if (idx < str.length) next.push({ type: 't', val: str.slice(idx) });
+                });
+                segments = next;
+            });
+            var html = '';
+            segments.forEach(function (seg) {
+                if (seg.type === 'a')
+                    html += '<a href="' + escapeHtml(seg.val) + '" target="_blank" rel="noopener noreferrer" class="blog360-inline-chat-link">' +
+                        escapeHtml(seg.val) + '</a>';
+                else html += escapeHtml(seg.val).replace(/\n/g, '<br>');
+            });
+            return html;
         }
 
         function apply() {
@@ -480,11 +614,17 @@
                 '.chat-message.chat-message-from-bot .chat-message-markdown'
             ];
             document.querySelectorAll(selectors.join(',')).forEach(function (el) {
-                var original = el.textContent || '';
-                var cleaned = cleanText(original);
-                if (!cleaned || cleaned === original) return;
-                el.textContent = cleaned;
-                el.style.whiteSpace = 'pre-line';
+                try {
+                    if (el.closest && el.closest('.blog360-chat-quick-actions')) return;
+                    if (el.querySelector && el.querySelector('a.blog360-inline-chat-link')) return;
+                    var cleaned = cleanPlainFromElement(el, linkPack);
+                    if (!cleaned) return;
+                    var rendered = trustedLinkifyHtml(cleaned, linkPack);
+                    if (el.getAttribute && el.getAttribute('data-blog360-plain') === cleaned) return;
+                    el.innerHTML = rendered;
+                    el.style.whiteSpace = 'normal';
+                    if (el.setAttribute) el.setAttribute('data-blog360-plain', cleaned);
+                } catch (e2) {}
             });
         }
 
@@ -568,7 +708,11 @@
         ].join('\n');
         document.body.appendChild(moduleScript);
         normalizeChatLanguage();
-        normalizeBotMessageText();
+        normalizeBotMessageText({
+            linkCompra: linkCompra,
+            linkCadastro: linkCadastro,
+            linkWhatsapp: linkWhatsapp
+        });
         injectQuickActions(linkCompra, linkCadastro, linkWhatsapp);
     }
 
