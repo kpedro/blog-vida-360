@@ -1,2 +1,4 @@
-# post.html tem de existir no build: npm run build gera api/post-template.html a partir dele.
-# O pedido a /post.html na Vercel é reescrito para /api/dynamic-post (vercel.json); o HTML servido vem do template.
+# post.html existe no Git para o build (npm run build → api/post-template.html), mas NÃO pode ir para o artefacto estático:
+# se existir ./post.html no deploy, a CDN serve esse ficheiro ANTES do rewrite → WhatsApp/Facebook veem OG genérico (banner).
+# Manter aqui garante que só /api/dynamic-post devolve og:image por artigo.
+post.html
