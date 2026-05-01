@@ -30,9 +30,9 @@
     <meta name="twitter:title" content="Vida 360º | Bem-estar, Aromaterapia e doTERRA">
     <meta name="twitter:description" content="Conteúdo prático para sono, foco e bem-estar com aromaterapia segura.">
     <meta name="twitter:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png?v=20260502-lilas">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/opportunity-strip.css">
-    <link rel="stylesheet" href="assets/css/leads.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260502b">
+    <link rel="stylesheet" href="assets/css/opportunity-strip.css?v=20260502b">
+    <link rel="stylesheet" href="assets/css/leads.css?v=20260502b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="alternate" type="application/rss+xml" title="RSS Feed - Vida 360º" href="feed.xml">
@@ -310,7 +310,7 @@
     </style>
 </head>
 <body>
-    <!-- deploy-check: utf8-nav 2026-05-02 (abrir código-fonte para confirmar que o browser recebeu esta versão) -->
+    <!-- deploy-check: index-scripts-utf8 2026-05-02b -->
 
     <header role="banner">
         <div class="container">
@@ -499,9 +499,9 @@
     <!-- Supabase JS (via CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- ConfiguraÃ§Ã£o Supabase -->
+    <!-- Configuração Supabase -->
     <script>
-        // âš ï¸ IMPORTANTE: Configure suas credenciais do Supabase aqui
+        // IMPORTANTE: credenciais acima (anon key — público no cliente).
         window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
         window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
     </script>
@@ -513,21 +513,21 @@
     <script>
         // Aguardar DOM e Supabase JS carregarem
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('ðŸ” Verificando Supabase...');
+            console.log('[Supabase] Verificando...');
             console.log('   - window.supabase existe?', typeof window.supabase !== 'undefined');
-            console.log('   - window.VITE_SUPABASE_URL:', window.VITE_SUPABASE_URL ? 'Configurado' : 'NÃƒO CONFIGURADO');
-            console.log('   - window.VITE_SUPABASE_ANON_KEY:', window.VITE_SUPABASE_ANON_KEY ? 'Configurado' : 'NÃƒO CONFIGURADO');
+            console.log('   - window.VITE_SUPABASE_URL:', window.VITE_SUPABASE_URL ? 'Configurado' : 'N\u00e3o configurado');
+            console.log('   - window.VITE_SUPABASE_ANON_KEY:', window.VITE_SUPABASE_ANON_KEY ? 'Configurado' : 'N\u00e3o configurado');
             console.log('   - initSupabase existe?', typeof initSupabase !== 'undefined');
             
             if (typeof initSupabase === 'function') {
                 window.supabaseClient = initSupabase();
                 if (window.supabaseClient && (window.supabaseClient.from || window.supabaseClient.getPosts)) {
-                    console.log('âœ… Supabase Client inicializado com sucesso!');
+                    console.log('[Supabase] Client inicializado.');
                 } else {
-                    console.error('âŒ Supabase Client NÃƒO inicializado corretamente!');
+                    console.error('[Supabase] Client n\u00e3o inicializado corretamente.');
                 }
             } else {
-                console.error('âŒ FunÃ§Ã£o initSupabase nÃ£o encontrada!');
+                console.error('[Supabase] Fun\u00e7\u00e3o initSupabase n\u00e3o encontrada.');
             }
         });
     </script>
@@ -536,10 +536,10 @@
     <script src="assets/js/performance.js"></script>
     <script src="assets/js/search.js"></script>
     <script>
-        // Listar posts do Supabase (substitui grid estÃ¡tico se houver posts publicados)
+        // Listar posts do Supabase (substitui grid estático se houver posts publicados)
         (function() {
             async function loadPostsFromSupabase() {
-                console.log('ðŸ“° Tentando carregar posts do Supabase...');
+                console.log('[Posts] Tentando carregar do Supabase...');
                 
                 // Aguardar Supabase client estar pronto (com retry)
                 var client = window.supabaseClient;
@@ -547,50 +547,50 @@
                 var maxAttempts = 10;
                 
                 while ((!client || !client.getPosts) && attempts < maxAttempts) {
-                    console.log('â³ Aguardando Supabase client... (tentativa ' + (attempts + 1) + '/' + maxAttempts + ')');
+                    console.log('[Posts] Aguardando client... (' + (attempts + 1) + '/' + maxAttempts + ')');
                     await new Promise(resolve => setTimeout(resolve, 200));
                     client = window.supabaseClient;
                     attempts++;
                 }
                 
                 if (!client) {
-                    console.error('âŒ Supabase client nÃ£o disponÃ­vel apÃ³s ' + maxAttempts + ' tentativas');
+                    console.error('[Posts] Client indispon\u00edvel ap\u00f3s ' + maxAttempts + ' tentativas.');
                     return;
                 }
                 
                 if (!client.getPosts) {
-                    console.error('âŒ MÃ©todo getPosts nÃ£o encontrado no client');
-                    console.log('   Client disponÃ­vel:', !!client);
-                    console.log('   MÃ©todos disponÃ­veis:', Object.keys(client));
+                    console.error('[Posts] M\u00e9todo getPosts n\u00e3o encontrado no client.');
+                    console.log('   Client dispon\u00edvel:', !!client);
+                    console.log('   M\u00e9todos:', Object.keys(client));
                     return;
                 }
                 
                 var grid = document.getElementById('posts-grid');
                 if (!grid) {
-                    console.error('âŒ Elemento posts-grid nÃ£o encontrado');
+                    console.error('[Posts] Elemento posts-grid n\u00e3o encontrado.');
                     return;
                 }
                 
-                console.log('âœ… Cliente Supabase pronto, buscando posts...');
+                console.log('[Posts] Cliente pronto, buscando...');
                 var result = await client.getPosts(6, 0); // Mostrar apenas 6 posts mais recentes na home
                 
-                console.log('ðŸ“Š Resultado da busca:', {
+                console.log('[Posts] Resultado:', {
                     success: result.success,
                     dataLength: result.data ? result.data.length : 0,
                     error: result.error
                 });
                 
                 if (!result.success) {
-                    console.error('âŒ Erro ao buscar posts:', result.error);
+                    console.error('[Posts] Erro:', result.error);
                     return;
                 }
                 
                 if (!result.data || result.data.length === 0) {
-                    console.warn('âš ï¸ Nenhum post encontrado no Supabase. Mantendo posts estÃ¡ticos.');
+                    console.warn('[Posts] Nenhum post no Supabase; mantendo posts est\u00e1ticos.');
                     return;
                 }
                 
-                console.log('âœ… ' + result.data.length + ' posts encontrados! Renderizando...');
+                console.log('[Posts] ' + result.data.length + ' posts; renderizando...');
                 
                 var baseUrl = window.location.href.replace(/\/index\.html$/, '/').replace(/\/$/, '');
                 var html = result.data.map(function(p) {
@@ -607,9 +607,9 @@
                 }).join('');
                 
                 grid.innerHTML = html;
-                console.log('âœ… Posts renderizados com sucesso!');
+                console.log('[Posts] Grid atualizado.');
                 
-                // Adicionar botÃ£o "Ver mais" se houver mais posts
+                // Botão "Ver mais"
                 var container = document.getElementById('posts-container');
                 if (container && result.data.length >= 6) {
                     var existingBtn = container.querySelector('.ver-mais-btn');
@@ -620,7 +620,7 @@
                         btnDiv.className = 'ver-mais-btn';
                         var btn = document.createElement('a');
                         btn.href = 'artigos.html';
-                        btn.textContent = 'Ver Todos os Artigos â†’';
+                        btn.textContent = 'Ver Todos os Artigos \u2192';
                         btn.style.cssText = 'background-color: var(--blue-secondary); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s;';
                         btn.onmouseover = function() { this.style.backgroundColor = 'var(--blue-primary)'; };
                         btn.onmouseout = function() { this.style.backgroundColor = 'var(--blue-secondary)'; };
@@ -680,7 +680,7 @@
                 inner += '<a class="banner-link" href="' + escAttr(link) + '" target="_blank" rel="noopener sponsored">';
                 inner += '<img src="' + escAttr(imgUrl) + '" alt="' + escAttr(s.produto_banner_titulo || 'Destaque') + '" loading="lazy">';
                 inner += '</a>';
-                inner += '<p class="banner-legal">' + (legenda || 'Pode ser link de indicaÃ§Ã£o. Ao utilizar, vocÃª apoia o blog sem custo adicional onde aplicÃ¡vel.') + '</p>';
+                inner += '<p class="banner-legal">' + (legenda || 'Pode ser link de indica\u00e7\u00e3o. Ao utilizar, voc\u00ea apoia o blog sem custo adicional onde aplic\u00e1vel.') + '</p>';
                 wrap.innerHTML = inner;
                 wrap.classList.remove('is-hidden');
                 var imgEl = wrap.querySelector('img');
@@ -704,8 +704,8 @@
     {
       "@context": "https://schema.org",
       "@type": "Blog",
-      "name": "Vida 360Âº",
-      "description": "Blog sobre saÃºde, bem-estar, sono, ansiedade leve, aromaterapia prÃ¡tica e segura e produtividade com equilÃ­brio",
+      "name": "Vida 360º",
+      "description": "Blog sobre saúde, bem-estar, sono, ansiedade leve, aromaterapia prática e segura e produtividade com equilíbrio",
       "url": "https://www.blogvida360.com.br/",
       "author": {
         "@type": "Person",
@@ -713,7 +713,7 @@
       },
       "publisher": {
         "@type": "Organization",
-        "name": "Vida 360Âº"
+        "name": "Vida 360º"
       }
     }
     </script>
