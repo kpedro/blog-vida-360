@@ -81,7 +81,8 @@ function escapeHtml(s) {
 }
 
 async function fetchPost(slug) {
-  const url = `${SUPABASE_URL}/rest/v1/blog360_posts?slug=eq.${encodeURIComponent(slug)}&select=titulo,resumo,imagem_destaque,imagem_social_url,slug,status,publicado,published_at&limit=1`;
+  /** `select=*` garante colunas antigas/alternativas (ex.: image_url) para og:image */
+  const url = `${SUPABASE_URL}/rest/v1/blog360_posts?slug=eq.${encodeURIComponent(slug)}&select=*&limit=1`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_ANON_KEY,
@@ -96,6 +97,42 @@ async function fetchPost(slug) {
   if (!row) return null;
   const isPublished = row.status === 'published' || row.publicado === true || row.published_at;
   return isPublished ? row : null;
+}
+
+/** Primeira URL de imagem encontrada no markdown/HTML do corpo (fallback para OG). */
+function extractFirstImageUrlFromBody(text) {
+  if (!text) return '';
+  const s = String(text);
+  const md = s.match(/!\[[^\]]*\]\((https?:[^)\s]+)\)/i);
+  if (md) return md[1].trim();
+  const mdBare = s.match(/\]\((https?:[^)\s]+\.(?:png|jpe?g|webp|gif)(?:\?[^)]*)?)\)/i);
+  if (mdBare) return mdBare[1].trim();
+  const imgTag = s.match(/<img[^>]+src=["'](https?:[^"']+)["']/i);
+  if (imgTag) return imgTag[1].trim();
+  const loose = s.match(/https?:\/\/[^\s"'<>]+\.(?:png|jpe?g|webp|gif)(?:\?[^\s"'<>]*)?/i);
+  return loose ? loose[0].trim() : '';
+}
+
+/** Ordem: redes sociais → destaque → nomes legados → 1.ª imagem no texto */
+function pickRawOgImage(post) {
+  if (!post || typeof post !== 'object') return '';
+  const keys = [
+    'imagem_social_url',
+    'imagem_destaque',
+    'image_url',
+    'featured_image',
+    'cover_image',
+    'og_image',
+    'thumbnail_url',
+    'thumb_url',
+  ];
+  for (let i = 0; i < keys.length; i++) {
+    const v = post[keys[i]];
+    const t = v && String(v).trim();
+    if (t) return t;
+  }
+  const body = post.conteudo || post.content || post.conteudo_markdown || '';
+  return extractFirstImageUrlFromBody(body);
 }
 
 function applyMeta(html, meta) {
@@ -131,11 +168,7 @@ module.exports = async (req, res) => {
   if (slug) {
     const post = await fetchPost(slug);
     if (post) {
-      const rawOg =
-        (post.imagem_social_url && String(post.imagem_social_url).trim()) ||
-        post.imagem_destaque ||
-        post.image_url ||
-        '';
+      const rawOg = pickRawOgImage(post);
       const img = resolveOgImage(rawOg, siteBase);
       let desc = (post.resumo || post.excerpt || '').trim();
       if (desc.length > 200) desc = desc.substring(0, 197) + '...';
@@ -157,6 +190,7 @@ module.exports = async (req, res) => {
 
   const html = applyMeta(template, meta);
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate');
+  /** HTML com OG por post: revalidar mais cedo para redes não ficarem no banner genérico em cache */
+  res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
   res.status(200).send(html);
 };
