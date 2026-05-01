@@ -1,4 +1,2 @@
-# Ignorar post.html no deploy: a rota envia /post.html para a API dynamic-post,
-# que devolve o HTML com meta tags (og:image, título, resumo) por artigo.
-# O template está em api/post-template.html.
-post.html
+# post.html tem de existir no build: npm run build gera api/post-template.html a partir dele.
+# O pedido a /post.html na Vercel é reescrito para /api/dynamic-post (vercel.json); o HTML servido vem do template.
