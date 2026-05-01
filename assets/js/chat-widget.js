@@ -198,6 +198,19 @@
             '  white-space: pre-line !important;',
             '}',
             '',
+            '/* Ligações clicáveis (markdown do n8n ou o nosso linkify): cor e sublinhado perceptíveis. */',
+            '.n8n-chat .chat-message.chat-message-from-bot .chat-message-markdown a,',
+            '.n8n-chat .chat-message.chat-message-from-bot .chat-message-text a,',
+            '.chat-message.chat-message-from-bot .chat-message-markdown a,',
+            '.chat-message.chat-message-from-bot .chat-message-text a {',
+            '  color: #5b21b6 !important;',
+            '  text-decoration: underline !important;',
+            '  font-weight: 600 !important;',
+            '  cursor: pointer !important;',
+            '  pointer-events: auto !important;',
+            '  word-break: break-word !important;',
+            '}',
+            '',
             '.n8n-chat .chat-message.chat-message-from-user .chat-message-markdown,',
             '.n8n-chat .chat-message.chat-message-from-user .chat-message-text,',
             '.chat-message.chat-message-from-user .chat-message-markdown,',
@@ -569,35 +582,109 @@
             return merged.trim();
         }
 
-        /** Só permite links clicáveis para URLs exatamente iguais às configuradas (evita XSS). */
+        /** Permite apenas estes hosts em texto solto (para URL que não coincide byte-a-byte com o pack). */
+        function stripTrailingLinkPunctuation(u) {
+            return String(u || '').replace(/\s+$/g, '').replace(/[)\].,;:!'»]+$/, '');
+        }
+
+        function isAllowlistedHttpsUrl(u) {
+            try {
+                var raw = stripTrailingLinkPunctuation(String(u || '').trim());
+                if (!/^https:\/\//i.test(raw)) return '';
+                var parsed = new URL(raw);
+                if (parsed.protocol !== 'https:') return '';
+                var host = (parsed.hostname || '').replace(/^www\./i, '').toLowerCase();
+                if (host === 'doterra.me') {
+                    var firstSeg = ((parsed.pathname || '/').replace(/^\//, '').split('/') || []).filter(Boolean)[0] || '';
+                    if (!/^[A-Za-z0-9]+$/.test(firstSeg)) return '';
+                    return parsed.origin + '/' + firstSeg + (parsed.search || '') + (parsed.hash || '');
+                }
+                if (host === 'wa.me') {
+                    var head = ((parsed.pathname || '').replace(/^\//, '').split('/') || []).filter(Boolean)[0] || '';
+                    if (!/^\d{8,18}$/.test(head)) return '';
+                    return 'https://wa.me/' + head + (parsed.search || '') + (parsed.hash || '');
+                }
+                return '';
+            } catch (e3) {
+                return '';
+            }
+        }
+
+        /** Sobe `<a>` com href allowlist sobre texto plano; pack entra primeiro (URLs exatas configuradas). */
         function trustedLinkifyHtml(s, pack) {
-            var urls = [];
+            var urlsPack = [];
             ['linkWhatsapp', 'linkCadastro', 'linkCompra'].forEach(function (k) {
-                if (pack[k]) urls.push(pack[k]);
+                if (pack[k]) urlsPack.push(String(pack[k]));
             });
-            urls.sort(function (a, b) { return b.length - a.length; });
-            var segments = [{ type: 't', val: String(s || '') }];
-            urls.forEach(function (u) {
-                var next = [];
-                segments.forEach(function (seg) {
-                    if (seg.type === 'a') {
-                        next.push(seg);
+
+            /** Parte texto em `{t|link}` por URLs exatas configuradas */
+            function splitSegmentsByExact(segmentsExact, needles) {
+                var ordered = needles.slice().sort(function (a, b) { return b.length - a.length; });
+                var segs = segmentsExact;
+                ordered.forEach(function (u) {
+                    var nextSegs = [];
+                    segs.forEach(function (seg) {
+                        if (seg.type !== 't') {
+                            nextSegs.push(seg);
+                            return;
+                        }
+                        var str = seg.val;
+                        var idx = 0;
+                        var pos = str.indexOf(u, idx);
+                        while ((pos = str.indexOf(u, idx)) !== -1) {
+                            if (pos > idx) nextSegs.push({ type: 't', val: str.slice(idx, pos) });
+                            nextSegs.push({ type: 'a', val: u });
+                            idx = pos + String(u).length;
+                        }
+                        if (idx < str.length) nextSegs.push({ type: 't', val: str.slice(idx) });
+                    });
+                    segs = nextSegs;
+                });
+                return segs;
+            }
+
+            /** Dentro dos pedaços de texto, apanha qualquer https://… allowlist pelo scan. */
+            function splitTextByAllowlistedHttps(segList) {
+                var outSegs = [];
+                segList.forEach(function (seg) {
+                    if (seg.type !== 't') {
+                        outSegs.push(seg);
                         return;
                     }
-                    var str = seg.val;
-                    var idx = 0;
-                    var pos = str.indexOf(u, idx);
-                    while ((pos = str.indexOf(u, idx)) !== -1) {
-                        if (pos > idx) next.push({ type: 't', val: str.slice(idx, pos) });
-                        next.push({ type: 'a', val: u });
-                        idx = pos + u.length;
+                    var chunk = seg.val || '';
+                    var i = 0;
+                    while (i < chunk.length) {
+                        var at = chunk.indexOf('https://', i);
+                        if (at === -1) {
+                            outSegs.push({ type: 't', val: chunk.slice(i) });
+                            break;
+                        }
+                        if (at > i) outSegs.push({ type: 't', val: chunk.slice(i, at) });
+
+                        var tailFromHttps = chunk.slice(at);
+                        var ws = tailFromHttps.search(/\s/);
+                        var rawToken = ws === -1 ? tailFromHttps : tailFromHttps.slice(0, ws);
+                        var token = stripTrailingLinkPunctuation(rawToken);
+                        var safeHref = isAllowlistedHttpsUrl(token);
+
+                        if (safeHref) {
+                            outSegs.push({ type: 'a', val: safeHref });
+                            i = at + rawToken.length;
+                        } else {
+                            outSegs.push({ type: 't', val: chunk.slice(at, at + 'https://'.length) });
+                            i = at + 'https://'.length;
+                        }
                     }
-                    if (idx < str.length) next.push({ type: 't', val: str.slice(idx) });
                 });
-                segments = next;
-            });
+                return outSegs;
+            }
+
+            var base = [{ type: 't', val: String(s || '') }];
+            var afterPack = splitSegmentsByExact(base, urlsPack.filter(Boolean));
+            var finalSegs = splitTextByAllowlistedHttps(afterPack);
+
             var html = '';
-            segments.forEach(function (seg) {
+            finalSegs.forEach(function (seg) {
                 if (seg.type === 'a')
                     html += '<a href="' + escapeHtml(seg.val) + '" target="_blank" rel="noopener noreferrer" class="blog360-inline-chat-link">' +
                         escapeHtml(seg.val) + '</a>';
@@ -606,7 +693,21 @@
             return html;
         }
 
-        function apply() {
+        var normalizeQueued = false;
+        /** Vue/n8n volta a gravar innerHTML ao renderizar Markdown — volta a aplicar pouco depois. */
+        function scheduleApply() {
+            if (normalizeQueued) return;
+            normalizeQueued = true;
+            queueMicrotask(function () {
+                normalizeQueued = false;
+                applyInner();
+                requestAnimationFrame(applyInner);
+                setTimeout(applyInner, 40);
+                setTimeout(applyInner, 140);
+            });
+        }
+
+        function applyInner() {
             var selectors = [
                 '.n8n-chat .chat-message.chat-message-from-bot .chat-message-text',
                 '.n8n-chat .chat-message.chat-message-from-bot .chat-message-markdown',
@@ -616,11 +717,12 @@
             document.querySelectorAll(selectors.join(',')).forEach(function (el) {
                 try {
                     if (el.closest && el.closest('.blog360-chat-quick-actions')) return;
-                    if (el.querySelector && el.querySelector('a.blog360-inline-chat-link')) return;
                     var cleaned = cleanPlainFromElement(el, linkPack);
                     if (!cleaned) return;
-                    var rendered = trustedLinkifyHtml(cleaned, linkPack);
-                    if (el.getAttribute && el.getAttribute('data-blog360-plain') === cleaned) return;
+                    var rendered = trustedLinkifyHtml(cleaned, linkPack).trim();
+                    var cur = String(el.innerHTML || '').replace(/\s+/g, ' ').trim();
+                    var nxt = String(rendered || '').replace(/\s+/g, ' ').trim();
+                    if (cur === nxt) return;
                     el.innerHTML = rendered;
                     el.style.whiteSpace = 'normal';
                     if (el.setAttribute) el.setAttribute('data-blog360-plain', cleaned);
@@ -628,8 +730,10 @@
             });
         }
 
-        apply();
-        var observer = new MutationObserver(function () { apply(); });
+        scheduleApply();
+        var observer = new MutationObserver(function () {
+            scheduleApply();
+        });
         observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     }
 
