@@ -429,17 +429,91 @@
     }
   }
 
-  function copyOutput() {
-    const t = $('studio-output');
-    if (!t || !t.value) return;
-    navigator.clipboard.writeText(t.value);
-    window.alert('Texto copiado.');
+  /** Clipboard da Web falha em iframes, preview embutido e alguns browsers sem permissão — usa fallbacks. */
+  function fallbackCopyString(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', 'readonly');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '-5000px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    let ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch (e) {
+      ok = false;
+    }
+    document.body.removeChild(ta);
+    return ok;
   }
 
-  function copyImageDataUrl() {
+  async function copyOutput() {
+    const t = $('studio-output');
+    if (!t || !t.value) return;
+    const text = t.value;
+
+    let ok = false;
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch (e) {
+        ok = false;
+      }
+    }
+    if (!ok) ok = fallbackCopyString(text);
+    if (!ok) {
+      try {
+        t.focus();
+        t.select();
+        t.setSelectionRange(0, text.length);
+        ok = document.execCommand('copy');
+      } catch (e2) {
+        ok = false;
+      }
+    }
+
+    if (ok) {
+      window.alert('Texto copiado. Abra o Instagram e cole com Ctrl+V (ou Cmd+V no Mac).');
+    } else {
+      t.focus();
+      t.select();
+      t.setSelectionRange(0, text.length);
+      window.alert(
+        'Este navegador bloqueou a cópia automática (comum no preview embutido). O texto ficou selecionado — pressione Ctrl+C (Cmd+C no Mac) e depois cole no Instagram.'
+      );
+    }
+  }
+
+  async function copyImageDataUrl() {
     if (!lastImageDataUrl) return;
-    navigator.clipboard.writeText(lastImageDataUrl);
-    window.alert('Data URL copiada. Cole na capa do editor ou use o campo «Link público da imagem» (editor ou Estúdio) com um https hospedado para o preview no WhatsApp/Facebook.');
+    const text = lastImageDataUrl;
+
+    let ok = false;
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch (e) {
+        ok = false;
+      }
+    }
+    if (!ok) ok = fallbackCopyString(text);
+
+    if (ok) {
+      window.alert(
+        'Data URL copiada. Cole na capa do editor ou use um link https público para preview nas redes.'
+      );
+    } else {
+      window.alert(
+        'Não foi possível copiar automaticamente. Use «Descarregar imagem» para guardar o ficheiro.'
+      );
+    }
   }
 
   function downloadGeneratedImage() {
