@@ -470,9 +470,9 @@
                 <div class="settings-card">
                     <div class="settings-grid">
                         <div>
-                            <label for="about-photo-url">URL da foto</label>
-                            <input id="about-photo-url" type="url" placeholder="https://... ou assets/images/sua-foto.jpg">
-                            <small>Upload permitido somente pelo painel administrador. Após salvar, a foto atualiza na página Sobre para todos.</small>
+                            <label for="about-photo-url">URL da foto (https ou caminho relativo)</label>
+                            <input id="about-photo-url" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://…/foto.jpg ou assets/images/sua-foto.jpg">
+                            <small>O campo não pode ser tipo «url» do browser porque falhas de upload geram endereço <code style="font-size:12px">data:image/…</code> (válido para pré-visualização). Preferir <strong>escolher ficheiro abaixo</strong> para enviar ao Storage e obter um https público. Depois de salvar, a página Sobre atualiza para todos.</small>
                             <div style="margin-top: 10px;">
                                 <label for="about-photo-file" style="font-size: 13px;">Ou selecionar arquivo (JPG/PNG/WebP)</label>
                                 <input id="about-photo-file" type="file" accept="image/png,image/jpeg,image/webp" style="margin-top: 6px; border: none; padding: 0;">

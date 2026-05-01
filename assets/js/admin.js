@@ -821,6 +821,9 @@ function getAboutPhotoUrl(value) {
     const raw = (value || '').trim();
     if (!raw) return ABOUT_PHOTO_FALLBACK;
     if (/^https?:\/\//i.test(raw) || raw.startsWith('assets/')) return raw;
+    /** Mesma lógica que sobre.html: pré-visualiza blob (ficheiro novo) e data URL (fallback local). */
+    if (/^data:image\//i.test(raw)) return raw;
+    if (/^blob:/i.test(raw)) return raw;
     return ABOUT_PHOTO_FALLBACK;
 }
 
@@ -842,7 +845,7 @@ function fileToDataUrl(file) {
     });
 }
 
-function resizeImageDataUrl(dataUrl, maxSize = 1000, quality = 0.82) {
+function resizeImageDataUrl(dataUrl, maxSize = 900, quality = 0.78) {
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = function() {
@@ -966,7 +969,17 @@ async function saveAboutPhotoSettings() {
             aboutPhotoPendingFile = null;
             input.value = value;
         }
-        const result = await client.saveSiteSettings({ sobre_foto_url: value || null, updated_at: new Date().toISOString() });
+        const MAX_DATA_URL_DB = 450000;
+        let toSave = value || null;
+        if (typeof toSave === 'string' && /^data:image\//i.test(toSave) && toSave.length > MAX_DATA_URL_DB) {
+            alert(
+                'A imagem em base64 é grande demais para gravar na base de dados.\n\n' +
+                    'Escolha o ficheiro em «Ou selecionar arquivo» e clique em Salvar (envio para o Storage), ou cole uma URL https da imagem.'
+            );
+            return;
+        }
+
+        const result = await client.saveSiteSettings({ sobre_foto_url: toSave, updated_at: new Date().toISOString() });
         if (!result || !result.success) {
             throw new Error((result && result.error) || 'Não foi possível salvar no Supabase');
         }
