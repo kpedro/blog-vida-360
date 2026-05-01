@@ -84,3 +84,41 @@
         animation: none;
     }
 }
+
+/* Anel suave no CTA (eco do efeito “ping” do botão flutuante — chama atenção sem exagerar) */
+@keyframes blog360-strip-cta-ring {
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+    45% {
+        opacity: 0.85;
+        transform: scale(1.03);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .site-opportunity-strip[data-active="true"] .site-opportunity-strip__cta {
+        position: relative;
+        overflow: visible;
+        z-index: 1;
+    }
+
+    .site-opportunity-strip[data-active="true"] .site-opportunity-strip__cta::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 10px;
+        border: 2px solid rgba(196, 181, 253, 0.65);
+        pointer-events: none;
+        animation: blog360-strip-cta-ring 2.6s ease-in-out infinite;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-opportunity-strip .site-opportunity-strip__cta::after {
+        content: none !important;
+        animation: none !important;
+    }
+}

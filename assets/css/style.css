@@ -900,3 +900,69 @@ footer .footer-grid a:hover {
         height: 26px;
     }
 }
+
+/* Pulso discreto (mesma ideia do PedagoFlow WhatsAppButton: animate-ping suave) */
+@keyframes blog360-attn-ping {
+    0% {
+        transform: scale(1);
+        opacity: 0.32;
+    }
+    75%,
+    100% {
+        transform: scale(1.72);
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .whatsapp-float {
+        overflow: visible;
+    }
+
+    .whatsapp-float::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: rgba(127, 63, 152, 0.28);
+        pointer-events: none;
+        z-index: 0;
+        animation: blog360-attn-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .whatsapp-float svg {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Launcher do chat n8n (classe injetada pelo widget) */
+    .chat-window-toggle {
+        position: relative !important;
+        overflow: visible !important;
+    }
+
+    .chat-window-toggle::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: rgba(127, 63, 152, 0.26);
+        pointer-events: none;
+        z-index: 0;
+        animation: blog360-attn-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .chat-window-toggle svg,
+    .chat-window-toggle img {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .whatsapp-float::after,
+    .chat-window-toggle::after {
+        animation: none !important;
+        content: none !important;
+    }
+}
