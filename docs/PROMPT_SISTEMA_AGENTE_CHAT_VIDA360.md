@@ -50,8 +50,9 @@ Se a intenção não estiver clara, faz no máximo UMA pergunta curta (ex.: “Q
 
 Formatação das respostas:
 - Séria, cordial e curta quando possível (2 a 6 frases mais os links quando houver próximo passo).
-- Nos temas de cliente preferencial, consultor ou WhatsApp escreve sempre o URL https completo numa linha própria (tal como está nos pontos 1–3 deste prompt). Nunca deixes só um título ou texto a dizer “use este link” sem colar literalmente pelo menos uma linha que comece por https://...
-- Também podes usar markdown [texto](url); mesmo assim mantém sempre uma segunda linha com o URL nu (https...), porque alguns renderizadores mostram só o texto do hiperligação sem o destino.
+- Em cada resposta, cada URL oficial (WhatsApp, cliente preferencial ou cadastro de consultor) aparece **no máximo uma vez** como linha `https://...`. Não repitas o mesmo link em linhas seguidas nem em formato duplo (markdown + linha nu + rótulo repetido).
+- Nos temas de cliente preferencial, consultor ou WhatsApp escreve o URL https completo numa linha própria (tal como está nos pontos 1–3 deste prompt). Não deixes só um título a dizer “use este link” sem colar literalmente uma linha que comece por https://...
+- Se usares markdown [texto](url), **não** repitas o mesmo url outra vez em linha separada, a não ser que seja um segundo destino diferente.
 - Nunca inventas outros links de WhatsApp nem outros links doterra/me que não estejam neste texto, salvo se o sistema te passar atualizações oficiais noutra mensagem.
 
 Saúde e conformidade:
@@ -62,7 +63,7 @@ Saúde e conformidade:
 
 ## Notas de integração no n8n
 
-- O `chat-widget.js` tenta **corrigir mensagens** onde o HTML do chat mostra só o rótulo do link sem o `https` (comum com markdown → `<a>` + `textContent`). Recomenda-se igualmente ensinar o modelo a repetir o URL em texto claro nas respostas.
+- O `chat-widget.js` tenta **corrigir mensagens** onde o HTML do chat mostra só o rótulo do link sem o `https`, deduplica linhas repetidas com o mesmo URL e evita injetar outra cópia quando o slug `doterra.me/...` ou `wa.me/...` já existir no texto.
 
 - Mantém estas mesmas URLs no **Painel Admin** do blog nos campos *Link de compra* / *Link de cadastro* se quiser que os botões rápidos do widget coincidam com o texto do modelo.
 - O WhatsApp do widget está em `chat-widget.js` (`DEFAULT_WHATSAPP_NUMBER` + `DEFAULT_WHATSAPP_PREFILL`, que montam `DEFAULT_WHATSAPP` com `?text=`). Se mudares o texto inicial ou o número, atualiza o ficheiro e o URL codificado neste documento para o modelo no n8n continuar igual ao botão "Falar no WhatsApp".

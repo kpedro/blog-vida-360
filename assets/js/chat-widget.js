@@ -535,14 +535,51 @@
             });
         }
 
+        /** Evita repetir a mesma linha só com URL (modelo + linkify + injeção). */
+        function dedupeExactDuplicateHttpsLines(s) {
+            var lines = String(s || '').split('\n');
+            var seen = Object.create(null);
+            var out = [];
+            lines.forEach(function (line) {
+                var t = line.trim();
+                if (/^https:\/\//i.test(t) && !/\s/.test(t)) {
+                    if (seen[t]) return;
+                    seen[t] = true;
+                }
+                out.push(line);
+            });
+            return out.join('\n');
+        }
+
+        /** Verifica se o texto já referencia o mesmo destino (slug doterra ou número wa.me), nem sempre igual à string do pack. */
+        function urlAlreadyPresentInText(text, packUrl) {
+            if (!packUrl || !text) return false;
+            if (text.indexOf(packUrl) !== -1) return true;
+            try {
+                var parsed = new URL(packUrl);
+                var host = (parsed.hostname || '').replace(/^www\./i, '').toLowerCase();
+                if (host === 'doterra.me') {
+                    var slug = ((parsed.pathname || '/').replace(/^\//, '').split('/') || []).filter(Boolean)[0] || '';
+                    if (!slug) return false;
+                    var esc = slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    return new RegExp('https://doterra\\.me/' + esc + '(?:\\?[^\\s]*)?(?:#\\S*)?', 'i').test(text);
+                }
+                if (host === 'wa.me') {
+                    var head = ((parsed.pathname || '').replace(/^\//, '').split('/') || []).filter(Boolean)[0] || '';
+                    if (!head) return false;
+                    var escW = head.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    return new RegExp('https://wa\\.me/' + escW, 'i').test(text);
+                }
+            } catch (eP) {}
+            return false;
+        }
+
         function ensureMandatoryUrls(plainText, pack) {
-            var out = String(plainText || '');
-            function has(u) {
-                return !!(u && out.indexOf(u) !== -1);
-            }
+            var out = dedupeExactDuplicateHttpsLines(String(plainText || ''));
 
             function appendBlock(lines, url) {
-                if (!url || !/^https?:\/\//i.test(url) || has(url)) return;
+                if (!url || !/^https?:\/\//i.test(url)) return;
+                if (urlAlreadyPresentInText(out, url)) return;
                 var trimmed = out.replace(/\s+$/, '');
                 out = trimmed.length ? trimmed + '\n\n' + lines.join('\n') + '\n' + url : lines.join('\n') + '\n' + url;
             }
@@ -562,7 +599,8 @@
             if (wantsConsultor && pack.linkCadastro) appendBlock(['Link (cadastro consultor(a) de bem-estar):'], pack.linkCadastro);
             if (wantsWa && pack.linkWhatsapp) appendBlock(['WhatsApp do Kadson (mensagem já sugerida):'], pack.linkWhatsapp);
 
-            return out.replace(/\n{3,}/g, '\n\n').trim();
+            out = dedupeExactDuplicateHttpsLines(out.replace(/\n{3,}/g, '\n\n').trim());
+            return out;
         }
 
         function cleanPlainFromElement(el, pack) {
@@ -579,6 +617,7 @@
             merged = merged.trim();
 
             merged = ensureMandatoryUrls(merged, pack);
+            merged = dedupeExactDuplicateHttpsLines(merged);
             return merged.trim();
         }
 
@@ -682,6 +721,16 @@
             var base = [{ type: 't', val: String(s || '') }];
             var afterPack = splitSegmentsByExact(base, urlsPack.filter(Boolean));
             var finalSegs = splitTextByAllowlistedHttps(afterPack);
+
+            (function collapseAdjacentDuplicateAnchors() {
+                var compact = [];
+                finalSegs.forEach(function (seg) {
+                    var prev = compact[compact.length - 1];
+                    if (seg.type === 'a' && prev && prev.type === 'a' && seg.val === prev.val) return;
+                    compact.push(seg);
+                });
+                finalSegs = compact;
+            })();
 
             var html = '';
             finalSegs.forEach(function (seg) {
