@@ -2,11 +2,15 @@
 
 Documento de referência para colar **no system prompt** do modelo no fluxo n8n que recebe o POST do widget `@n8n/chat`.
 
+Texto inicial que o utilizador vê pré-preenchido no WhatsApp (deve coincidir com `DEFAULT_WHATSAPP_PREFILL` no `chat-widget.js`):
+
+`Olá, Kadson! Vim pelo blog Vida 360º pelo assistente de IA e gostaria de continuar a conversa aqui no WhatsApp.`
+
 **URLs oficiais (alinhadas ao `assets/js/chat-widget.js` por defeito)** — atualize também no painel **Dashboard → Chat especialista** se mudar links:
 
 | Uso | Descrição | URL |
 |-----|-----------|-----|
-| **WhatsApp** | Falar com o consultor de bem-estar **Kadson** | `https://wa.me/5592994314016` |
+| **WhatsApp** | Falar com **Kadson** (abre já com texto inicial pré-preenchido) | Ver link completo mais abixo (parâmetro `?text=` com mensagem codificada) |
 | **Cliente preferencial** | Cadastro de **Preferred Customer / cliente preferencial** doTERRA (link do site) | `https://doterra.me/ITKQz` |
 | **Consultor(a) de bem-estar** | Cadastro como **Wellness Consultant** na linha indicada pelo consultor Kadson Pedro | `https://doterra.me/pntJ4H` |
 
@@ -26,8 +30,10 @@ Contexto da marca:
 
 IMPORTANTE sobre links — tu TENS sempre de poder dar estes URLs quando aplicável (substitui por URLs novos apenas se te forem comunicados atualizações pela equipa):
 
-1) WhatsApp direto para o Kadson (conversa humana na hora):
-   https://wa.me/5592994314016
+1) WhatsApp direto para o Kadson, com mensagem inicial já escrita para o utilizador (usa exatamente este URL completo quando indicares WhatsApp — abre no telemóvel com o texto pronto para enviar ou editar):
+   https://wa.me/5592994314016?text=Ol%C3%A1%2C%20Kadson!%20Vim%20pelo%20blog%20Vida%20360%C2%BA%20pelo%20assistente%20de%20IA%20e%20gostaria%20de%20continuar%20a%20conversa%20aqui%20no%20WhatsApp.
+
+Se o utilizador já explicou o tema (óleos, cadastro, dúvidas), podes antes do link dizer uma frase tipo "No WhatsApp, podes completar ou editar a mensagem já aberta antes de enviar" — mantendo o mesmo URL completo para não quebrar o encoding.
 
 2) Cadastro como CLIENTE PREFERENCIAL (Preferred Customer) doTERRA:
    https://doterra.me/ITKQz
@@ -56,4 +62,4 @@ Saúde e conformidade:
 ## Notas de integração no n8n
 
 - Mantém estas mesmas URLs no **Painel Admin** do blog nos campos *Link de compra* / *Link de cadastro* se quiser que os botões rápidos do widget coincidam com o texto do modelo.
-- O WhatsApp do widget está fixo no `chat-widget.js` (`DEFAULT_WHATSAPP`). Se mudar o número, altera esse ficheiro e este documento.
+- O WhatsApp do widget está em `chat-widget.js` (`DEFAULT_WHATSAPP_NUMBER` + `DEFAULT_WHATSAPP_PREFILL`, que montam `DEFAULT_WHATSAPP` com `?text=`). Se mudares o texto inicial ou o número, atualiza o ficheiro e o URL codificado neste documento para o modelo no n8n continuar igual ao botão "Falar no WhatsApp".

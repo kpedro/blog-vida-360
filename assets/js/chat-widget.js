@@ -11,7 +11,12 @@
     var CONFIG_CACHE_KEY = 'blog360_specialist_chat_config';
     var DEFAULT_LINK_COMPRA = 'https://doterra.me/ITKQz';
     var DEFAULT_LINK_CADASTRO = 'https://doterra.me/pntJ4H';
-    var DEFAULT_WHATSAPP = 'https://wa.me/5592994314016';
+    var DEFAULT_WHATSAPP_NUMBER = '5592994314016';
+    /** Mensagem inicial no campo de texto do WhatsApp (ajuda a abrir a conversa com contexto). */
+    var DEFAULT_WHATSAPP_PREFILL =
+        'Olá, Kadson! Vim pelo blog Vida 360º pelo assistente de IA e gostaria de continuar a conversa aqui no WhatsApp.';
+    var DEFAULT_WHATSAPP =
+        'https://wa.me/' + DEFAULT_WHATSAPP_NUMBER + '?text=' + encodeURIComponent(DEFAULT_WHATSAPP_PREFILL);
     var cfg = {
         webhookUrl: '',
         linkCompra: DEFAULT_LINK_COMPRA,
