@@ -297,11 +297,11 @@
             var filteredPosts = [];
 
             async function init() {
-                console.log('🔍 Inicializando página de artigos...');
+                console.log('ðŸ” Inicializando pÃ¡gina de artigos...');
                 
-                // Inicializar Supabase client se ainda não foi inicializado
+                // Inicializar Supabase client se ainda nÃ£o foi inicializado
                 if (typeof initSupabase === 'function' && !window.supabaseClient) {
-                    console.log('📦 Inicializando Supabase client...');
+                    console.log('ðŸ“¦ Inicializando Supabase client...');
                     window.supabaseClient = initSupabase();
                 }
                 
@@ -311,10 +311,10 @@
                 var maxAttempts = 15;
                 
                 while ((!client || !client.getPosts) && attempts < maxAttempts) {
-                    console.log('⏳ Aguardando Supabase client... (tentativa ' + (attempts + 1) + '/' + maxAttempts + ')');
+                    console.log('â³ Aguardando Supabase client... (tentativa ' + (attempts + 1) + '/' + maxAttempts + ')');
                     await new Promise(resolve => setTimeout(resolve, 300));
                     
-                    // Tentar inicializar novamente se ainda não estiver disponível
+                    // Tentar inicializar novamente se ainda nÃ£o estiver disponÃ­vel
                     if (!window.supabaseClient && typeof initSupabase === 'function') {
                         window.supabaseClient = initSupabase();
                     }
@@ -324,28 +324,28 @@
                 }
 
                 if (!client) {
-                    console.error('❌ Supabase client não disponível após ' + maxAttempts + ' tentativas');
+                    console.error('âŒ Supabase client nÃ£o disponÃ­vel apÃ³s ' + maxAttempts + ' tentativas');
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>Não foi possível conectar ao banco de dados. Por favor, recarregue a página.</p></div>';
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>NÃ£o foi possÃ­vel conectar ao banco de dados. Por favor, recarregue a pÃ¡gina.</p></div>';
                     return;
                 }
 
                 if (!client.getPosts) {
-                    console.error('❌ Método getPosts não encontrado no client');
-                    console.log('   Client disponível:', !!client);
-                    console.log('   Métodos disponíveis:', Object.keys(client));
+                    console.error('âŒ MÃ©todo getPosts nÃ£o encontrado no client');
+                    console.log('   Client disponÃ­vel:', !!client);
+                    console.log('   MÃ©todos disponÃ­veis:', Object.keys(client));
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>Erro na configuração do cliente. Por favor, recarregue a página.</p></div>';
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>Erro na configuraÃ§Ã£o do cliente. Por favor, recarregue a pÃ¡gina.</p></div>';
                     return;
                 }
                 
-                console.log('✅ Cliente Supabase pronto!');
+                console.log('âœ… Cliente Supabase pronto!');
 
                 // Carregar todos os posts
-                console.log('📰 Buscando posts do Supabase...');
+                console.log('ðŸ“° Buscando posts do Supabase...');
                 var result = await client.getPosts(200, 0);
                 
-                console.log('📊 Resultado da busca:', {
+                console.log('ðŸ“Š Resultado da busca:', {
                     success: result.success,
                     dataLength: result.data ? result.data.length : 0,
                     error: result.error
@@ -354,17 +354,17 @@
                 if (result.success && result.data && result.data.length > 0) {
                     allPosts = result.data;
                     filteredPosts = allPosts;
-                    console.log('✅ ' + allPosts.length + ' artigos carregados com sucesso!');
+                    console.log('âœ… ' + allPosts.length + ' artigos carregados com sucesso!');
                     renderPosts();
                     setupFilters();
                 } else if (result.success && result.data && result.data.length === 0) {
-                    console.warn('⚠️ Nenhum artigo encontrado');
+                    console.warn('âš ï¸ Nenhum artigo encontrado');
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Nenhum artigo encontrado</h3><p>Ainda não há artigos publicados.</p></div>';
+                        '<div class="no-posts"><h3>Nenhum artigo encontrado</h3><p>Ainda nÃ£o hÃ¡ artigos publicados.</p></div>';
                 } else {
-                    console.error('❌ Erro ao buscar posts:', result.error);
+                    console.error('âŒ Erro ao buscar posts:', result.error);
                     document.getElementById('posts-container').innerHTML = 
-                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>' + (result.error || 'Erro desconhecido') + '</p><p>Por favor, recarregue a página.</p></div>';
+                        '<div class="no-posts"><h3>Erro ao carregar artigos</h3><p>' + (result.error || 'Erro desconhecido') + '</p><p>Por favor, recarregue a pÃ¡gina.</p></div>';
                 }
             }
 
@@ -453,7 +453,7 @@
                     var publishedAt = p.published_at || p.created_at || '';
                     var url = baseUrl + '/post.html?v=20260501-rodape&post=' + encodeURIComponent(slug);
 
-                    // Converter URL relativa para absoluta se necessário
+                    // Converter URL relativa para absoluta se necessÃ¡rio
                     if (img && !img.startsWith('http://') && !img.startsWith('https://')) {
                         if (!img.startsWith('/')) {
                             img = baseUrl + '/' + img;
@@ -474,13 +474,13 @@
                     html += '<img src="' + img + '" alt="' + titulo.replace(/"/g, '&quot;') + '" class="post-image" loading="lazy" onerror="this.src=\'assets/images/equilibrio-vida.jpg\'">';
                     html += '<div class="post-content">';
                     if (categoria) {
-                        html += '<div class="post-meta">📁 ' + categoria + (dateStr ? ' • ' + dateStr : '') + '</div>';
+                        html += '<div class="post-meta">ðŸ“ ' + categoria + (dateStr ? ' â€¢ ' + dateStr : '') + '</div>';
                     } else if (dateStr) {
-                        html += '<div class="post-meta">📅 ' + dateStr + '</div>';
+                        html += '<div class="post-meta">ðŸ“… ' + dateStr + '</div>';
                     }
                     html += '<h3>' + titulo.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</h3>';
                     html += '<p>' + (resumo || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>';
-                    html += '<a href="' + url + '" class="read-more">Leia mais →</a>';
+                    html += '<a href="' + url + '" class="read-more">Leia mais â†’</a>';
                     html += '</div>';
                     html += '</article>';
                 });
@@ -488,7 +488,7 @@
                 html += '</div>';
                 container.innerHTML = html;
 
-                // Renderizar paginação
+                // Renderizar paginaÃ§Ã£o
                 renderPagination();
             }
 
@@ -504,14 +504,14 @@
                 pagination.style.display = 'flex';
                 var html = '';
 
-                // Botão Anterior
+                // BotÃ£o Anterior
                 if (currentPage > 1) {
-                    html += '<button class="pagination-btn" onclick="goToPage(' + (currentPage - 1) + ')">← Anterior</button>';
+                    html += '<button class="pagination-btn" onclick="goToPage(' + (currentPage - 1) + ')">â† Anterior</button>';
                 } else {
-                    html += '<button class="pagination-btn disabled">← Anterior</button>';
+                    html += '<button class="pagination-btn disabled">â† Anterior</button>';
                 }
 
-                // Números das páginas
+                // NÃºmeros das pÃ¡ginas
                 var startPage = Math.max(1, currentPage - 2);
                 var endPage = Math.min(totalPages, currentPage + 2);
 
@@ -537,11 +537,11 @@
                     html += '<button class="pagination-btn" onclick="goToPage(' + totalPages + ')">' + totalPages + '</button>';
                 }
 
-                // Botão Próximo
+                // BotÃ£o PrÃ³ximo
                 if (currentPage < totalPages) {
-                    html += '<button class="pagination-btn" onclick="goToPage(' + (currentPage + 1) + ')">Próximo →</button>';
+                    html += '<button class="pagination-btn" onclick="goToPage(' + (currentPage + 1) + ')">PrÃ³ximo â†’</button>';
                 } else {
-                    html += '<button class="pagination-btn disabled">Próximo →</button>';
+                    html += '<button class="pagination-btn disabled">PrÃ³ximo â†’</button>';
                 }
 
                 pagination.innerHTML = html;
@@ -557,6 +557,7 @@
         })();
     </script>
     <script src="assets/js/opportunity-strip.js"></script>
-    <script src="assets/js/chat-widget.js"></script>
+    <script src="assets/js/chat-widget.js?v=20260501-26"></script>
 </body>
 </html>
+

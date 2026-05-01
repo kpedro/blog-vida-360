@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Aprendizado - Vida 360º</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #2d1f3d;
+        }
+        .top {
+            background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .top h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+        .top-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .top-actions a {
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 6px;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.88rem;
+        }
+        .top-actions a:hover { background: rgba(255, 255, 255, 0.14); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .intro {
+            background: #fff;
+            border: 1px solid #e8d8f2;
+            border-radius: 10px;
+            padding: 1rem;
+            color: #5d4b70;
+            margin-bottom: 1rem;
+        }
+        .tab-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+        }
+        .tab-btn {
+            border: 1px solid #d7c2e6;
+            background: #fff;
+            color: #6d2d86;
+            border-radius: 8px;
+            padding: 0.45rem 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .tab-btn.active {
+            background: #7f3f98;
+            border-color: #7f3f98;
+            color: #fff;
+        }
+        .panel {
+            display: none;
+            background: #fff;
+            border: 1px solid #e8d8f2;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .panel.active { display: block; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 0.9rem;
+        }
+        .video-card {
+            background: #faf7fc;
+            border: 1px solid #e4d2f0;
+            border-radius: 10px;
+            padding: 0.75rem;
+        }
+        .video-card h3 {
+            font-size: 0.95rem;
+            color: #6d2d86;
+            margin-bottom: 0.45rem;
+            line-height: 1.35;
+        }
+        .video-card p {
+            font-size: 0.84rem;
+            color: #655674;
+            margin-bottom: 0.55rem;
+        }
+        .video-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 8px;
+            background: #1f1f1f;
+            border: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .video-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .video-thumb::after {
+            content: "▶ Assistir no YouTube";
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.28rem 0.5rem;
+            border-radius: 999px;
+            letter-spacing: 0.01em;
+        }
+        .video-meta {
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .badge {
+            font-size: 0.72rem;
+            color: #fff;
+            background: #8e44ad;
+            border-radius: 999px;
+            padding: 0.2rem 0.55rem;
+        }
+        .video-meta a {
+            font-size: 0.78rem;
+            color: #6d2d86;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .video-meta a:hover { text-decoration: underline; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 0.8rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.84rem;
+            color: #4d3a60;
+            font-weight: 600;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            border: 1px solid #d7c2e6;
+            border-radius: 8px;
+            padding: 0.55rem 0.65rem;
+            font-size: 0.88rem;
+        }
+        .btn-primary {
+            background: #7f3f98;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 0.95rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: #6d2d86; }
+        .btn-danger {
+            border: 1px solid #d6bfd8;
+            background: #fff;
+            color: #7f3f98;
+            border-radius: 8px;
+            padding: 0.3rem 0.55rem;
+            cursor: pointer;
+            font-size: 0.77rem;
+            font-weight: 600;
+        }
+        .empty {
+            color: #6f6280;
+            font-size: 0.9rem;
+            padding: 1rem 0.4rem;
+            text-align: center;
+        }
+        .hint {
+            color: #6f6280;
+            font-size: 0.8rem;
+            margin-bottom: 0.7rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <header class="top">
+        <h1>🎓 Centro de Aprendizado — Aromaterapia e Oportunidade</h1>
+        <div class="top-actions">
+            <a href="index.html">Ver blog</a>
+            <a href="admin-dashboard.html">Painel</a>
+            <a href="admin-estudio-conteudo.html">Estúdio IA</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            Esta área reúne vídeos para manter sua constância: estudo de produtos, desenvolvimento do negócio e motivação de execução.
+            Você pode usar as trilhas prontas e também salvar sua própria biblioteca de vídeos.
+        </section>
+        <section class="intro" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.7rem;">
+            <div>
+                <strong style="color:#6d2d86;">Busca automática de vídeos (API YouTube)</strong>
+                <p class="hint" style="margin:0.25rem 0 0;">Atualize as trilhas com vídeos públicos e disponíveis por tema, usando a mesma integração do Pedagoflow.</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                <button class="btn-primary" type="button" id="btn-sync-youtube">Atualizar trilhas automaticamente</button>
+                <span id="sync-status" class="hint" style="margin:0;"></span>
+            </div>
+        </section>
+
+        <div class="tab-row" id="tab-row">
+            <button class="tab-btn active" data-tab="trilha-produtos">🧴 Produtos e uso</button>
+            <button class="tab-btn" data-tab="trilha-oportunidade">🚀 Oportunidade e negócio</button>
+            <button class="tab-btn" data-tab="trilha-motivacao">🔥 Motivação e rotina</button>
+            <button class="tab-btn" data-tab="minha-biblioteca">📚 Minha biblioteca</button>
+        </div>
+
+        <section id="trilha-produtos" class="panel active">
+            <div class="grid" id="grid-produtos"></div>
+        </section>
+
+        <section id="trilha-oportunidade" class="panel">
+            <div class="grid" id="grid-oportunidade"></div>
+        </section>
+
+        <section id="trilha-motivacao" class="panel">
+            <div class="grid" id="grid-motivacao"></div>
+        </section>
+
+        <section id="minha-biblioteca" class="panel">
+            <p class="hint">Cole links públicos do YouTube (watch, short, embed ou youtu.be). Esses vídeos ficam salvos localmente neste navegador para seu plano de estudos diário.</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="video-title">Título do vídeo</label>
+                    <input id="video-title" type="text" placeholder="Ex: Rotina matinal para energia e foco">
+                </div>
+                <div class="form-group">
+                    <label for="video-url">URL do vídeo (YouTube)</label>
+                    <input id="video-url" type="url" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+                <div class="form-group">
+                    <label for="video-track">Trilha</label>
+                    <select id="video-track">
+                        <option value="Produtos e uso">Produtos e uso</option>
+                        <option value="Oportunidade e negócio">Oportunidade e negócio</option>
+                        <option value="Motivação e rotina">Motivação e rotina</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-primary" id="btn-add-video" type="button">Salvar vídeo na minha biblioteca</button>
+            <div class="grid" id="grid-custom" style="margin-top: 1rem;"></div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+
+    <script>
+        (function() {
+            const STORAGE_KEY = 'blog360_learning_center_v1';
+            const STORAGE_LAST_SYNC = 'blog360_learning_center_sync_v1';
+            const $ = (id) => document.getElementById(id);
+
+            const SEARCH_CONFIG = {
+                produtos: 'aromaterapia óleos essenciais uso seguro rotina',
+                oportunidade: 'doterra marketing de relacionamento negocio bem-estar',
+                motivacao: 'disciplina produtividade constancia empreendedorismo'
+            };
+
+            const trilhas = {
+                produtos: [
+                    { title: 'Introdução aos óleos essenciais', url: 'https://www.youtube.com/watch?v=2hyozuN7wYY', desc: 'Fundamentos para começar com segurança no dia a dia.' },
+                    { title: 'Guia rápido de uso seguro', url: 'https://www.youtube.com/watch?v=LG3T2BlyJ6E', desc: 'Boas práticas para uso tópico, aromático e rotina familiar.' },
+                    { title: 'Como montar rotina noturna', url: 'https://www.youtube.com/watch?v=2hyozuN7wYY', desc: 'Aplicação prática para sono e desaceleração mental.' }
+                ],
+                oportunidade: [
+                    { title: 'Construção de negócio com propósito', url: 'https://www.youtube.com/watch?v=Gf9v6r3N8fY', desc: 'Visão de longo prazo para crescimento sustentável.' },
+                    { title: 'Plano de ação semanal para consultoras', url: 'https://www.youtube.com/watch?v=QH2-TGUlwu4', desc: 'Estrutura de execução e acompanhamento.' },
+                    { title: 'Comunicação ética nas recomendações', url: 'https://www.youtube.com/watch?v=LG3T2BlyJ6E', desc: 'Como comunicar benefícios com responsabilidade.' }
+                ],
+                motivacao: [
+                    { title: 'Disciplina e constância no recomeço', url: 'https://www.youtube.com/watch?v=Gf9v6r3N8fY', desc: 'Mentalidade para manter ritmo mesmo em fases difíceis.' },
+                    { title: 'Produtividade com equilíbrio emocional', url: 'https://www.youtube.com/watch?v=tQSKyvjsUuI', desc: 'Como produzir sem se esgotar.' },
+                    { title: 'Rotina de alta energia para empreender', url: 'https://www.youtube.com/watch?v=LG3T2BlyJ6E', desc: 'Práticas simples de foco e execução diária.' }
+                ]
+            };
+
+            function setSyncStatus(text, isError) {
+                const el = $('sync-status');
+                if (!el) return;
+                el.textContent = text || '';
+                el.style.color = isError ? '#b42318' : '#6f6280';
+            }
+
+            function toWatchUrl(url) {
+                const input = (url || '').trim();
+                if (!input) return input;
+                const id = getYoutubeId(input);
+                return id ? ('https://www.youtube.com/watch?v=' + id) : input;
+            }
+
+            async function getSession() {
+                let c = window.supabaseClient;
+                if (!c && typeof window.initSupabase === 'function') {
+                    c = window.initSupabase();
+                    window.supabaseClient = c;
+                }
+                if (!c || !c.auth) return null;
+                const { data } = await c.auth.getSession();
+                return data && data.session ? data.session : null;
+            }
+
+            async function fetchYoutubeByTrack(trackKey) {
+                const query = SEARCH_CONFIG[trackKey] || '';
+                if (!query) return [];
+                const session = await getSession();
+                if (!session) throw new Error('Sessão admin não encontrada.');
+                const res = await fetch(window.VITE_SUPABASE_URL + '/functions/v1/search-youtube-videos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + session.access_token,
+                        apikey: window.VITE_SUPABASE_ANON_KEY || ''
+                    },
+                    body: JSON.stringify({ query: query, maxResults: 6, category: trackKey })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((data && (data.error || data.details)) || ('Erro HTTP ' + res.status));
+                const videos = (data && data.videos) || [];
+                return videos.map(v => ({
+                    title: v.title || 'Vídeo de estudo',
+                    url: toWatchUrl(v.url || (v.videoId ? ('https://www.youtube.com/watch?v=' + v.videoId) : '')),
+                    desc: (v.description || '').slice(0, 140) || ('Canal: ' + (v.channelTitle || 'YouTube'))
+                })).filter(v => !!getYoutubeId(v.url));
+            }
+
+            async function syncTracksFromApi() {
+                const btn = $('btn-sync-youtube');
+                if (btn) btn.disabled = true;
+                setSyncStatus('Atualizando trilhas via API...', false);
+                try {
+                    const [produtos, oportunidade, motivacao] = await Promise.all([
+                        fetchYoutubeByTrack('produtos'),
+                        fetchYoutubeByTrack('oportunidade'),
+                        fetchYoutubeByTrack('motivacao')
+                    ]);
+                    if (produtos.length) trilhas.produtos = produtos;
+                    if (oportunidade.length) trilhas.oportunidade = oportunidade;
+                    if (motivacao.length) trilhas.motivacao = motivacao;
+                    localStorage.setItem(STORAGE_LAST_SYNC, new Date().toISOString());
+                    renderStatic();
+                    setSyncStatus('Trilhas atualizadas com sucesso.', false);
+                } catch (error) {
+                    console.warn('Falha ao atualizar trilhas via API:', error);
+                    setSyncStatus('API indisponível agora. Mantidas trilhas locais.', true);
+                } finally {
+                    if (btn) btn.disabled = false;
+                }
+            }
+
+            function getYoutubeId(raw) {
+                const input = (raw || '').trim();
+                if (!input) return '';
+                let id = '';
+                try {
+                    const u = new URL(input);
+                    if (u.hostname.includes('youtu.be')) {
+                        id = u.pathname.replace('/', '');
+                    } else if (u.pathname.includes('/shorts/')) {
+                        id = u.pathname.split('/shorts/')[1].split('/')[0];
+                    } else if (u.pathname.includes('/embed/')) {
+                        id = u.pathname.split('/embed/')[1].split('/')[0];
+                    } else {
+                        id = u.searchParams.get('v') || '';
+                    }
+                } catch (e) {
+                    id = '';
+                }
+                if (!id || id.length < 6) return '';
+                return id;
+            }
+
+            function cardTemplate(item, extraActions) {
+                const videoId = getYoutubeId(item.url);
+                const thumb = videoId ? ('https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg') : '';
+                const media = videoId
+                    ? `<a class="video-thumb" href="${item.url}" target="_blank" rel="noopener"><img src="${thumb}" alt="${item.title || 'Vídeo'}"></a>`
+                    : `<a class="video-thumb" href="${item.url}" target="_blank" rel="noopener" style="color:#fff;font-weight:700;">Abrir vídeo no YouTube</a>`;
+                return `
+                    <article class="video-card">
+                        <h3>${item.title || 'Sem título'}</h3>
+                        <p>${item.desc || 'Vídeo para estudo prático.'}</p>
+                        ${media}
+                        <div class="video-meta">
+                            <span class="badge">${item.track || 'Trilha'}</span>
+                            <div>
+                                <a href="${item.url}" target="_blank" rel="noopener">Abrir no YouTube</a>
+                                ${extraActions || ''}
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }
+
+            function renderStatic() {
+                $('grid-produtos').innerHTML = trilhas.produtos.map(v => cardTemplate({ ...v, track: 'Produtos e uso' })).join('');
+                $('grid-oportunidade').innerHTML = trilhas.oportunidade.map(v => cardTemplate({ ...v, track: 'Oportunidade e negócio' })).join('');
+                $('grid-motivacao').innerHTML = trilhas.motivacao.map(v => cardTemplate({ ...v, track: 'Motivação e rotina' })).join('');
+                const lastSync = localStorage.getItem(STORAGE_LAST_SYNC);
+                if (lastSync) {
+                    const d = new Date(lastSync);
+                    if (!isNaN(d.getTime())) {
+                        setSyncStatus('Última atualização: ' + d.toLocaleString('pt-BR'), false);
+                    }
+                }
+            }
+
+            function loadCustom() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    return raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            function saveCustom(list) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+            }
+
+            function renderCustom() {
+                const grid = $('grid-custom');
+                const items = loadCustom();
+                if (!items.length) {
+                    grid.innerHTML = '<p class="empty">Sua biblioteca ainda está vazia. Adicione seu primeiro vídeo de estudo.</p>';
+                    return;
+                }
+                grid.innerHTML = items.map((item, idx) => {
+                    const del = `<button type="button" class="btn-danger" data-del="${idx}" style="margin-left:8px;">Remover</button>`;
+                    return cardTemplate(item, del);
+                }).join('');
+
+                grid.querySelectorAll('[data-del]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const index = Number(btn.getAttribute('data-del'));
+                        const list = loadCustom();
+                        list.splice(index, 1);
+                        saveCustom(list);
+                        renderCustom();
+                    });
+                });
+            }
+
+            function addCustom() {
+                const title = $('video-title').value.trim();
+                const url = $('video-url').value.trim();
+                const track = $('video-track').value;
+                const id = getYoutubeId(url);
+                if (!title || !url) {
+                    alert('Preencha título e URL do vídeo.');
+                    return;
+                }
+                if (!id) {
+                    alert('URL inválida. Use um link público do YouTube (watch, shorts, youtu.be ou embed).');
+                    return;
+                }
+                const list = loadCustom();
+                list.unshift({
+                    title,
+                    url,
+                    track,
+                    desc: 'Vídeo salvo na sua biblioteca para estudo contínuo.'
+                });
+                saveCustom(list);
+                $('video-title').value = '';
+                $('video-url').value = '';
+                renderCustom();
+                alert('Vídeo salvo com sucesso na sua biblioteca.');
+            }
+
+            function bindTabs() {
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tab = btn.getAttribute('data-tab');
+                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                        const panel = $(tab);
+                        if (panel) panel.classList.add('active');
+                    });
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                bindTabs();
+                renderStatic();
+                renderCustom();
+                $('btn-add-video').addEventListener('click', addCustom);
+                $('btn-sync-youtube').addEventListener('click', syncTracksFromApi);
+                // Tenta sincronizar automaticamente na abertura para evitar vídeos removidos.
+                syncTracksFromApi();
+            });
+        })();
+    </script>
+</body>
+</html>

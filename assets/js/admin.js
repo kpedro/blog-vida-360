@@ -5,6 +5,7 @@ const ABOUT_PHOTO_STORAGE_KEY = 'blog360_about_photo_url';
 const ABOUT_PHOTO_FALLBACK = 'assets/images/avatar-vida360.png';
 const ABOUT_PHOTO_BUCKET_CANDIDATES = ['blog-media', 'blog360-media', 'public'];
 let aboutPhotoPendingFile = null;
+const SPECIALIST_CHAT_STORAGE_KEY = 'blog360_specialist_chat_config';
 
 // Verificar autenticação ao carregar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -191,6 +192,7 @@ async function loadDashboardData() {
     await loadStats();
     await loadRecentLeads();
     await loadAboutPhotoSettings();
+    await loadSpecialistChatSettings();
 }
 
 // Carregar estatísticas
@@ -991,7 +993,100 @@ async function saveAboutPhotoSettings() {
     }
 }
 
+async function loadSpecialistChatSettings() {
+    const webhook = document.getElementById('specialist-webhook-url');
+    const compra = document.getElementById('specialist-compra-url');
+    const cadastro = document.getElementById('specialist-cadastro-url');
+    const nome = document.getElementById('specialist-agent-name');
+    if (!webhook || !compra || !cadastro || !nome) return;
+
+    try {
+        const local = JSON.parse(localStorage.getItem(SPECIALIST_CHAT_STORAGE_KEY) || '{}');
+        webhook.value = local.webhookUrl || '';
+        compra.value = local.linkCompra || '';
+        cadastro.value = local.linkCadastro || '';
+        nome.value = local.agentName || '';
+    } catch (e) {}
+
+    try {
+        const client = window.supabaseClient;
+        if (!client || typeof client.getSiteSettings !== 'function') return;
+        const res = await client.getSiteSettings();
+        if (!res || !res.success || !res.data) return;
+        webhook.value = res.data.agente_chat_webhook_url || webhook.value;
+        compra.value = res.data.agente_chat_link_compra || compra.value;
+        cadastro.value = res.data.agente_chat_link_cadastro || cadastro.value;
+        nome.value = res.data.agente_chat_nome || nome.value;
+    } catch (error) {
+        console.warn('Não foi possível carregar config do chat especialista do banco.', error);
+    }
+}
+
+async function saveSpecialistChatSettings() {
+    const webhook = document.getElementById('specialist-webhook-url');
+    const compra = document.getElementById('specialist-compra-url');
+    const cadastro = document.getElementById('specialist-cadastro-url');
+    const nome = document.getElementById('specialist-agent-name');
+    const statusEl = document.getElementById('specialist-save-status');
+    if (!webhook || !compra || !cadastro || !nome) {
+        if (statusEl) {
+            statusEl.textContent = 'Não foi possível localizar os campos do formulário.';
+            statusEl.style.color = '#b42318';
+        }
+        alert('Falha ao salvar: campos não encontrados na página. Atualize com Ctrl+F5.');
+        return;
+    }
+
+    const payload = {
+        webhookUrl: (webhook.value || '').trim(),
+        linkCompra: (compra.value || '').trim(),
+        linkCadastro: (cadastro.value || '').trim(),
+        agentName: (nome.value || '').trim()
+    };
+    localStorage.setItem(SPECIALIST_CHAT_STORAGE_KEY, JSON.stringify(payload));
+    if (statusEl) {
+        statusEl.textContent = 'Salvando configuração...';
+        statusEl.style.color = '#6f6280';
+    }
+
+    const client = window.supabaseClient;
+    if (!client || typeof client.saveSiteSettings !== 'function') {
+        if (statusEl) {
+            statusEl.textContent = 'Salvo localmente neste navegador.';
+            statusEl.style.color = '#166534';
+        }
+        alert('Configuração salva localmente neste navegador.');
+        return;
+    }
+
+    try {
+        const result = await client.saveSiteSettings({
+            agente_chat_webhook_url: payload.webhookUrl || null,
+            agente_chat_link_compra: payload.linkCompra || null,
+            agente_chat_link_cadastro: payload.linkCadastro || null,
+            agente_chat_nome: payload.agentName || null,
+            updated_at: new Date().toISOString()
+        });
+        if (!result || !result.success) {
+            throw new Error((result && result.error) || 'Falha ao salvar configurações no banco');
+        }
+        if (statusEl) {
+            statusEl.textContent = 'Configuração salva no banco com sucesso.';
+            statusEl.style.color = '#166534';
+        }
+        alert('Chat especialista salvo com sucesso.');
+    } catch (error) {
+        console.warn('Falha ao salvar config do chat especialista no banco.', error);
+        if (statusEl) {
+            statusEl.textContent = 'Salvo localmente. Falha ao persistir no banco (verifique colunas agente_chat_*).';
+            statusEl.style.color = '#b54708';
+        }
+        alert('Configuração salva localmente. Para salvar globalmente, confirme se as colunas agente_chat_* existem em blog360_site_settings.');
+    }
+}
+
 // Expor funções globais
 window.logout = logout;
 window.exportLeads = exportLeads;
 window.saveAboutPhotoSettings = saveAboutPhotoSettings;
+window.saveSpecialistChatSettings = saveSpecialistChatSettings;

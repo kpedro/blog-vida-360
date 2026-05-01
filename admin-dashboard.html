@@ -249,6 +249,12 @@
             display: flex;
             justify-content: flex-end;
         }
+        .settings-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #6d2d86;
+            margin-bottom: 0.4rem;
+        }
         @media (max-width: 768px) {
             .settings-grid {
                 grid-template-columns: 1fr;
@@ -450,6 +456,14 @@
             </div>
 
             <div class="table-container" style="margin-bottom: 1.5rem;">
+                <div class="table-header" style="flex-wrap: wrap; gap: 12px;">
+                    <h2>🎓 Centro de Aprendizado (Aromaterapia e Negócio)</h2>
+                    <button type="button" class="btn-secondary" onclick="window.location.href='admin-centro-aprendizado.html'">Abrir trilhas</button>
+                </div>
+                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Área com vídeos para estudo contínuo: produtos, oportunidades e motivação para retomada do negócio.</p>
+            </div>
+
+            <div class="table-container" style="margin-bottom: 1.5rem;">
                 <div class="table-header">
                     <h2>👤 Foto da página Sobre</h2>
                 </div>
@@ -471,6 +485,40 @@
                     <div class="settings-actions">
                         <button type="button" class="btn-primary" onclick="saveAboutPhotoSettings()">Salvar foto da Sobre</button>
                     </div>
+                </div>
+            </div>
+
+            <div class="table-container" style="margin-bottom: 1.5rem;">
+                <div class="table-header">
+                    <h2>🤖 Chat especialista (n8n + doTERRA)</h2>
+                </div>
+                <div class="settings-card">
+                    <p class="settings-title">Configuração do agente de dúvidas e indicação</p>
+                    <div class="settings-grid">
+                        <div>
+                            <label for="specialist-webhook-url">Webhook n8n (POST)</label>
+                            <input id="specialist-webhook-url" type="url" placeholder="https://seu-n8n/webhook/especialista-doterra">
+                            <small>Fluxo recomendado: receber mensagem, responder dúvidas e sugerir próximo passo com links.</small>
+                        </div>
+                        <div>
+                            <label for="specialist-compra-url">Link de compra (seu link)</label>
+                            <input id="specialist-compra-url" type="url" placeholder="https://.../seu-link-compra">
+                        </div>
+                    </div>
+                    <div class="settings-grid" style="margin-top:0.7rem;">
+                        <div>
+                            <label for="specialist-cadastro-url">Link de cadastro (seu link)</label>
+                            <input id="specialist-cadastro-url" type="url" placeholder="https://.../seu-link-cadastro">
+                        </div>
+                        <div>
+                            <label for="specialist-agent-name">Nome exibido no chat</label>
+                            <input id="specialist-agent-name" type="text" placeholder="Ex: Consultora Vida 360º">
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button type="button" class="btn-primary" onclick="saveSpecialistChatSettings()">Salvar chat especialista</button>
+                    </div>
+                    <p id="specialist-save-status" style="margin-top:0.45rem;font-size:12px;color:#6f6280;"></p>
                 </div>
             </div>
             
@@ -786,7 +834,7 @@
         }
     </script>
     
-    <script src="assets/js/admin.js?v=20260501-2" onerror="console.error('❌ Erro ao carregar admin.js'); alert('Erro ao carregar admin.js. Verifique se o servidor está rodando e os arquivos existem.');"></script>
+    <script src="assets/js/admin.js?v=20260501-4" onerror="console.error('❌ Erro ao carregar admin.js'); alert('Erro ao carregar admin.js. Verifique se o servidor está rodando e os arquivos existem.');"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

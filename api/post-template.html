@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="/">
-    <title id="page-title">___OG_TITLE___ - Vida 360º</title>
+    <title id="page-title">___OG_TITLE___ - Vida 360Âº</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link rel="canonical" href="___OG_URL___" id="canonical-link">
     
-    <!-- Open Graph Metatags Dinâmicos -->
+    <!-- Open Graph Metatags DinÃ¢micos -->
     <meta property="og:title" content="___OG_TITLE___" id="og-title">
     <meta property="og:description" content="___OG_DESCRIPTION___" id="og-description">
     <meta property="og:image" content="___OG_IMAGE___" id="og-image">
@@ -18,9 +18,9 @@
     <meta property="og:url" content="___OG_URL___" id="og-url">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="pt_BR">
-    <meta property="og:site_name" content="Vida 360º">
+    <meta property="og:site_name" content="Vida 360Âº">
     
-    <!-- Twitter Card Metatags Dinâmicos -->
+    <!-- Twitter Card Metatags DinÃ¢micos -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="___OG_TITLE___" id="twitter-title">
     <meta name="twitter:description" content="___OG_DESCRIPTION___" id="twitter-description">
@@ -29,13 +29,13 @@
     
     <!-- Script inline para atualizar meta tags ANTES do carregamento completo (para redes sociais) -->
     <script>
-        // Atualizar meta tags o mais rápido possível para redes sociais
+        // Atualizar meta tags o mais rÃ¡pido possÃ­vel para redes sociais
         (function() {
             var params = new URLSearchParams(window.location.search);
             var slug = params.get('post');
             if (!slug) return;
             
-            // Tentar buscar dados do post via Supabase (se já estiver disponível)
+            // Tentar buscar dados do post via Supabase (se jÃ¡ estiver disponÃ­vel)
             if (window.VITE_SUPABASE_URL && window.VITE_SUPABASE_ANON_KEY && window.supabase) {
                 try {
                     var client = window.supabase.createClient(
@@ -55,7 +55,7 @@
                                 var titulo = (p.titulo || 'Post').trim();
                                 var desc = (p.resumo || '').trim();
                                 if (desc.length > 200) desc = desc.substring(0, 197) + '...';
-                                if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
+                                if (!desc) desc = 'Leia este artigo completo no Blog Vida 360Âº';
                                 
                                 var rawPick = (p.imagem_social_url && String(p.imagem_social_url).trim()) || (p.imagem_destaque || '');
                                 var img = rawPick;
@@ -93,7 +93,7 @@
                                 var twImg = document.getElementById('twitter-image');
                                 if (twImg) twImg.setAttribute('content', img);
                                 
-                                document.title = titulo + ' - Vida 360º';
+                                document.title = titulo + ' - Vida 360Âº';
                             }
                         })
                         .catch(function(err) {
@@ -112,7 +112,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="assets/js/sanitize-article-html.js?v=7"></script>
     <style>
-        /* Usa a mesma paleta da página inicial (variáveis em style.css) */
+        /* Usa a mesma paleta da pÃ¡gina inicial (variÃ¡veis em style.css) */
         #post-content {
             background-color: var(--blue-light);
             padding: 20px;
@@ -128,7 +128,7 @@
             transition: opacity 0.15s ease-out;
         }
         
-        /* Botões de Compartilhamento */
+        /* BotÃµes de Compartilhamento */
         .share-buttons {
             display: flex;
             gap: 8px;
@@ -275,18 +275,18 @@
     </style>
 </head>
 <body>
-    <!-- Cabeçalho -->
+    <!-- CabeÃ§alho -->
     <header>
         <div class="container">
-            <div class="logo">Vida 360º</div>
+            <div class="logo">Vida 360Âº</div>
             <nav>
                 <ul>
-                    <li><a href="index.html">Início</a></li>
+                    <li><a href="index.html">InÃ­cio</a></li>
                     <li><a href="artigos.html">Artigos</a></li>
                     <li><a href="oportunidades.html">Oportunidades</a></li>
                     <li><a href="sobre.html">Sobre</a></li>
                     <li><a href="contato.html">Contato</a></li>
-                    <li><a href="politica.html">Política</a></li>
+                    <li><a href="politica.html">PolÃ­tica</a></li>
                 </ul>
             </nav>
         </div>
@@ -294,75 +294,75 @@
 
     <div id="site-opportunity-strip" class="site-opportunity-strip is-hidden" role="region" aria-label="Oportunidade"></div>
 
-    <!-- Conteúdo Principal -->
+    <!-- ConteÃºdo Principal -->
     <main class="container">
-        <!-- Título, autor e data de publicação (preenchidos pelo JS) -->
+        <!-- TÃ­tulo, autor e data de publicaÃ§Ã£o (preenchidos pelo JS) -->
         <h1 id="article-title" class="article-title" style="display:none; margin-bottom: 0.25rem;"></h1>
         <p id="article-byline" class="article-byline" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.95rem; color: var(--blue-primary);"></p>
         <p id="article-meta" class="article-meta" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.875rem; color: #666;"></p>
         <p id="article-meta-local" class="article-meta-local" style="display:none; margin-top: 0; margin-bottom: 1.5rem; font-size: 0.875rem; color: #444; font-weight: 500;"></p>
-        <!-- Área do Post (oculta até renderizar para não mostrar código) -->
+        <!-- Ãrea do Post (oculta atÃ© renderizar para nÃ£o mostrar cÃ³digo) -->
         <div id="post-content" class="post-content-loading">
             Carregando post...
         </div>
         
-        <!-- Botões de Compartilhamento -->
+        <!-- BotÃµes de Compartilhamento -->
         <div class="share-buttons" id="share-buttons" style="display: none;">
-            <h3>📤 Compartilhe este artigo:</h3>
+            <h3>ðŸ“¤ Compartilhe este artigo:</h3>
             <a href="#" class="share-btn whatsapp" onclick="shareWhatsApp(event)" title="Compartilhar no WhatsApp">
-                💬 WhatsApp
+                ðŸ’¬ WhatsApp
             </a>
             <a href="#" class="share-btn facebook" onclick="shareFacebook(event)" title="Compartilhar no Facebook">
-                📘 Facebook
+                ðŸ“˜ Facebook
             </a>
             <a href="#" class="share-btn twitter" onclick="shareTwitter(event)" title="Compartilhar no Twitter">
-                🐦 Twitter
+                ðŸ¦ Twitter
             </a>
             <a href="#" class="share-btn linkedin" onclick="shareLinkedIn(event)" title="Compartilhar no LinkedIn">
-                💼 LinkedIn
+                ðŸ’¼ LinkedIn
             </a>
             <a href="#" class="share-btn telegram" onclick="shareTelegram(event)" title="Compartilhar no Telegram">
-                ✈️ Telegram
+                âœˆï¸ Telegram
             </a>
             <button type="button" class="share-btn copy-link" onclick="copyLinkToClipboard(event)" title="Copiar link">
-                📋 Copiar Link
+                ðŸ“‹ Copiar Link
             </button>
         </div>
 
-        <!-- Seção de Comentários -->
+        <!-- SeÃ§Ã£o de ComentÃ¡rios -->
         <section class="comment-section">
-            <h2>Deixe seu comentário</h2>
+            <h2>Deixe seu comentÃ¡rio</h2>
             <form id="comment-form">
                 <label for="name">Nome:</label>
                 <input type="text" id="name" name="name" placeholder="Digite seu nome" required>
 
-                <label for="comment">Comentário:</label>
-                <textarea id="comment" name="comment" rows="4" placeholder="Digite seu comentário" required></textarea>
+                <label for="comment">ComentÃ¡rio:</label>
+                <textarea id="comment" name="comment" rows="4" placeholder="Digite seu comentÃ¡rio" required></textarea>
 
-                <button type="submit">Enviar Comentário</button>
+                <button type="submit">Enviar ComentÃ¡rio</button>
             </form>
 
-            <!-- Lista de Comentários -->
+            <!-- Lista de ComentÃ¡rios -->
             <div id="comments">
-                <h3>Comentários:</h3>
-                <p>Ainda não há comentários. Seja o primeiro a comentar!</p>
+                <h3>ComentÃ¡rios:</h3>
+                <p>Ainda nÃ£o hÃ¡ comentÃ¡rios. Seja o primeiro a comentar!</p>
             </div>
         </section>
     </main>
 
-    <!-- Botão flutuante WhatsApp -->
-    <a href="https://wa.me/5592994314016?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20o%20protocolo%20de%20rotinas%20de%20sa%C3%BAde." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp para solicitar protocolo de rotinas de saúde">
+    <!-- BotÃ£o flutuante WhatsApp -->
+    <a href="https://wa.me/5592994314016?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20o%20protocolo%20de%20rotinas%20de%20sa%C3%BAde." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp para solicitar protocolo de rotinas de saÃºde">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     </a>
 
-    <!-- Rodapé -->
+    <!-- RodapÃ© -->
     <footer role="contentinfo">
     <div class="container">
-        <p>© 2026 Vida 360º. Todos os direitos reservados.</p>
+        <p>Â© 2026 Vida 360Âº. Todos os direitos reservados.</p>
         <div class="footer-grid">
             <div>
-                <h3>Navegação</h3>
-                <a href="index.html">Início</a><br>
+                <h3>NavegaÃ§Ã£o</h3>
+                <a href="index.html">InÃ­cio</a><br>
                 <a href="artigos.html">Artigos</a><br>
                 <a href="sobre.html">Sobre</a><br>
                 <a href="contato.html">Contato</a>
@@ -372,18 +372,18 @@
                 <a href="oportunidades.html">Oportunidades</a><br>
                 <a href="feed.xml">RSS Feed</a><br>
                 <a href="sitemap.xml">Sitemap</a><br>
-                <a href="contato.html">Fale com o Vida 360º</a>
+                <a href="contato.html">Fale com o Vida 360Âº</a>
             </div>
             <div>
-                <h3>Transparência</h3>
-                <a href="politica.html">Política de Privacidade</a><br>
+                <h3>TransparÃªncia</h3>
+                <a href="politica.html">PolÃ­tica de Privacidade</a><br>
                 <a href="artigos.html">Todos os artigos</a><br>
                 <a href="sobre.html">Quem somos</a><br>
                 <a href="admin-login.html">Painel Admin</a>
             </div>
         </div>
         <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.9;">
-            Este conteúdo é educativo e não substitui orientação de profissionais de saúde. Aromaterapia deve ser usada com responsabilidade. Alguns artigos podem conter links de indicação, sem custo adicional para você.
+            Este conteÃºdo Ã© educativo e nÃ£o substitui orientaÃ§Ã£o de profissionais de saÃºde. Aromaterapia deve ser usada com responsabilidade. Alguns artigos podem conter links de indicaÃ§Ã£o, sem custo adicional para vocÃª.
         </p>
     </div>
 </footer>
@@ -415,9 +415,9 @@
                 // Preparar resumo (limitar a 200 caracteres para OG)
                 var descCompleto = (p.resumo || p.excerpt || '').trim();
                 var desc = descCompleto.length > 200 ? descCompleto.substring(0, 197) + '...' : descCompleto;
-                if (!desc) desc = 'Leia este artigo completo no Blog Vida 360º';
+                if (!desc) desc = 'Leia este artigo completo no Blog Vida 360Âº';
                 
-                // OG: prioridade imagem_social_url (link público), senão imagem_destaque; data:/blob: → banner
+                // OG: prioridade imagem_social_url (link pÃºblico), senÃ£o imagem_destaque; data:/blob: â†’ banner
                 var ogBanner = 'https://www.blogvida360.com.br/assets/images/og-banner.png';
                 var canon = 'https://www.blogvida360.com.br';
                 var rawPick = (p.imagem_social_url && String(p.imagem_social_url).trim()) || (p.imagem_destaque || p.image_url || '');
@@ -430,8 +430,8 @@
                 
                 var url = canon + '/post.html?post=' + encodeURIComponent(p.slug || slug);
                 
-                // Atualizar título da página
-                document.title = titulo + ' - Vida 360º';
+                // Atualizar tÃ­tulo da pÃ¡gina
+                document.title = titulo + ' - Vida 360Âº';
                 
                 // Atualizar todas as meta tags Open Graph
                 var ogTitle = document.getElementById('og-title'); 
@@ -464,13 +464,13 @@
                 var twImgAlt = document.getElementById('twitter-image-alt');
                 if (twImgAlt) twImgAlt.setAttribute('content', titulo);
                 
-                console.log('✅ Meta tags atualizadas:', {
+                console.log('âœ… Meta tags atualizadas:', {
                     titulo: titulo,
                     descricao: desc.substring(0, 50) + '...',
                     imagem: img,
                     url: url
                 });
-                // Exibir título do artigo na página
+                // Exibir tÃ­tulo do artigo na pÃ¡gina
                 var titleEl = document.getElementById('article-title');
                 if (titleEl) {
                     titleEl.textContent = titulo;
@@ -483,7 +483,7 @@
                     authorEl.textContent = autor ? 'Por ' + autor : '';
                     authorEl.style.display = autor ? '' : 'none';
                 }
-                // Exibir data e horário de publicação
+                // Exibir data e horÃ¡rio de publicaÃ§Ã£o
                 var metaEl = document.getElementById('article-meta');
                 if (metaEl) {
                     var dataPub = p.published_at || p.created_at;
@@ -493,7 +493,7 @@
                             var d = new Date(dataPub);
                             var dataFmt = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                             var horaFmt = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                            parts.push('Publicado em ' + dataFmt + ' às ' + horaFmt);
+                            parts.push('Publicado em ' + dataFmt + ' Ã s ' + horaFmt);
                         } catch (e) {
                             parts.push('Publicado em ' + String(dataPub).slice(0, 10));
                         }
@@ -501,7 +501,7 @@
                     metaEl.textContent = parts.join(' ');
                     metaEl.style.display = parts.length ? '' : 'none';
                 }
-                // Local de publicação (em destaque)
+                // Local de publicaÃ§Ã£o (em destaque)
                 var localStr = (p.local || p.location || '').trim();
                 var localEl = document.getElementById('article-meta-local');
                 if (localEl) {
@@ -517,7 +517,7 @@
                     var raw = typeof window.pickBlog360PostBodyRaw === 'function'
                         ? window.pickBlog360PostBodyRaw(p)
                         : String(p.conteudo || p.content || p.conteudo_markdown || '').trim();
-                    if (!raw) raw = '<p>Conteúdo indisponível.</p>';
+                    if (!raw) raw = '<p>ConteÃºdo indisponÃ­vel.</p>';
                     var html = raw;
                     if (typeof marked !== 'undefined' && raw && !/^\s*</.test(raw)) {
                         try { html = marked.parse(raw); } catch (e) { }
@@ -526,7 +526,7 @@
                         html = window.sanitizeArticleHtml(html);
                     }
                     if (!html || !String(html).replace(/\s/g, '')) {
-                        html = '<p>Conteúdo indisponível.</p>';
+                        html = '<p>ConteÃºdo indisponÃ­vel.</p>';
                     }
                     el.innerHTML = html;
                     el.classList.remove('post-content-loading');
@@ -536,7 +536,7 @@
                     });
                 }
                 
-                // Mostrar botões de compartilhamento
+                // Mostrar botÃµes de compartilhamento
                 var shareButtons = document.getElementById('share-buttons');
                 if (shareButtons) {
                     shareButtons.style.display = 'flex';
@@ -548,9 +548,9 @@
         })();
     </script>
     <script>
-        // Funções de Compartilhamento
+        // FunÃ§Ãµes de Compartilhamento
         function getCurrentPostInfo() {
-            const title = window.currentPostTitle || document.title || 'Vida 360º';
+            const title = window.currentPostTitle || document.title || 'Vida 360Âº';
             const url = window.currentPostUrl || window.location.href;
             const text = title + ' - ' + url;
             return { title, url, text };
@@ -597,7 +597,7 @@
             navigator.clipboard.writeText(url).then(() => {
                 const btn = e.target;
                 const originalText = btn.textContent;
-                btn.textContent = '✅ Link Copiado!';
+                btn.textContent = 'âœ… Link Copiado!';
                 btn.style.background = '#27AE60';
                 setTimeout(() => {
                     btn.textContent = originalText;
@@ -615,7 +615,7 @@
             });
         }
         
-        // Mostrar botões de compartilhamento para posts estáticos também
+        // Mostrar botÃµes de compartilhamento para posts estÃ¡ticos tambÃ©m
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 const shareButtons = document.getElementById('share-buttons');
@@ -634,11 +634,11 @@
     <script src="assets/js/script.js?v=20260501-1"></script>
     <script src="assets/js/comments.js?v=20260501-1"></script>
     <script>
-        // Informações dos artigos (fallback para posts estáticos .md)
+        // InformaÃ§Ãµes dos artigos (fallback para posts estÃ¡ticos .md)
         const articles = {
             "saude-mental": {
-                title: "Como Cuidar da Saúde Mental no Dia a Dia",
-                description: "Descubra práticas simples para manter a saúde mental em equilíbrio.",
+                title: "Como Cuidar da SaÃºde Mental no Dia a Dia",
+                description: "Descubra prÃ¡ticas simples para manter a saÃºde mental em equilÃ­brio.",
                 image: "https://www.blogvida360.com.br/assets/images/saude-mental.jpg",
                 url: "https://www.blogvida360.com.br/post.html?post=saude-mental"
             },
@@ -649,26 +649,26 @@
                 url: "https://www.blogvida360.com.br/post.html?post=produtividade"
             },
             "equilibrio-vida": {
-                title: "Encontrando o Equilíbrio entre Trabalho e Vida Pessoal",
+                title: "Encontrando o EquilÃ­brio entre Trabalho e Vida Pessoal",
                 description: "Saiba como conciliar suas responsabilidades sem perder o bem-estar.",
                 image: "https://www.blogvida360.com.br/assets/images/equilibrio-vida.jpg",
                 url: "https://www.blogvida360.com.br/post.html?post=equilibrio-vida"
             },
             "mentalidade-empreendedora": {
-                title: "Mentalidade Empreendedora – Como Pensar como um Sucesso",
-                description: "Descubra como cultivar uma mentalidade voltada para o crescimento e transformar sua trajetória.",
+                title: "Mentalidade Empreendedora â€“ Como Pensar como um Sucesso",
+                description: "Descubra como cultivar uma mentalidade voltada para o crescimento e transformar sua trajetÃ³ria.",
                 image: "https://i.postimg.cc/xdshKNZK/mediensturmer-a-Wf7mjww-JJo-unsplash.jpg",
                 url: "https://www.blogvida360.com.br/post.html?post=mentalidade-empreendedora"
             },
             "marketing-relacionamento": {
                 title: "O Poder do Marketing de Relacionamento",
-                description: "Aprenda como construir relações sólidas que geram resultados duradouros no seu negócio.",
+                description: "Aprenda como construir relaÃ§Ãµes sÃ³lidas que geram resultados duradouros no seu negÃ³cio.",
                 image: "https://i.postimg.cc/gJn54k91/new-data-services-UO-QYR28h-S0-unsplash.jpg",
                 url: "https://www.blogvida360.com.br/post.html?post=marketing-relacionamento"
             },
             "habitos-produtivos": {
-                title: "7 Hábitos de Pessoas Altamente Produtivas",
-                description: "Aprenda os hábitos que pessoas produtivas praticam diariamente para alcançar resultados extraordinários.",
+                title: "7 HÃ¡bitos de Pessoas Altamente Produtivas",
+                description: "Aprenda os hÃ¡bitos que pessoas produtivas praticam diariamente para alcanÃ§ar resultados extraordinÃ¡rios.",
                 image: "https://i.postimg.cc/NGCSyXXY/john-schnobrich-Fl-Pc9-Voc-J4-unsplash-1.jpg",
                 url: "https://www.blogvida360.com.br/post.html?post=habitos-produtivos"
             }
@@ -676,7 +676,7 @@
     
         const params = new URLSearchParams(window.location.search);
         const postKey = params.get("post");
-        // Só aplicar meta do objeto articles se não foi carregado do Supabase
+        // SÃ³ aplicar meta do objeto articles se nÃ£o foi carregado do Supabase
         if (!window.postLoadedFromSupabase && articles[postKey]) {
             const article = articles[postKey];
             document.title = article.title;
@@ -689,10 +689,11 @@
             document.getElementById("twitter-description").content = article.description;
             document.getElementById("twitter-image").content = article.image;
         } else {
-            console.error("Artigo não encontrado");
+            console.error("Artigo nÃ£o encontrado");
         }
     </script>
-    <script src="assets/js/chat-widget.js?v=20260501-1"></script>
+    <script src="assets/js/chat-widget.js?v=20260501-26"></script>
 </body>
 </html>
+
 
