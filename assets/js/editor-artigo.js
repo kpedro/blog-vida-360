@@ -584,6 +584,15 @@ async function publishPost() {
 
 const BLOG360_COVERS_BUCKET = 'blog360-covers';
 
+function isPublicHttpImageUrl(value) {
+    const v = (value || '').trim();
+    if (!/^https?:\/\//i.test(v)) return false;
+    if (/^https?:\/\/localhost/i.test(v)) return false;
+    if (/^https?:\/\/127\.0\.0\.1/i.test(v)) return false;
+    if (/^data:/i.test(v) || /^blob:/i.test(v)) return false;
+    return true;
+}
+
 /**
  * Envia capa em data URL ao Storage público; devolve URL https para og:image e para o artigo.
  */
@@ -709,12 +718,28 @@ async function savePost(status) {
                 }
             } else if (upErr && status === 'published') {
                 console.warn('Upload capa Storage:', upErr);
+            }
+        }
+
+        // Regra anti-erro para publicação: precisa de URL pública para preview em redes.
+        if (status === 'published') {
+            const hasSocialPublic = isPublicHttpImageUrl(socialUrlFinal);
+            const hasFeaturedPublic = isPublicHttpImageUrl(imageUrlFinal);
+            if (!hasSocialPublic && !hasFeaturedPublic) {
                 alert(
-                    'A capa está em formato embutido (IA/upload). Para o Facebook mostrar essa imagem:\n\n' +
-                    '1) No Supabase, execute o script supabase/BLOG360_STORAGE_CAPAS.sql (bucket blog360-covers), ou\n' +
-                    '2) Cole um link https no campo «Imagem para redes».\n\n' +
-                    'Detalhe: ' + upErr
+                    'Para publicar com preview correto no WhatsApp/Facebook, informe uma imagem pública (https).\n\n' +
+                    'Como resolver:\n' +
+                    '1) Cole uma URL https em «Imagem para redes sociais», ou\n' +
+                    '2) Use uma imagem de capa https, ou\n' +
+                    '3) Configure o bucket blog360-covers no Supabase para upload automático da capa.\n\n' +
+                    'Sem isso, o link pode sair sem imagem ao compartilhar.'
                 );
+                return;
+            }
+            if (!hasSocialPublic && hasFeaturedPublic) {
+                socialUrlFinal = imageUrlFinal;
+                const sElAuto = document.getElementById('social-image-url');
+                if (sElAuto && !sElAuto.value.trim()) sElAuto.value = imageUrlFinal;
             }
         }
 
