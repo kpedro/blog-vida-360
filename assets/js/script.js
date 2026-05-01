@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // A página post.html já possui carregamento próprio via Supabase.
+    // Evita sobrescrever o conteúdo renderizado com fallback Markdown.
+    if (window.location.pathname.toLowerCase().includes('post.html')) return;
+
     // Se o post foi carregado do Supabase, não buscar .md
     if (window.postLoadedFromSupabase) return;
     const markdownFile = new URLSearchParams(window.location.search).get("post");

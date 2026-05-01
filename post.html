@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="UTF-8">
@@ -106,8 +106,8 @@
         })();
     </script>
     
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/opportunity-strip.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260501-1">
+    <link rel="stylesheet" href="assets/css/opportunity-strip.css?v=20260501-1">
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="assets/js/sanitize-article-html.js?v=7"></script>
@@ -527,6 +527,14 @@
                     if (typeof window.sanitizeArticleHtml === 'function') {
                         html = window.sanitizeArticleHtml(html);
                     }
+                    // Limpeza extra para dumps de <head> colados como texto no corpo
+                    html = String(html || '')
+                        .replace(/&lt;!--\s*Favicon[\s\S]*?--&gt;/gi, '')
+                        .replace(/&lt;link\b[^&]*?&gt;/gi, '')
+                        .replace(/&lt;meta\b[^&]*?&gt;/gi, '')
+                        .replace(/(?:^|<br\s*\/?>|\n)\s*<!--\s*(?:Favicon|Open Graph|Twitter Card)[\s\S]*?-->\s*(?=<br\s*\/?>|\n|$)/gi, '')
+                        .replace(/(?:^|<br\s*\/?>|\n)\s*<link\b[^>]*>\s*(?=<br\s*\/?>|\n|$)/gi, '')
+                        .replace(/(?:^|<br\s*\/?>|\n)\s*<meta\b[^>]*>\s*(?=<br\s*\/?>|\n|$)/gi, '');
                     if (!html || !String(html).replace(/\s/g, '')) {
                         html = '<p>Conteúdo indisponível.</p>';
                     }
@@ -632,9 +640,9 @@
             }, 1000);
         });
     </script>
-    <script src="assets/js/performance.js"></script>
-    <script src="assets/js/script.js"></script>
-    <script src="assets/js/comments.js"></script>
+    <script src="assets/js/performance.js?v=20260501-1"></script>
+    <script src="assets/js/script.js?v=20260501-1"></script>
+    <script src="assets/js/comments.js?v=20260501-1"></script>
     <script>
         // Informações dos artigos (fallback para posts estáticos .md)
         const articles = {
@@ -694,7 +702,7 @@
             console.error("Artigo não encontrado");
         }
     </script>
-    <script src="assets/js/chat-widget.js"></script>
+    <script src="assets/js/chat-widget.js?v=20260501-1"></script>
 </body>
 </html>
 

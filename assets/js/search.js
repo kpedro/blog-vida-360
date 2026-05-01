@@ -58,7 +58,7 @@
             var slug = post.slug || '';
             var titulo = (post.titulo || post.title || 'Artigo').trim();
             var cat = (post.categoria || '').trim();
-            html += '<li style="margin-bottom:10px;"><a href="post.html?post=' + encodeURIComponent(slug) + '" style="color:var(--blue-primary);text-decoration:none;">' +
+            html += '<li style="margin-bottom:10px;"><a href="post.html?v=20260501-rodape&post=' + encodeURIComponent(slug) + '" style="color:var(--blue-primary);text-decoration:none;">' +
                 '<strong>' + escapeHtml(titulo) + '</strong>' +
                 (cat ? ' <span style="color:#888;font-size:0.9em;">(' + escapeHtml(cat) + ')</span>' : '') +
                 '</a></li>';
