@@ -58,6 +58,46 @@
     return window.VITE_SUPABASE_URL || '';
   }
 
+  function isFileProtocol() {
+    return typeof location !== 'undefined' && location.protocol === 'file:';
+  }
+
+  /** Lê corpo JSON mesmo quando a função devolve texto de erro. */
+  async function readEdgeFunctionBody(res) {
+    const raw = await res.text();
+    let data = null;
+    if (raw) {
+      try {
+        data = JSON.parse(raw);
+      } catch (_) {
+        data = { _nonJson: true };
+      }
+    }
+    return { raw, data };
+  }
+
+  function explainEdgeFunctionHttpError(functionName, status, data, raw) {
+    const detail =
+      (data && typeof data === 'object' && !data._nonJson && (data.details || data.error)) || '';
+    const snippet = (typeof raw === 'string' && raw.length ? raw : '').slice(0, 500);
+    if (status === 401) {
+      return 'Sessão expirada ou sem permissão. Abra admin-login.html e entre de novo.';
+    }
+    if (status === 404) {
+      return `Função «${functionName}» não encontrada. Faça deploy dessa Edge Function no Supabase (Dashboard → Edge Functions).`;
+    }
+    if (status === 429) {
+      return detail || 'Limite de pedidos à API. Tente daqui a pouco.';
+    }
+    if (status >= 500) {
+      if (/GEMINI_API/i.test(String(detail))) {
+        return 'Configure o segredo GEMINI_API no Supabase (Edge Functions → Secrets) e faça redeploy das funções do Estúdio.';
+      }
+      return detail || snippet || `Erro no servidor (${status}). Veja Supabase → Edge Functions → Logs.`;
+    }
+    return detail || snippet || `Erro HTTP ${status}`;
+  }
+
   function getAnonKey() {
     return window.VITE_SUPABASE_ANON_KEY || '';
   }
@@ -157,6 +197,21 @@
       return;
     }
 
+    if (!getSupabaseUrl().trim()) {
+      showError(
+        'URL do Supabase não definida (window.VITE_SUPABASE_URL). No HTML do Estúdio deve existir o script que define VITE_SUPABASE_URL.',
+        true
+      );
+      return;
+    }
+    if (isFileProtocol()) {
+      showError(
+        'Abra esta página por HTTP, não como arquivo (file://). No Cursor/terminal: npm run dev e acesse http://localhost:8080/admin-estudio-conteudo.html — assim o navegador permite chamar o Supabase.',
+        true
+      );
+      return;
+    }
+
     const btn = $('btn-generate');
     if (btn) btn.disabled = true;
     clearError();
@@ -176,10 +231,12 @@
         headers: fnHeaders(session),
         body: JSON.stringify({ type: contentType, prompt: prompt.trim(), temperature: 0.8 }),
       });
-      const data = await res.json().catch(() => null);
+      const { raw: bodyRaw, data } = await readEdgeFunctionBody(res);
       if (!res.ok) {
-        const fallbackError = (data && (data.details || data.error)) || res.statusText || `Erro HTTP ${res.status}`;
-        throw new Error(fallbackError);
+        console.error('[Estúdio] generate-blog-studio-content', res.status, bodyRaw);
+        throw new Error(
+          explainEdgeFunctionHttpError('generate-blog-studio-content', res.status, data, bodyRaw)
+        );
       }
 
       const generated =
@@ -199,11 +256,18 @@
 
       window.alert('Conteúdo gerado. Revise e copie ou envie ao editor.');
     } catch (e) {
-      showError(
+      let msg =
         (e && e.message) ||
-          'Erro ao gerar conteúdo. Verifique se as Edge Functions foram deployadas e se GEMINI_API está configurada.',
-        true
-      );
+        'Erro ao gerar conteúdo. Verifique se as Edge Functions foram deployadas e se GEMINI_API está configurada.';
+      if (
+        msg === 'Failed to fetch' ||
+        /network/i.test(msg) ||
+        (typeof msg === 'string' && msg.includes('Load failed'))
+      ) {
+        msg =
+          'Sem ligação ao Supabase (Failed to fetch). Use http://localhost com npm run dev (não file://); confirme VPN/firewall e se o projeto Supabase está online.';
+      }
+      showError(msg, true);
     } finally {
       if (btn) btn.disabled = false;
     }
@@ -306,13 +370,34 @@
     const btn = $('btn-gen-image');
     if (btn) btn.disabled = true;
 
+    if (!getSupabaseUrl().trim()) {
+      showError('URL do Supabase não definida.', true);
+      if (btn) btn.disabled = false;
+      return;
+    }
+    if (isFileProtocol()) {
+      showError(
+        'Abra por HTTP (npm run dev → http://localhost:8080/…). Com file:// o navegador bloqueia o Supabase.',
+        true
+      );
+      if (btn) btn.disabled = false;
+      return;
+    }
+
     try {
       const res = await fetch(`${getSupabaseUrl()}/functions/v1/generate-blog-studio-image`, {
         method: 'POST',
         headers: fnHeaders(session),
         body: JSON.stringify({ prompt: desc, format: fmt }),
       });
-      const data = await res.json().catch(() => ({}));
+      const { raw: bodyRaw, data } = await readEdgeFunctionBody(res);
+
+      if (!res.ok) {
+        console.error('[Estúdio] generate-blog-studio-image', res.status, bodyRaw);
+        throw new Error(
+          explainEdgeFunctionHttpError('generate-blog-studio-image', res.status, data, bodyRaw)
+        );
+      }
 
       if (data.imageBase64 && data.mimeType) {
         lastImageMimeType = data.mimeType;
@@ -324,10 +409,21 @@
         const dl = $('btn-download-image');
         if (dl) dl.style.display = 'inline-flex';
       } else {
-        throw new Error(data.details || data.error || 'Nenhuma imagem retornada');
+        throw new Error(
+          (data && (data.details || data.error)) || 'Nenhuma imagem retornada (resposta sem base64).'
+        );
       }
     } catch (e) {
-      showError(e.message || 'Erro ao gerar imagem.');
+      let msg = e.message || 'Erro ao gerar imagem.';
+      if (
+        msg === 'Failed to fetch' ||
+        /network/i.test(msg) ||
+        (typeof msg === 'string' && msg.includes('Load failed'))
+      ) {
+        msg =
+          'Sem ligação ao Supabase. Use http://localhost (npm run dev), não file://; verifique rede/VPN.';
+      }
+      showError(msg);
     } finally {
       if (btn) btn.disabled = false;
     }

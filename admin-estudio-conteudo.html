@@ -268,7 +268,8 @@
     <div class="wrap">
         <p class="lead">
             Gere textos para landing, <strong>redes (com foco em legenda para Instagram)</strong> e artigos, alinhados ao tom do blog.
-            Proporção <strong>4:5</strong> e descarregar a imagem em ficheiro são <strong>experimentais</strong> — se a API rejeitar 4:5, volte a 1:1 ou 9:16. Após alterar o backend, faça <strong>deploy</strong> das funções <code style="font-size:0.8rem">generate-blog-studio-content</code> e <code style="font-size:0.8rem">generate-blog-studio-image</code> no Supabase.
+            <strong>Teste local:</strong> na pasta do projeto rode <code style="font-size:0.8rem">npm run dev</code> e abra <code style="font-size:0.8rem">http://localhost:8080/admin-estudio-conteudo.html</code> — abrir o HTML direto como <code style="font-size:0.8rem">file://</code> impede o navegador de chamar o Supabase.
+            Proporção <strong>4:5</strong> e descarregar a imagem são <strong>experimentais</strong>. Após alterar o backend, faça <strong>deploy</strong> das funções <code style="font-size:0.8rem">generate-blog-studio-content</code> e <code style="font-size:0.8rem">generate-blog-studio-image</code> no Supabase.
         </p>
 
         <div id="error-banner" class="error-banner"></div>
@@ -408,7 +409,7 @@
             initStudioSupabase();
         }
     </script>
-    <script src="assets/js/estudio-conteudo.js?v=20260501-instagram-exp"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260501-local-http"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">
