@@ -29,6 +29,7 @@
     <meta name="twitter:description" content="Conteúdo confiável para melhorar sono, reduzir ansiedade leve e aumentar foco com aromaterapia prática e segura.">
     <meta name="twitter:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/opportunity-strip.css">
     <link rel="stylesheet" href="assets/css/leads.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -256,6 +257,18 @@
             display: block;
             vertical-align: middle;
         }
+        .optional-reco {
+            background: #faf6fc;
+            border: 1px solid #e4d4ef;
+        }
+        .optional-reco h2 {
+            margin-top: 0;
+            color: var(--blue-primary);
+        }
+        .optional-reco .optional-reco__desc {
+            color: var(--gray-600);
+            margin-bottom: 0.75rem;
+        }
         .footer-grid {
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             margin-top: 1rem;
@@ -312,51 +325,53 @@
         </div>
     </header>
 
+    <div id="site-opportunity-strip" class="site-opportunity-strip is-hidden" role="region" aria-label="Oportunidade"></div>
+
     <main class="container">
         <section id="home">
             <section class="home-section home-hero">
-                <h1>Vida 360º: orientações práticas para cuidar do sono, reduzir ansiedade leve e produzir com equilíbrio</h1>
-                <p class="hero-subtitle">Somos um blog de saúde e bem-estar com linguagem clara e foco em rotina real: sem radicalismo, sem promessas exageradas e com passos aplicáveis no dia a dia.</p>
-                <p class="hero-helper">Você encontra conteúdos sobre saúde, bem-estar, foco, produtividade e aromaterapia prática e segura para construir uma rotina mais estável e leve.</p>
+                <h1>Bem-vindo ao Blog "Vida 360º"</h1>
+                <p class="hero-subtitle">Aqui você encontra conteúdos sobre <strong>saúde, bem-estar, produtividade, mentalidade e equilíbrio</strong> para uma vida mais plena, com foco em quem tem rotina corrida, ansiedade leve e dificuldade para dormir.</p>
+                <p class="hero-helper">Nosso objetivo é ajudar você a melhorar sua rotina, preservar sua saúde emocional e manter consistência no trabalho e na vida pessoal, inclusive para quem busca mais estabilidade financeira com organização e foco.</p>
                 <div class="hero-ctas">
-                    <a href="artigos.html" class="btn-primary">Começar pelos artigos</a>
-                    <a href="#lead-magnet" class="btn-secondary">Receber o guia gratuito</a>
+                    <a href="#lead-magnet" class="btn-primary">Baixar guia gratuito</a>
+                    <a href="contato.html" class="btn-secondary">Agendar consulta rápida</a>
                 </div>
-                <p class="next-step"><strong>Próximo passo:</strong> escolha um artigo para aplicar hoje ou baixe o guia gratuito para começar com um plano de 7 dias.</p>
+                <p class="next-step"><strong>Próximo passo:</strong> baixe o guia para iniciar com segurança, ou agende uma conversa rápida para ajustar sua rotina de sono e ansiedade.</p>
             </section>
 
             <section class="home-section" aria-labelledby="temas-principais">
-                <h2 id="temas-principais">Temas principais do Vida 360º</h2>
+                <h2 id="temas-principais">Este blog é para quem quer</h2>
                 <div class="topics-grid">
                     <article class="topic-card">
-                        <h3>Sono</h3>
-                        <p>Rotinas noturnas simples, higiene do sono e ajustes de hábitos para acordar com mais disposição.</p>
+                        <h3>Melhorar o sono</h3>
+                        <p>Dormir melhor com práticas de rotina e higiene do sono, sem depender apenas de medicação.</p>
                     </article>
                     <article class="topic-card">
-                        <h3>Ansiedade leve</h3>
-                        <p>Estratégias de organização, respiração e autocuidado para reduzir sobrecarga no dia a dia.</p>
+                        <h3>Usar aromaterapia com segurança</h3>
+                        <p>Aprender como usar óleos essenciais de forma prática, responsável e adequada ao dia a dia.</p>
                     </article>
                     <article class="topic-card">
-                        <h3>Foco e produtividade</h3>
-                        <p>Métodos simples de planejamento, execução e recuperação de energia para manter constância sem exaustão.</p>
+                        <h3>Aumentar foco e produtividade</h3>
+                        <p>Produzir mais sem abrir mão do equilíbrio emocional, mesmo com rotina intensa e pouco tempo.</p>
                     </article>
                 </div>
             </section>
 
             <section class="home-section" aria-labelledby="para-quem">
-                <h2 id="para-quem">Para quem é este blog</h2>
+                <h2 id="para-quem">📚 O que você vai encontrar</h2>
                 <div class="audience-grid">
                     <div class="audience-item">
-                        <strong>Para quem vive cansado</strong>
-                        Conteúdo para reorganizar hábitos, desacelerar à noite e recuperar energia de forma sustentável.
+                        <strong>Rotinas de bem-estar com aromaterapia</strong>
+                        Conteúdo prático para aplicar no trabalho, em casa e no fim do dia com segurança.
                     </div>
                     <div class="audience-item">
-                        <strong>Para quem sente ansiedade leve</strong>
-                        Orientações para desacelerar, priorizar e reduzir a sensação de mente acelerada com técnicas práticas.
+                        <strong>Dicas para quem trabalha muito e tem pouco tempo</strong>
+                        Estratégias objetivas para foco, energia e organização sem complicar a rotina.
                     </div>
                     <div class="audience-item">
-                        <strong>Para quem busca foco com equilíbrio</strong>
-                        Técnicas para produzir melhor sem abrir mão da saúde, do bem-estar e do descanso.
+                        <strong>Conteúdos sobre professor, ansiedade, estresse e sono</strong>
+                        Materiais pensados para quem vive sobrecarga e precisa de um plano simples para recuperar equilíbrio.
                     </div>
                 </div>
             </section>
@@ -368,8 +383,8 @@
             </section>
 
             <section id="lead-magnet" class="home-section lead-card" aria-labelledby="isca-digital">
-                <h2 id="isca-digital">Baixe o guia gratuito: Rotina 360º em 7 dias</h2>
-                <p>Um material objetivo para organizar manhã, trabalho e noite com hábitos de sono, foco e uso seguro de óleos essenciais.</p>
+                <h2 id="isca-digital">✨ Comece por aqui</h2>
+                <p>Baixe nosso <strong>guia gratuito de aromaterapia segura</strong> para iniciantes e comece com passos simples para sono, foco e bem-estar.</p>
                 <form class="newsletter-form" data-origem="form_home_isca">
                     <input type="email" name="email" placeholder="Digite seu melhor e-mail" required aria-label="Email para receber o guia gratuito">
                     <button type="submit">Quero receber o guia</button>
@@ -378,14 +393,12 @@
             </section>
 
             <section class="home-section consulting-box" aria-labelledby="consultoria-rotinas">
-                <h2 id="consultoria-rotinas">Consultoria de rotinas (opcional)</h2>
-                <p>Se você quiser apoio individual para organizar sua rotina de sono, foco, bem-estar e autocuidado com aromaterapia, oferecemos orientações pontuais e práticas.</p>
-                <p>Não é atendimento médico. É organização de hábitos, planejamento e acompanhamento de execução.</p>
-                <a href="contato.html" class="btn-secondary">Entender como funciona</a>
+                <h2 id="consultoria-rotinas">Consulta rápida e recomendações</h2>
+                <p>Agende uma <strong>consulta rápida de 30 minutos</strong> para ajustar sua rotina de sono e ansiedade com estratégias práticas.</p>
+                <p>Também reunimos recomendações de óleos essenciais para uso em casa e no trabalho, sempre com abordagem educativa e responsável.</p>
+                <a href="oportunidades.html" class="btn-secondary">Ver recomendações</a>
             </section>
 
-            <!-- Banner de produto (global — painel admin; oculto até ativar no Supabase) -->
-            <div id="home-product-banner-wrap" class="home-product-banner-wrap home-section is-hidden" aria-live="polite"></div>
         </section>
 
         <section id="posts-container" aria-labelledby="posts-destaque">
@@ -431,12 +444,21 @@
                 </article>
             </div>
         </section>
+
+        <section class="home-section optional-reco" aria-labelledby="recomendacoes-opcionais">
+            <h2 id="recomendacoes-opcionais">Recomendações opcionais</h2>
+            <p class="optional-reco__desc">Quando fizer sentido para sua rotina, você também pode consultar nossas recomendações de produtos. Esta seção é complementar e não substitui orientações profissionais.</p>
+            <!-- Banner de produto (global — painel admin; oculto até ativar no Supabase) -->
+            <div id="home-product-banner-wrap" class="home-product-banner-wrap is-hidden" aria-live="polite"></div>
+        </section>
     </main>
 
     <!-- Botão flutuante WhatsApp (altere 5592994314016 para seu número: 55+DDD+número) -->
-    <a href="https://wa.me/5592994314016?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20o%20protocolo%20de%20rotinas%20de%20sa%C3%BAde." class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp para solicitar protocolo de rotinas de saúde">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    </a>
+    <a href="https://www.instagram.com/vida360.bemestar/" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Acesse nosso Instagram para continuar esse trabalho">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.9 1.65a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/>
+    </svg>
+</a>
 
     <footer role="contentinfo">
     <div class="container">
@@ -693,5 +715,6 @@
     }
     </script>
     <script src="assets/js/chat-widget.js"></script>
+    <script src="assets/js/opportunity-strip.js"></script>
 </body>
 </html>

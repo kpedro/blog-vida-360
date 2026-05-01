@@ -3,6 +3,23 @@
  * Requer: @supabase/supabase-js, assets/js/supabase.js (initSupabase)
  */
 (function () {
+    var FALLBACK_STRIP = {
+        text: 'Empreenda com propósito: leve os óleos essenciais da doTERRA para mais pessoas com educação e bem-estar.',
+        cta: 'Conhecer a doTERRA',
+        link: 'oportunidades.html',
+    };
+
+    function normalizeOpportunityBranding(text) {
+        var t = String(text || '');
+        // Migração suave de copy legada: evita exibir marca antiga.
+        t = t.replace(/\bamway\b/gi, 'doTERRA');
+        t = t.replace(
+            /renda extra,\s*tempo livre,\s*seguran[çc]a financeira\.\s*sua oportunidade doTERRA!?/gi,
+            'Empreenda com propósito: leve os óleos essenciais da doTERRA para mais pessoas com educação e bem-estar.'
+        );
+        return t;
+    }
+
     function escHtml(s) {
         return String(s || '')
             .replace(/&/g, '&amp;')
@@ -13,6 +30,20 @@
         return String(s || '')
             .replace(/&/g, '&amp;')
             .replace(/"/g, '&quot;');
+    }
+
+    function renderStrip(root, text, cta, link) {
+        var inner = '<div class="site-opportunity-strip__inner">';
+        inner += '<p class="site-opportunity-strip__text">' + escHtml(text) + '</p>';
+        if (link) {
+            var rel = /^https?:\/\//i.test(link) ? 'noopener noreferrer sponsored' : 'noopener noreferrer';
+            var target = /^https?:\/\//i.test(link) ? ' target="_blank"' : '';
+            inner += '<a class="site-opportunity-strip__cta" href="' + escAttr(link) + '"' + target + ' rel="' + rel + '">' + escHtml(cta) + '</a>';
+        }
+        inner += '</div>';
+        root.innerHTML = inner;
+        root.classList.remove('is-hidden');
+        root.setAttribute('data-active', 'true');
     }
 
     async function loadOpportunityStrip() {
@@ -33,36 +64,42 @@
             client = window.supabaseClient;
             attempts++;
         }
-        if (!client || !client.getSiteSettings) return;
+        if (!client || !client.getSiteSettings) {
+            renderStrip(root, FALLBACK_STRIP.text, FALLBACK_STRIP.cta, FALLBACK_STRIP.link);
+            return;
+        }
 
         var res = await client.getSiteSettings();
-        if (!res.success || !res.data) return;
+        if (!res.success || !res.data) {
+            renderStrip(root, FALLBACK_STRIP.text, FALLBACK_STRIP.cta, FALLBACK_STRIP.link);
+            return;
+        }
         var s = res.data;
         var active = !!s.faixa_oportunidade_ativo;
-        var text = (s.faixa_oportunidade_texto || '').trim();
+        var text = normalizeOpportunityBranding((s.faixa_oportunidade_texto || '').trim());
         if (!active || !text) {
-            root.classList.add('is-hidden');
-            root.innerHTML = '';
-            root.removeAttribute('data-active');
+            renderStrip(root, FALLBACK_STRIP.text, FALLBACK_STRIP.cta, FALLBACK_STRIP.link);
             return;
         }
 
         var link = (s.faixa_oportunidade_link || '').trim();
-        var cta = (s.faixa_oportunidade_cta || '').trim() || 'Saiba mais';
+        var cta = normalizeOpportunityBranding((s.faixa_oportunidade_cta || '').trim()) || 'Saiba mais';
+        cta = cta.replace(/descubra agora/gi, 'Conhecer a doTERRA');
 
-        var inner = '<div class="site-opportunity-strip__inner">';
-        inner += '<p class="site-opportunity-strip__text">' + escHtml(text) + '</p>';
-        if (/^https?:\/\//i.test(link)) {
-            inner += '<a class="site-opportunity-strip__cta" href="' + escAttr(link) + '" target="_blank" rel="noopener noreferrer sponsored">' + escHtml(cta) + '</a>';
-        }
-        inner += '</div>';
-        root.innerHTML = inner;
-        root.classList.remove('is-hidden');
-        root.setAttribute('data-active', 'true');
+        renderStrip(root, text, cta, link || FALLBACK_STRIP.link);
     }
 
     function run() {
-        setTimeout(function () { loadOpportunityStrip(); }, 280);
+        var root = document.getElementById('site-opportunity-strip');
+        if (root) {
+            // Render imediato para não depender de Supabase/configuração.
+            renderStrip(root, FALLBACK_STRIP.text, FALLBACK_STRIP.cta, FALLBACK_STRIP.link);
+        }
+        setTimeout(function () {
+            loadOpportunityStrip().catch(function () {
+                // Mantém fallback já renderizado em caso de erro.
+            });
+        }, 280);
     }
 
     if (document.readyState === 'loading') {

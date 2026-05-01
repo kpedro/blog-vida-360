@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -7,8 +7,8 @@
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; width: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%); min-height: 100vh; padding: 20px 0 0; }
+        .login-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; width: 100%; margin: 32px auto; }
         .logo { text-align: center; margin-bottom: 30px; }
         .logo h1 { color: #6d2d86; font-size: 32px; margin-bottom: 5px; }
         .logo p { color: #7F8C8D; font-size: 14px; }
@@ -27,7 +27,48 @@
         .footer-link a:hover { text-decoration: underline; }
         .loading { display: none; text-align: center; margin-top: 15px; }
         .loading.active { display: block; }
-    </style>
+        /* admin-global-footer */
+    .admin-global-footer {
+        background: #7f3f98;
+        color: #fff;
+        margin-top: 24px;
+        padding: 20px;
+        text-align: center;
+        width: 100%;
+    }
+    .admin-global-footer .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .admin-global-footer .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+        text-align: left;
+    }
+    .admin-global-footer .footer-grid h3 {
+        margin: 0 0 0.6rem;
+        font-size: 0.95rem;
+        color: #f4ecf7;
+    }
+    .admin-global-footer .footer-grid a {
+        color: #f4ecf7;
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-bottom: 0.35rem;
+    }
+    .admin-global-footer .footer-grid a:hover {
+        text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+        .admin-global-footer .footer-grid {
+            text-align: center;
+        }
+    }
+</style>
 </head>
 <body>
     <div class="login-container">
@@ -244,5 +285,37 @@
             }
         });
     </script>
+<!-- admin-global-footer -->
+<footer class="admin-global-footer" role="contentinfo">
+    <div class="container">
+        <p>© 2026 Vida 360º. Todos os direitos reservados.</p>
+        <div class="footer-grid">
+            <div>
+                <h3>Navegação</h3>
+                <a href="index.html">Início</a><br>
+                <a href="artigos.html">Artigos</a><br>
+                <a href="sobre.html">Sobre</a><br>
+                <a href="contato.html">Contato</a>
+            </div>
+            <div>
+                <h3>Recursos</h3>
+                <a href="oportunidades.html">Oportunidades</a><br>
+                <a href="feed.xml">RSS Feed</a><br>
+                <a href="sitemap.xml">Sitemap</a><br>
+                <a href="contato.html">Fale com o Vida 360º</a>
+            </div>
+            <div>
+                <h3>Transparência</h3>
+                <a href="politica.html">Política de Privacidade</a><br>
+                <a href="artigos.html">Todos os artigos</a><br>
+                <a href="sobre.html">Quem somos</a><br>
+                <a href="admin-login.html">Painel Admin</a>
+            </div>
+        </div>
+        <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.9;">
+            Este conteúdo é educativo e não substitui orientação de profissionais de saúde. Aromaterapia deve ser usada com responsabilidade. Alguns artigos podem conter links de indicação, sem custo adicional para você.
+        </p>
+    </div>
+</footer>
 </body>
 </html>
