@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <meta property="og:title" content="Ebooks - Vida 360º">
     <meta property="og:description" content="Baixe nossos ebooks e guias exclusivos sobre saúde, bem-estar e produtividade.">
-    <meta property="og:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png">
+    <meta property="og:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png?v=20260502-lilas">
     <meta property="og:url" content="https://www.blogvida360.com.br/ebooks.html">
     <meta property="og:type" content="website">
     <link rel="stylesheet" href="assets/css/style.css">
@@ -170,12 +170,12 @@
                     var html = r.data.map(function(e) {
                         var titulo = (e.titulo || 'Ebook').trim();
                         var desc = (e.descricao_curta || '').trim();
-                        var img = e.imagem_capa_url || 'assets/images/og-banner.png';
+                        var img = e.imagem_capa_url || 'assets/images/og-banner.png?v=20260502-lilas';
                         var tipo = e.tipo_envio || 'whatsapp';
                         var arquivo = e.arquivo_url || '';
                         var msg = encodeURIComponent('Olá! Gostaria de receber o ebook: ' + titulo);
                         var urlWhatsapp = 'https://wa.me/' + WA_NUMBER + '?text=' + msg;
-                        var imgTag = '<img src="' + img + '" alt="' + titulo.replace(/"/g, '&quot;') + '" onerror="this.src=\'assets/images/og-banner.png\'">';
+                        var imgTag = '<img src="' + img + '" alt="' + titulo.replace(/"/g, '&quot;') + '" onerror="this.src=\'assets/images/og-banner.png?v=20260502-lilas\'">';
                         var btnWhatsapp = '';
                         var btnDownload = '';
                         if (tipo === 'whatsapp' || tipo === 'ambos') {
