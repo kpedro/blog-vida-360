@@ -798,7 +798,7 @@
             var wrap = document.createElement('div');
             wrap.className = 'blog360-chat-quick-actions';
             wrap.innerHTML = [
-                '<p class="blog360-chat-quick-title">Escolha uma opção ou digite abaixo:</p>',
+                '<p class="blog360-chat-quick-title">Escolha uma opção ou digite sua mensagem no campo de texto.</p>',
                 '<div class="blog360-chat-quick-grid">',
                 '  <button type="button" class="primary" data-link="' + linkCompra + '">Cliente preferencial</button>',
                 '  <button type="button" data-link="' + linkCadastro + '">Cadastro consultor</button>',
@@ -848,7 +848,7 @@
             "  mode: 'window',",
             "  showWelcomeScreen: false,",
             "  initialMessages: [",
-            "    'Ola! Sou o assistente Vida 360º. Escolha uma opcao rapida abaixo ou digite sua duvida.'",
+            "    'Olá! Sou o assistente Vida 360º. Use os botões acima para atalhos rápidos ou digite sua dúvida no campo de texto.'",
             "  ],",
             "  i18n: {",
             "    en: {",
