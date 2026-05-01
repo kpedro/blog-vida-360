@@ -1,16 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre - Vida 360º</title>
+    <title>Sobre o Vida 360º | Bem-estar, rotina e aromaterapia segura</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="Sobre - Vida 360º">
-    <meta property="og:description" content="Conheça o Vida 360º: conteúdo confiável sobre sono, ansiedade leve, aromaterapia e produtividade com equilíbrio.">
+    <meta property="og:title" content="Sobre o Vida 360º">
+    <meta property="og:description" content="Conheça o propósito do Vida 360º: conteúdos práticos para sono, ansiedade leve, foco e aromaterapia segura no dia a dia.">
     <meta property="og:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png">
     <meta property="og:url" content="https://www.blogvida360.com.br/sobre.html">
     <meta property="og:type" content="website">
@@ -23,8 +23,8 @@
         /* Usa a mesma paleta da página inicial (variáveis em style.css) */
         .about-section {
             background-color: var(--blue-light);
-            padding: 20px;
-            border-radius: 10px;
+            padding: clamp(18px, 2vw, 28px);
+            border-radius: 14px;
         }
 
         .about-section h1 {
@@ -39,9 +39,121 @@
         }
 
         .about-section p {
-            text-align: justify;
+            text-align: left;
             line-height: 1.6;
             margin-bottom: 15px;
+        }
+        .about-lead {
+            max-width: 760px;
+            margin: 0.65rem auto 1.3rem;
+            text-align: center;
+            color: #5a3a75;
+        }
+        .about-pillars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.9rem;
+            margin: 1rem 0 1.2rem;
+        }
+        .about-pillar {
+            background: #fff;
+            border: 1px solid #e5d8f0;
+            border-radius: 12px;
+            padding: 0.85rem;
+        }
+        .about-pillar h3 {
+            color: var(--blue-primary);
+            margin-bottom: 0.45rem;
+            font-size: 1rem;
+        }
+        .about-note {
+            background: #fff;
+            border-left: 4px solid var(--blue-primary);
+            border-radius: 8px;
+            padding: 0.75rem 0.9rem;
+            margin-top: 0.7rem;
+            font-size: 0.95rem;
+        }
+        .about-author {
+            display: grid;
+            grid-template-columns: minmax(180px, 240px) 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin: 1rem 0 1.5rem;
+            background: #fff;
+            border: 1px solid #e5d8f0;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .about-author__photo {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #dbc6eb;
+            box-shadow: var(--shadow-sm);
+            background: #f4ecf7;
+        }
+        .about-author__content h3 {
+            margin: 0 0 0.35rem;
+            color: var(--blue-primary);
+            font-size: 1.15rem;
+        }
+        .about-author__content p {
+            margin: 0.35rem 0;
+            text-align: left;
+        }
+        .about-cta {
+            margin-top: 1.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+        }
+        .about-cta a {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 148px;
+            padding: 0.65rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            line-height: 1;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+        .about-cta .about-btn-primary {
+            background: linear-gradient(135deg, #7f3f98 0%, #9b59b6 100%);
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(127, 63, 152, 0.2);
+        }
+        .about-cta .about-btn-secondary {
+            background: #f7effc;
+            color: #6d2d86;
+            border: 1px solid #dbc6eb;
+        }
+        .about-cta a:hover {
+            transform: translateY(-1px);
+        }
+        .about-cta .about-btn-primary:hover {
+            box-shadow: 0 10px 20px rgba(127, 63, 152, 0.26);
+        }
+        .about-cta .about-btn-secondary:hover {
+            background: #efe3f8;
+        }
+        @media (max-width: 768px) {
+            .about-author {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .about-author__content p {
+                text-align: left;
+            }
+            .about-cta {
+                justify-content: center;
+            }
+            .about-cta a {
+                width: 100%;
+            }
         }
 
         .about-section ul {
@@ -83,42 +195,54 @@
     <!-- Conteúdo Principal -->
     <main class="container">
         <section class="about-section">
-            <h1>Sobre Nós</h1>
-            <p>
-                Bem-vindo ao <strong>Vida 360º</strong>! Nosso blog é dedicado a trazer conteúdos que inspirem e capacitem nossos leitores a alcançar seus objetivos, sejam eles pessoais ou profissionais.
+            <h1>Sobre o Vida 360º</h1>
+            <p class="about-lead">
+                O Vida 360º nasceu para apoiar pessoas com rotina corrida que querem mais equilíbrio, clareza e constância no dia a dia.
             </p>
 
-            <h2>🌟 Nossa Missão</h2>
+            <h2>🌿 Nosso propósito</h2>
             <p>
-                Nossa missão é ajudar pessoas a descobrirem ferramentas, estratégias e inspirações para uma vida mais equilibrada, produtiva e significativa. Valorizamos o poder do conhecimento e acreditamos que ele é o primeiro passo para transformar vidas.
+                Entregar conteúdo útil, direto e aplicável sobre sono, ansiedade leve, foco e aromaterapia segura, sem promessas exageradas e sem alegações médicas.
             </p>
 
-            <h2>💡 Nosso Propósito</h2>
-            <p>
-                Queremos ser uma fonte confiável de aprendizado e motivação nas áreas de:
-            </p>
+            <div class="about-pillars">
+                <article class="about-pillar">
+                    <h3>💤 Sono e recuperação</h3>
+                    <p>Estratégias simples para melhorar a rotina noturna e descansar melhor.</p>
+                </article>
+                <article class="about-pillar">
+                    <h3>🧠 Foco com equilíbrio</h3>
+                    <p>Hábitos para produtividade sustentável, sem abrir mão da saúde emocional.</p>
+                </article>
+                <article class="about-pillar">
+                    <h3>🪻 Aromaterapia prática</h3>
+                    <p>Orientações responsáveis para uso de óleos essenciais na rotina pessoal e familiar.</p>
+                </article>
+            </div>
+
+            <h2>🤝 Nossa forma de comunicar</h2>
             <ul>
-                <li>Empreendedorismo</li>
-                <li>Saúde e Bem-estar</li>
-                <li>Marketing de Relacionamento</li>
-                <li>Mentalidade e Produtividade</li>
+                <li>Linguagem humana e acessível, sem complicação.</li>
+                <li>Conteúdo educativo, responsável e baseado em prática real.</li>
+                <li>Respeito ao seu contexto: família, trabalho, fé e objetivos.</li>
             </ul>
-            <p>
-                Nosso propósito é compartilhar ideias e ferramentas práticas que possam ser aplicadas no dia a dia, ajudando nossos leitores a criarem a vida que desejam.
-            </p>
-
-            <h2>🌍 Nossa Comunidade</h2>
-            <p>
-                Acreditamos que juntos podemos ir mais longe. Por isso, convidamos você a fazer parte da nossa comunidade, compartilhando suas ideias, experiências e feedback. Aqui, sua voz é importante!
+            <p class="about-note">
+                Quando falamos de oportunidade e empreendedorismo com a doTERRA, nosso foco é propósito, educação e construção de longo prazo.
             </p>
 
             <h2>👤 Quem está por trás do Vida 360º</h2>
-            <p>
-                O <strong>Vida 360º</strong> foi criado por <strong>Kadson Pedro</strong>, pedagogo, pai e esposo, que se esforça diariamente para ser um bom cristão e é estudioso do espiritismo. Na política, identifica-se com ideais socialistas e progressistas. Empreendedor no mercado de marketing de relacionamento, entusiasta de tecnologias e concurseiro, Kadson acredita no potencial de cada ser humano e é grato pelas coisas criadas por Deus.
-            </p>
-            <p>
-                Essa mistura de formação, fé, estudo e empreendedorismo é o que move o blog: compartilhar conteúdo que una saúde, bem-estar, produtividade e reflexão, sempre com respeito à diversidade e à capacidade de evolução de cada um.
-            </p>
+            <div class="about-author">
+                <img id="about-author-photo" class="about-author__photo" src="assets/images/og-banner.png" alt="Foto do criador do Vida 360º">
+                <div class="about-author__content">
+                    <h3>Kadson Pedro — criador do Vida 360º</h3>
+                    <p>Pedagogo, criador de conteúdo e empreendedor, reúno educação, rotina e bem-estar para ajudar pessoas a viverem com mais clareza e constância.</p>
+                    <p>No blog, compartilho aprendizados práticos sobre saúde integral, produtividade equilibrada e aromaterapia segura para o dia a dia.</p>
+                    <div class="about-cta">
+                        <a href="artigos.html" class="about-btn-primary">Ler artigos</a>
+                        <a href="contato.html" class="about-btn-secondary">Falar comigo</a>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -155,6 +279,59 @@
         </p>
     </div>
 </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
     <script src="assets/js/opportunity-strip.js"></script>
+    <script>
+        (function() {
+            var FALLBACK = 'assets/images/og-banner.png';
+            var STORAGE_KEY = 'blog360_about_photo_url';
+
+            function isHttpUrl(v) {
+                return /^https?:\/\//i.test(v || '');
+            }
+
+            function resolvePhotoUrl(raw) {
+                var value = (raw || '').trim();
+                if (!value) return FALLBACK;
+                if (isHttpUrl(value) || value.startsWith('assets/') || value.startsWith('data:image/')) return value;
+                return FALLBACK;
+            }
+
+            function applyPhoto(url) {
+                var img = document.getElementById('about-author-photo');
+                if (!img) return;
+                img.src = resolvePhotoUrl(url);
+                img.onerror = function() {
+                    img.src = FALLBACK;
+                };
+            }
+
+            async function loadPhoto() {
+                var localValue = localStorage.getItem(STORAGE_KEY);
+                if (localValue) applyPhoto(localValue);
+
+                if (typeof window.initSupabase !== 'function') return;
+                var client = window.initSupabase();
+                if (!client || typeof client.getSiteSettings !== 'function') return;
+
+                try {
+                    var res = await client.getSiteSettings();
+                    if (res && res.success && res.data && res.data.sobre_foto_url) {
+                        localStorage.setItem(STORAGE_KEY, res.data.sobre_foto_url);
+                        applyPhoto(res.data.sobre_foto_url);
+                    }
+                } catch (error) {
+                    console.warn('Foto da página Sobre em fallback local:', error);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadPhoto);
+            } else {
+                loadPhoto();
+            }
+        })();
+    </script>
 </body>
 </html>

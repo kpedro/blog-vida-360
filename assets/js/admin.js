@@ -1,6 +1,10 @@
 // Admin Dashboard JavaScript (usa window.supabaseClient após DOMContentLoaded)
 // Updated: 2026-02-17 - Removida declaração duplicada de supabaseClient
 // Usar apenas window.supabaseClient para evitar conflito com supabase.js
+const ABOUT_PHOTO_STORAGE_KEY = 'blog360_about_photo_url';
+const ABOUT_PHOTO_FALLBACK = 'assets/images/og-banner.png';
+const ABOUT_PHOTO_BUCKET_CANDIDATES = ['blog-media', 'blog360-media', 'public'];
+let aboutPhotoPendingFile = null;
 
 // Verificar autenticação ao carregar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -186,6 +190,7 @@ async function loadTabData(tabId) {
 async function loadDashboardData() {
     await loadStats();
     await loadRecentLeads();
+    await loadAboutPhotoSettings();
 }
 
 // Carregar estatísticas
@@ -810,6 +815,183 @@ function formatDate(dateString) {
     });
 }
 
+function getAboutPhotoUrl(value) {
+    const raw = (value || '').trim();
+    if (!raw) return ABOUT_PHOTO_FALLBACK;
+    if (/^https?:\/\//i.test(raw) || raw.startsWith('assets/')) return raw;
+    return ABOUT_PHOTO_FALLBACK;
+}
+
+function renderAboutPhotoPreview(value) {
+    const preview = document.getElementById('about-photo-preview');
+    if (!preview) return;
+    preview.src = getAboutPhotoUrl(value);
+    preview.onerror = () => {
+        preview.src = ABOUT_PHOTO_FALLBACK;
+    };
+}
+
+function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function resizeImageDataUrl(dataUrl, maxSize = 1000, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ratio = Math.min(1, maxSize / Math.max(img.width, img.height));
+            canvas.width = Math.round(img.width * ratio);
+            canvas.height = Math.round(img.height * ratio);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+    });
+}
+
+async function uploadAboutPhotoToStorage(file) {
+    const client = window.supabaseClient;
+    const rawClient = client && (client.client || client);
+    if (!rawClient || !rawClient.storage) {
+        throw new Error('Supabase Storage indisponível');
+    }
+    const ext = (file.name && file.name.includes('.')) ? file.name.split('.').pop().toLowerCase() : 'jpg';
+    const safeExt = ['jpg', 'jpeg', 'png', 'webp'].includes(ext) ? ext : 'jpg';
+    const path = `about/author-photo-${Date.now()}.${safeExt}`;
+
+    let lastError = null;
+    for (const bucket of ABOUT_PHOTO_BUCKET_CANDIDATES) {
+        try {
+            const { error: uploadError } = await rawClient.storage
+                .from(bucket)
+                .upload(path, file, { upsert: true, contentType: file.type || 'image/jpeg', cacheControl: '3600' });
+            if (uploadError) {
+                lastError = uploadError;
+                continue;
+            }
+            const { data: publicData } = rawClient.storage.from(bucket).getPublicUrl(path);
+            if (publicData && publicData.publicUrl) {
+                return publicData.publicUrl;
+            }
+        } catch (error) {
+            lastError = error;
+        }
+    }
+    throw new Error((lastError && lastError.message) || 'Falha ao enviar imagem para o Storage');
+}
+
+async function loadAboutPhotoSettings() {
+    const input = document.getElementById('about-photo-url');
+    const fileInput = document.getElementById('about-photo-file');
+    if (!input) return;
+
+    input.value = localStorage.getItem(ABOUT_PHOTO_STORAGE_KEY) || '';
+    renderAboutPhotoPreview(input.value);
+    input.oninput = function() {
+        renderAboutPhotoPreview(input.value);
+    };
+
+    if (fileInput) {
+        fileInput.onchange = async function() {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+            try {
+                aboutPhotoPendingFile = file;
+                const previewUrl = URL.createObjectURL(file);
+                renderAboutPhotoPreview(previewUrl);
+                alert('Imagem selecionada. Clique em "Salvar foto da Sobre" para enviar pelo painel admin.');
+            } catch (error) {
+                console.error('Erro ao processar imagem:', error);
+                alert('Não foi possível processar a imagem. Tente outro arquivo.');
+            } finally {
+                fileInput.value = '';
+            }
+        };
+    }
+
+    try {
+        const client = window.supabaseClient;
+        if (!client || typeof client.getSiteSettings !== 'function') return;
+        const res = await client.getSiteSettings();
+        if (res && res.success && res.data && typeof res.data.sobre_foto_url === 'string') {
+            input.value = res.data.sobre_foto_url || '';
+            localStorage.setItem(ABOUT_PHOTO_STORAGE_KEY, input.value);
+            renderAboutPhotoPreview(input.value);
+        }
+    } catch (error) {
+        console.warn('Falha ao carregar foto da Sobre no Supabase. Usando fallback local.', error);
+    }
+}
+
+async function saveAboutPhotoSettings() {
+    const input = document.getElementById('about-photo-url');
+    if (!input) return;
+
+    const client = window.supabaseClient;
+    let value = (input.value || '').trim();
+
+    try {
+        // Funciona também sem Supabase (modo local)
+        if (!client || typeof client.saveSiteSettings !== 'function') {
+            if (aboutPhotoPendingFile) {
+                const rawDataUrl = await fileToDataUrl(aboutPhotoPendingFile);
+                value = await resizeImageDataUrl(rawDataUrl);
+                aboutPhotoPendingFile = null;
+                input.value = value;
+            }
+            localStorage.setItem(ABOUT_PHOTO_STORAGE_KEY, value || '');
+            renderAboutPhotoPreview(value);
+            alert('Foto salva localmente neste navegador.');
+            return;
+        }
+
+        if (aboutPhotoPendingFile) {
+            try {
+                value = await uploadAboutPhotoToStorage(aboutPhotoPendingFile);
+            } catch (uploadError) {
+                console.warn('Upload no Storage falhou. Usando fallback otimizado em site_settings.', uploadError);
+                const rawDataUrl = await fileToDataUrl(aboutPhotoPendingFile);
+                value = await resizeImageDataUrl(rawDataUrl);
+            }
+            aboutPhotoPendingFile = null;
+            input.value = value;
+        }
+        const result = await client.saveSiteSettings({ sobre_foto_url: value || null, updated_at: new Date().toISOString() });
+        if (!result || !result.success) {
+            throw new Error((result && result.error) || 'Não foi possível salvar no Supabase');
+        }
+        localStorage.setItem(ABOUT_PHOTO_STORAGE_KEY, value);
+        renderAboutPhotoPreview(value);
+        alert('Foto da página Sobre salva com sucesso.');
+    } catch (error) {
+        console.warn('Falha ao salvar foto da Sobre:', error);
+        // Último fallback: salva local mesmo com erro remoto
+        try {
+            if (aboutPhotoPendingFile) {
+                const rawDataUrl = await fileToDataUrl(aboutPhotoPendingFile);
+                value = await resizeImageDataUrl(rawDataUrl);
+                aboutPhotoPendingFile = null;
+                input.value = value;
+            }
+            localStorage.setItem(ABOUT_PHOTO_STORAGE_KEY, value || '');
+            renderAboutPhotoPreview(value);
+        } catch (localError) {
+            console.warn('Fallback local também falhou:', localError);
+        }
+        const message = (error && error.message) ? error.message : 'erro desconhecido';
+        alert('Não foi possível salvar a foto no painel.\n\nDetalhe: ' + message + '\n\nVerifique bucket público (blog-media/blog360-media/public), policy de upload para admin autenticado e coluna "sobre_foto_url" em blog360_site_settings.');
+    }
+}
+
 // Expor funções globais
 window.logout = logout;
 window.exportLeads = exportLeads;
+window.saveAboutPhotoSettings = saveAboutPhotoSettings;
