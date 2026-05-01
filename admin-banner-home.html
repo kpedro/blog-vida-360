@@ -1,104 +1,49 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banner e faixa do site - Vida 360º</title>
+    <title>Banner da home - Vida 360º</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    <link rel="stylesheet" href="assets/css/admin-theme.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--admin-page-bg); color: var(--admin-text-strong); min-height: 100vh; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F5F7FA; color: #6d2d86; min-height: 100vh; }
         .editor-header {
-            background: var(--admin-header-gradient);
+            background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%);
             color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
             flex-wrap: wrap; gap: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .editor-header a { color: #ECF0F1; text-decoration: none; font-weight: 600; }
         .editor-header a:hover { color: white; }
-        .editor-container { max-width: 760px; margin: 0 auto; padding: 2rem; }
-        .card { background: white; border-radius: 8px; box-shadow: 0 2px 12px rgba(91, 33, 182, 0.07); padding: 1.5rem; border: 1px solid rgba(196, 181, 253, 0.35); }
+        .editor-container { max-width: 720px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 1.5rem; }
         .form-ground { margin-bottom: 1.25rem; }
         .form-ground label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        .form-ground input[type="text"], .form-ground input[type="url"], .form-ground textarea { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; font-family: inherit; transition: border-color 0.2s, box-shadow 0.2s; }
-        .form-ground input[type="text"]:focus, .form-ground input[type="url"]:focus, .form-ground textarea:focus {
-            outline: none;
-            border-color: var(--admin-accent);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
-        }
-        .form-ground textarea { min-height: 72px; resize: vertical; }
-        .card + .card { margin-top: 1.75rem; }
+        .form-ground input[type="text"], .form-ground input[type="url"] { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; }
         .form-ground .hint { font-size: 12px; color: #7F8C8D; margin-top: 4px; }
         .check-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
-        .check-row input { width: 18px; height: 18px; accent-color: var(--admin-accent); }
-        .btn-primary { background: var(--admin-btn-cta); color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px; box-shadow: 0 2px 10px rgba(91, 33, 182, 0.25); }
-        .btn-primary:hover { background: var(--admin-btn-cta-hover); }
+        .check-row input { width: 18px; height: 18px; }
+        .btn-primary { background: #7f3f98; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px; }
+        .btn-primary:hover { background: #6d2d86; }
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
         #msg { margin-top: 1rem; padding: 12px; border-radius: 6px; font-size: 14px; display: none; }
         #msg.ok { display: block; background: #D5F4E6; color: #1E8449; }
-        #msg.err { display: block; background: #FADBD8; color: #C0392B; }
-        .preview { margin-top: 1.5rem; padding: 1rem; background: var(--admin-surface-tint); border-radius: 8px; border: 1px dashed rgba(124, 58, 237, 0.35); }
+        #msg.err { display: block; background: #FADBD8; color: #6d2d86; }
+        .preview { margin-top: 1.5rem; padding: 1rem; background: #F8F9FA; border-radius: 8px; border: 1px dashed #BDC3C7; }
         .preview img { max-width: 100%; width: auto; height: auto; max-height: 200px; object-fit: contain; border-radius: 6px; margin-top: 8px; display: block; margin-left: auto; margin-right: auto; }
-        .btn-outline {
-            background: white; color: var(--admin-text-strong); border: 2px solid #c4b5fd;
-            padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;
-        }
-        .btn-outline:hover { border-color: var(--admin-accent); background: var(--admin-surface-tint); }
-        .faixa-hist-row { margin-bottom: 0; }
-        .modal-faixa-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000;
-            align-items: center; justify-content: center; padding: 16px;
-        }
-        .modal-faixa-overlay.open { display: flex; }
-        .modal-faixa-box {
-            background: white; border-radius: 10px; max-width: 520px; width: 100%; max-height: 85vh;
-            display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-        }
-        .modal-faixa-head {
-            padding: 14px 18px; border-bottom: 1px solid #ECEFF1; display: flex; justify-content: space-between; align-items: center;
-        }
-        .modal-faixa-head h3 { font-size: 1rem; color: var(--admin-text-strong); }
-        .modal-faixa-body { padding: 12px 18px; overflow-y: auto; flex: 1; }
-        .modal-faixa-item {
-            border: 1px solid #E0E0E0; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px;
-            font-size: 13px; color: var(--admin-text);
-        }
-        .modal-faixa-item .prev { color: #5D6D7E; font-size: 12px; margin-bottom: 8px; max-height: 72px; overflow: hidden; line-height: 1.4; }
-        .modal-faixa-item .meta { font-size: 11px; color: #95A5A6; margin-bottom: 8px; }
-        .modal-faixa-item .use-btn { background: var(--admin-btn-cta); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
-        .modal-faixa-item .use-btn:hover { background: var(--admin-btn-cta-hover); }
-        .modal-faixa-empty { color: #7F8C8D; font-size: 14px; text-align: center; padding: 24px 12px; }
-        .legenda-row-head {
-            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
-            gap: 8px; margin-bottom: 6px;
-        }
-        .legenda-row-head label { margin-bottom: 0; }
-        .btn-ia-legenda {
-            font-size: 13px; padding: 6px 12px; white-space: nowrap;
-            background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
-            color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;
-        }
-        .btn-ia-legenda:hover:not(:disabled) { filter: brightness(1.08); }
-        .btn-ia-legenda:disabled { opacity: 0.55; cursor: not-allowed; }
-        #prodLegenda {
-            min-height: 100px;
-            max-height: 280px;
-            resize: vertical;
-            line-height: 1.45;
-        }
     </style>
 </head>
 <body>
     <header class="editor-header">
-        <h1>Banner e faixa do site</h1>
+        <h1>Banner de produto (home)</h1>
         <div style="display:flex;gap:16px;align-items:center;">
             <a href="admin-dashboard.html">← Dashboard</a>
             <a href="index.html">Ver blog</a>
         </div>
     </header>
     <div class="editor-container">
-        <p style="margin-bottom:1rem;color:#5D6D7E;font-size:14px;">Banner lateral na home e <strong>faixa no topo</strong> (todas as páginas onde o script está incluído: início, lista de artigos, post). Rode <code>supabase/BLOG360_SITE_SETTINGS.sql</code> e, se a tabela já existia antes, <code>supabase/BLOG360_SITE_SETTINGS_FAIXA_OPORTUNIDADE.sql</code> (ou rode o SQL completo de novo — os <code>ADD COLUMN IF NOT EXISTS</code> são seguros).</p>
+        <p style="margin-bottom:1rem;color:#5D6D7E;font-size:14px;">Um único destaque na página inicial. Só aparece para visitantes se estiver <strong>ativo</strong> e com imagem e link <strong>https</strong> válidos. Execute o SQL <code>supabase/BLOG360_SITE_SETTINGS.sql</code> no projeto se ainda não criou a tabela.</p>
         <div class="card">
             <div class="check-row">
                 <input type="checkbox" id="prodAtivo">
@@ -106,7 +51,7 @@
             </div>
             <div class="form-ground">
                 <label for="prodTitulo">Título acima do banner</label>
-                <input type="text" id="prodTitulo" placeholder="Ex.: Kit bem-estar que usamos">
+                <input type="text" id="prodTitulo" placeholder="Ex.: Kit de aromaterapia prática que usamos">
             </div>
             <div class="form-ground">
                 <label for="prodImagem">URL da imagem (https)</label>
@@ -119,58 +64,14 @@
                 <p class="hint">Cole o mesmo URL que abre na barra do navegador. Ao salvar, removemos um segmento final duplicado (ex.: <code>…/60338539204/60338539204</code>) se for cópia errada.</p>
             </div>
             <div class="form-ground">
-                <div class="legenda-row-head">
-                    <label for="prodLegenda">Legenda / transparência (opcional)</label>
-                    <button type="button" class="btn-ia-legenda" id="btnRewriteLegenda" title="Melhora clareza e tom (Gemini)">✨ Reescrever com IA</button>
-                </div>
-                <textarea id="prodLegenda" maxlength="500" rows="5" placeholder="Ex.: Indicação — você apoia o blog sem custo extra."></textarea>
-                <p class="hint">Use a IA com um rascunho ou texto colado da embalagem; revise sempre antes de salvar. Requer deploy da função <code style="font-size:11px;">blog-rewrite-banner-legenda</code> e variável <code style="font-size:11px;">GEMINI_API</code> no Supabase.</p>
+                <label for="prodLegenda">Legenda / transparência (opcional)</label>
+                <input type="text" id="prodLegenda" placeholder="Ex.: Indicação — você apoia o blog sem custo extra.">
             </div>
+            <button type="button" class="btn-primary" id="btnSalvar">Salvar</button>
+            <div id="msg"></div>
             <div class="preview" id="previewBox" style="display:none;">
                 <strong>Prévia</strong>
                 <div id="previewInner"></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 style="font-size:1.1rem;margin-bottom:1rem;color:#312e81;">Faixa de oportunidade (topo do site)</h2>
-            <p style="margin-bottom:1rem;color:#5D6D7E;font-size:13px;line-height:1.45;">Estilo “announcement bar” usado em blogs e lojas: uma linha chamativa abaixo do menu, com texto curto e botão opcional (ex.: prospectar distribuidores, parceria Amway ou outra empresa). Evitamos flash rápido; há apenas um brilho suave na borda para chamar atenção sem prejudicar acessibilidade.</p>
-            <p class="faixa-hist-row" style="margin-bottom:12px;">
-                <button type="button" class="btn-outline" id="btnFaixaHistorico">📚 Escolher do histórico de marketing</button>
-                <span style="margin-left:10px;font-size:12px;color:#7F8C8D;">Textos guardados na <a href="admin-marketing-studio.html" style="color:var(--admin-accent);">Central de marketing</a> (SQL <code style="font-size:11px;">BLOG360_MARKETING_HISTORY.sql</code>).</span>
-            </p>
-            <div class="check-row">
-                <input type="checkbox" id="faixaAtivo">
-                <label for="faixaAtivo" style="margin:0;font-weight:600;">Exibir faixa no topo</label>
-            </div>
-            <div class="form-ground">
-                <label for="faixaTexto">Mensagem (obrigatória se ativo)</label>
-                <textarea id="faixaTexto" maxlength="400" placeholder="Ex.: Quer construir renda extra com produtos de bem-estar? Fale com a nossa equipe."></textarea>
-                <p class="hint">Uma ou duas frases. Em telas pequenas o texto quebra em várias linhas.</p>
-            </div>
-            <div class="form-ground">
-                <label for="faixaLink">Link do botão (https, opcional)</label>
-                <input type="text" id="faixaLink" placeholder="https://… ou só o número com DDD (ex.: 92 99431-4016)" autocomplete="off">
-                <p class="hint">Se vazio, só a mensagem aparece (sem botão). Se colar <strong>só o número</strong> (com DDD, Brasil), ao sair do campo geramos o link do WhatsApp com uma mensagem pronta para o visitante. Links <code>wa.me</code> sem texto ganham a mesma mensagem automática.</p>
-            </div>
-            <div class="form-ground">
-                <label for="faixaCta">Texto do botão</label>
-                <input type="text" id="faixaCta" placeholder="Saiba mais" maxlength="80">
-            </div>
-        </div>
-
-        <p style="margin-top:1.25rem;"><button type="button" class="btn-primary" id="btnSalvar">Salvar tudo</button></p>
-        <div id="msg"></div>
-    </div>
-
-    <div id="modalFaixaHist" class="modal-faixa-overlay" role="dialog" aria-modal="true" aria-labelledby="modalFaixaHistTitle">
-        <div class="modal-faixa-box">
-            <div class="modal-faixa-head">
-                <h3 id="modalFaixaHistTitle">Histórico — preencher faixa</h3>
-                <button type="button" class="btn-outline" id="modalFaixaHistClose" aria-label="Fechar" style="padding:4px 10px;">✕</button>
-            </div>
-            <div class="modal-faixa-body" id="modalFaixaHistBody">
-                <p class="modal-faixa-empty">Carregando…</p>
             </div>
         </div>
     </div>
@@ -212,42 +113,6 @@
             return client;
         }
 
-        /** Mensagem pré-preenchida ao abrir o WhatsApp a partir da faixa do blog */
-        var WA_FAIXA_DEFAULT_TEXT = 'Olá! Vi a faixa no blog Vida 360º e gostaria de mais informações.';
-
-        function ensureWhatsAppPreFilledMessage(url) {
-            var u = (url || '').trim();
-            if (!/^https?:\/\//i.test(u)) return u;
-            try {
-                var parsed = new URL(u);
-                var host = (parsed.hostname || '').toLowerCase();
-                if (host !== 'wa.me' && host !== 'api.whatsapp.com') return u;
-                if (parsed.searchParams.has('text')) return u;
-                parsed.searchParams.set('text', WA_FAIXA_DEFAULT_TEXT);
-                return parsed.toString();
-            } catch (e) {
-                return u;
-            }
-        }
-
-        /** Só dígitos; monta https://wa.me/55...?text=... para números brasileiros ou já com 55. */
-        function buildWaMeFromPhoneInput(raw) {
-            var d = String(raw || '').replace(/\D/g, '');
-            if (d.length < 10 || d.length > 15) return null;
-            if (!/^55/.test(d) && d.length <= 11) d = '55' + d;
-            if (d.length < 12) return null;
-            return 'https://wa.me/' + d + '?text=' + encodeURIComponent(WA_FAIXA_DEFAULT_TEXT);
-        }
-
-        /** Número solto → wa.me; URL http(s) → acrescenta ?text= em wa.me se faltar. */
-        function normalizeFaixaLinkField(raw) {
-            var v = String(raw || '').trim();
-            if (!v) return '';
-            if (/^https?:\/\//i.test(v)) return ensureWhatsAppPreFilledMessage(v);
-            var phoneUrl = buildWaMeFromPhoneInput(v);
-            return phoneUrl || v;
-        }
-
         function updatePreview() {
             var img = document.getElementById('prodImagem').value.trim();
             var tit = document.getElementById('prodTitulo').value.trim() || 'Título';
@@ -257,103 +122,8 @@
                 box.style.display = 'none';
                 return;
             }
-            inner.innerHTML = '<div style="font-weight:700;color:#312e81;">' + tit.replace(/</g, '&lt;') + '</div><img src="' + img.replace(/"/g, '') + '" alt="">';
+            inner.innerHTML = '<div style="font-weight:700;color:#6d2d86;">' + tit.replace(/</g, '&lt;') + '</div><img src="' + img.replace(/"/g, '') + '" alt="">';
             box.style.display = 'block';
-        }
-
-        function parseFaixaMarketingContent(raw) {
-            var t = (raw || '').trim();
-            var mensagem = t;
-            var cta = '';
-            var link = '';
-            if (!t) return { mensagem: '', cta: '', link: '' };
-
-            var mFaixa = t.match(/TEXTO[_\s]*DA[_\s]*FAIXA\s*:\s*([\s\S]*?)(?=\n\s*TEXTO[_\s]*DO[_\s]*BOT|\n\s*LINK|\n\s*URL|$)/i);
-            var mCta = t.match(/TEXTO[_\s]*DO[_\s]*BOT[AÃ]O\s*:\s*([^\n\r]+)/i);
-            var mLinkLabel = t.match(/(?:LINK(?:_DO_BOT[AÃ]O)?|LINK_DO_BOT[AÃ]O|URL)\s*:\s*(\S+)/i);
-
-            if (mFaixa) mensagem = mFaixa[1].trim().replace(/\s+/g, ' ');
-            if (mCta) cta = mCta[1].trim();
-            if (mLinkLabel) link = mLinkLabel[1].trim();
-
-            if (!link && !mLinkLabel && !mFaixa) {
-                var lines = t.split(/\r?\n/).map(function(l) { return l.trim(); }).filter(Boolean);
-                if (lines.length >= 2) {
-                    var last = lines[lines.length - 1];
-                    if (/^https?:\/\//i.test(last) && last.length < 2048) {
-                        link = last;
-                        mensagem = lines.slice(0, -1).join(' ').trim();
-                    }
-                } else if (lines.length === 1 && /^https?:\/\//i.test(lines[0])) {
-                    link = lines[0];
-                    mensagem = '';
-                }
-            }
-
-            if (mensagem.length > 400) mensagem = mensagem.slice(0, 400);
-            if (cta.length > 80) cta = cta.slice(0, 80);
-            return { mensagem: mensagem, cta: cta, link: link };
-        }
-
-        var faixaHistById = {};
-
-        function closeModalFaixaHist() {
-            var el = document.getElementById('modalFaixaHist');
-            if (el) el.classList.remove('open');
-        }
-
-        function openModalFaixaHist() {
-            var el = document.getElementById('modalFaixaHist');
-            if (el) el.classList.add('open');
-        }
-
-        async function loadFaixaHistoricoList() {
-            var body = document.getElementById('modalFaixaHistBody');
-            var client = window.supabaseClient;
-            if (!body || !client) return;
-            body.innerHTML = '<p class="modal-faixa-empty">Carregando…</p>';
-            faixaHistById = {};
-            var res = await client.from('blog360_marketing_history').select('id, title, prompt, content, created_at').order('created_at', { ascending: false }).limit(40);
-            if (res.error) {
-                body.innerHTML = '<p class="modal-faixa-empty">Não foi possível carregar. Execute <code>BLOG360_MARKETING_HISTORY.sql</code> no Supabase e use a Central de marketing para gerar entradas.</p>';
-                return;
-            }
-            var rows = res.data || [];
-            if (rows.length === 0) {
-                body.innerHTML = '<p class="modal-faixa-empty">Nenhuma entrada. Abra a <a href="admin-marketing-studio.html">Central de marketing</a>, gere copy e ela será guardada no histórico.</p>';
-                return;
-            }
-            body.innerHTML = '';
-            rows.forEach(function(row) {
-                faixaHistById[row.id] = row.content || '';
-                var prev = (row.title && String(row.title).trim()) || (row.prompt || '').slice(0, 60) || (row.content || '').slice(0, 80) || '—';
-                if (prev.length > 120) prev = prev.slice(0, 120) + '…';
-                var d = row.created_at ? new Date(row.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '';
-                var div = document.createElement('div');
-                div.className = 'modal-faixa-item';
-                div.innerHTML = '<div class="meta"></div><div class="prev"></div><button type="button" class="use-btn">Preencher campos</button>';
-                div.querySelector('.meta').textContent = d;
-                div.querySelector('.prev').textContent = prev;
-                var useBtn = div.querySelector('.use-btn');
-                useBtn.setAttribute('data-faixa-hist-id', row.id);
-                body.appendChild(div);
-            });
-            body.querySelectorAll('[data-faixa-hist-id]').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    var id = btn.getAttribute('data-faixa-hist-id');
-                    var content = faixaHistById[id] || '';
-                    var p = parseFaixaMarketingContent(content);
-                    document.getElementById('faixaTexto').value = p.mensagem;
-                    var linkNormHist = normalizeFaixaLinkField(p.link);
-                    document.getElementById('faixaLink').value = linkNormHist && /^https?:\/\//i.test(linkNormHist)
-                        ? (normalizeBannerDestinationUrl(linkNormHist) || linkNormHist)
-                        : linkNormHist;
-                    document.getElementById('faixaCta').value = p.cta;
-                    document.getElementById('faixaAtivo').checked = true;
-                    closeModalFaixaHist();
-                    showMsg('Campos da faixa preenchidos. Revise e clique em «Salvar tudo» para publicar no blog.', true);
-                });
-            });
         }
 
         document.addEventListener('DOMContentLoaded', async function() {
@@ -369,10 +139,6 @@
                 document.getElementById('prodImagem').value = d.produto_banner_imagem_url || '';
                 document.getElementById('prodLink').value = d.produto_banner_link || '';
                 document.getElementById('prodLegenda').value = d.produto_banner_legenda || '';
-                document.getElementById('faixaAtivo').checked = !!d.faixa_oportunidade_ativo;
-                document.getElementById('faixaTexto').value = d.faixa_oportunidade_texto || '';
-                document.getElementById('faixaLink').value = d.faixa_oportunidade_link || '';
-                document.getElementById('faixaCta').value = d.faixa_oportunidade_cta || '';
                 updatePreview();
             } else if (r.error && r.error.includes('does not exist')) {
                 showMsg('Tabela blog360_site_settings não encontrada. Rode BLOG360_SITE_SETTINGS.sql no Supabase.', false);
@@ -380,69 +146,6 @@
 
             ['prodImagem', 'prodTitulo'].forEach(function(id) {
                 document.getElementById(id).addEventListener('input', updatePreview);
-            });
-
-            document.getElementById('btnFaixaHistorico').addEventListener('click', async function() {
-                openModalFaixaHist();
-                await loadFaixaHistoricoList();
-            });
-            document.getElementById('modalFaixaHistClose').addEventListener('click', closeModalFaixaHist);
-            document.getElementById('modalFaixaHist').addEventListener('click', function(ev) {
-                if (ev.target.id === 'modalFaixaHist') closeModalFaixaHist();
-            });
-
-            document.getElementById('faixaLink').addEventListener('blur', function() {
-                var el = this;
-                var n = normalizeFaixaLinkField(el.value);
-                if (!n) return;
-                if (/^https?:\/\//i.test(n)) {
-                    var fixed = normalizeBannerDestinationUrl(n) || n;
-                    el.value = fixed;
-                } else {
-                    el.value = n;
-                }
-            });
-
-            function fnHeadersForEdge(session) {
-                var h = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token };
-                var k = window.VITE_SUPABASE_ANON_KEY || '';
-                if (k) h.apikey = k;
-                return h;
-            }
-
-            document.getElementById('btnRewriteLegenda').addEventListener('click', async function() {
-                var inp = document.getElementById('prodLegenda');
-                var raw = (inp && inp.value.trim()) || '';
-                if (raw.length < 8) {
-                    showMsg('Escreva ou cole uma legenda com pelo menos 8 caracteres antes de reescrever.', false);
-                    return;
-                }
-                var btn = this;
-                btn.disabled = true;
-                document.getElementById('msg').style.display = 'none';
-                try {
-                    var sess = await client.auth.getSession();
-                    var tok = sess.data.session;
-                    if (!tok) {
-                        showMsg('Sessão expirada. Entre novamente.', false);
-                        btn.disabled = false;
-                        return;
-                    }
-                    var res = await fetch((window.VITE_SUPABASE_URL || '') + '/functions/v1/blog-rewrite-banner-legenda', {
-                        method: 'POST',
-                        headers: fnHeadersForEdge(tok),
-                        body: JSON.stringify({ text: raw }),
-                    });
-                    var data = await res.json().catch(function() { return {}; });
-                    if (!res.ok) throw new Error(data.error || data.details || 'Erro ao reescrever');
-                    var out = (data.text || '').trim();
-                    if (!out) throw new Error('Resposta vazia da IA');
-                    inp.value = out.slice(0, 500);
-                    showMsg('Legenda reescrita. Revise o texto e clique em Salvar tudo se estiver de acordo.', true);
-                } catch (e) {
-                    showMsg(e.message || 'Erro. Faça deploy da função blog-rewrite-banner-legenda no Supabase (e configure GEMINI_API).', false);
-                }
-                btn.disabled = false;
             });
 
             function normalizeBannerDestinationUrl(url) {
@@ -477,24 +180,12 @@
                 if (linkNorm && linkNorm !== linkRaw) {
                     document.getElementById('prodLink').value = linkNorm;
                 }
-                var faixaLinkRaw = document.getElementById('faixaLink').value.trim() || null;
-                var faixaExpanded = faixaLinkRaw ? normalizeFaixaLinkField(faixaLinkRaw) : null;
-                var faixaLinkNorm = faixaExpanded && /^https?:\/\//i.test(faixaExpanded)
-                    ? (normalizeBannerDestinationUrl(faixaExpanded) || faixaExpanded)
-                    : (faixaExpanded || null);
-                if (faixaLinkNorm && faixaLinkNorm !== faixaLinkRaw) {
-                    document.getElementById('faixaLink').value = faixaLinkNorm;
-                }
                 var payload = {
                     produto_banner_ativo: document.getElementById('prodAtivo').checked,
                     produto_banner_titulo: document.getElementById('prodTitulo').value.trim() || null,
                     produto_banner_imagem_url: document.getElementById('prodImagem').value.trim() || null,
                     produto_banner_link: linkNorm,
-                    produto_banner_legenda: document.getElementById('prodLegenda').value.trim() || null,
-                    faixa_oportunidade_ativo: document.getElementById('faixaAtivo').checked,
-                    faixa_oportunidade_texto: document.getElementById('faixaTexto').value.trim() || null,
-                    faixa_oportunidade_link: faixaLinkNorm,
-                    faixa_oportunidade_cta: document.getElementById('faixaCta').value.trim() || null
+                    produto_banner_legenda: document.getElementById('prodLegenda').value.trim() || null
                 };
                 if (payload.produto_banner_ativo) {
                     if (!payload.produto_banner_imagem_url || !/^https?:\/\//i.test(payload.produto_banner_imagem_url)) {
@@ -508,21 +199,9 @@
                         return;
                     }
                 }
-                if (payload.faixa_oportunidade_ativo) {
-                    if (!payload.faixa_oportunidade_texto) {
-                        showMsg('Com a faixa ativa, preencha a mensagem.', false);
-                        btn.disabled = false;
-                        return;
-                    }
-                    if (payload.faixa_oportunidade_link && !/^https?:\/\//i.test(payload.faixa_oportunidade_link)) {
-                        showMsg('Link da faixa deve começar com http(s) ou fique vazio.', false);
-                        btn.disabled = false;
-                        return;
-                    }
-                }
                 var save = await client.saveSiteSettings(payload);
                 if (save.success) {
-                    showMsg('Salvo. Atualize o blog para ver o banner e a faixa.', true);
+                    showMsg('Salvo. Atualize a home para ver o banner.', true);
                 } else {
                     showMsg(save.error || 'Erro ao salvar. Verifique sessão e se o SQL foi aplicado.', false);
                 }

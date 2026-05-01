@@ -1,23 +1,13 @@
 /* ============================================
    Variáveis CSS - Design Minimalista e Profissional
-   Blog Vida 360º — matizes violeta (cor da sorte)
+   Blog Vida 360º - Nova Paleta
    ============================================ */
 :root {
-    /* Violeta / índigo (identidade principal) */
-    --violet-deep: #1e1b4b;    /* Base escura (header, contraste) */
-    --violet-dark: #4c1d95;
-    --violet-core: #5b21b6;
-    --violet-bright: #7c3aed;
-    --violet-soft: #8b5cf6;
-    --violet-glow: #a78bfa;
-    --violet-mist: #ede9fe;    /* Fundos suaves */
-    --violet-blush: #f5f3ff;
-
-    /* Cores principais (compatível com componentes que usam --primary / --accent) */
-    --primary: #4c1d95;
-    --primary-light: #6d28d9;
-    --accent: #7c3aed;
-    --accent-light: #8b5cf6;
+    /* Cores Principais - Lilás (identidade aromaterapia) */
+    --primary: #7f3f98;        /* Lilás principal */
+    --primary-light: #9b59b6;  /* Lilás médio */
+    --accent: #6d2d86;         /* Roxo para CTAs */
+    --accent-light: #8e44ad;   /* Roxo hover */
     
     /* Neutros */
     --white: #FFFFFF;
@@ -30,7 +20,7 @@
     
     /* Sucesso/Confiança */
     --success: #27AE60;        /* Verde sucesso */
-    --info: #6366f1;           /* Índigo (informação, alinhado à paleta) */
+    --info: #8e44ad;           /* Lilás de apoio */
     
     /* Sombras - Sutis e Elegantes */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -64,12 +54,12 @@
     --radius-md: 0.75rem;
     --radius-lg: 1rem;
     
-    /* Aliases “blue-*” (legado) — agora tons violeta para não quebrar páginas */
-    --blue-dark: #2e1065;
-    --blue-primary: #5b21b6;
-    --blue-secondary: #7c3aed;
-    --blue-light: #ede9fe;
-    --blue-background: #faf5ff;
+    /* Cores compatíveis (apelidos históricos do projeto) */
+    --blue-dark: #7f3f98;
+    --blue-primary: #7f3f98;
+    --blue-secondary: #9b59b6;
+    --blue-light: #f4ecf7;
+    --blue-background: #fbf8fd;
     --text-color: #FFFFFF;
     --text-dark: #212121;
     --shadow-hover: 0 8px 12px rgba(0, 0, 0, 0.2);
@@ -114,14 +104,14 @@ body {
    Cabeçalho - Escuro unificado (todas as páginas)
    ============================================ */
 header {
-    background: linear-gradient(135deg, var(--violet-deep) 0%, var(--violet-dark) 42%, var(--violet-core) 100%);
+    background-color: var(--blue-dark);
     color: var(--text-color);
     padding: var(--spacing-md) 0;
     box-shadow: var(--shadow-sm);
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid rgba(167, 139, 250, 0.22);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 header .container {
@@ -142,7 +132,7 @@ header nav ul li a {
 }
 
 header nav ul li a:hover {
-    color: #e9d5ff;
+    color: var(--blue-light);
 }
 
 /* Menu de Navegação */
@@ -219,11 +209,11 @@ main {
     margin-bottom: 15px;
 }
 
-/* Botão Leia Mais — mesmo espírito do CTA “Reescrever com IA” */
+/* Botão Leia Mais */
 .read-more {
     display: inline-block;
     padding: 10px 18px;
-    background: linear-gradient(135deg, var(--violet-core) 0%, var(--violet-bright) 100%);
+    background-color: var(--blue-secondary);
     color: var(--text-color);
     text-decoration: none;
     border-radius: var(--radius);
@@ -233,7 +223,7 @@ main {
 }
 
 .read-more:hover {
-    background: linear-gradient(135deg, var(--violet-dark) 0%, var(--primary-light) 100%);
+    background-color: var(--primary-light);
     color: var(--text-color);
     transform: translateY(-1px);
     box-shadow: var(--shadow);
@@ -347,14 +337,13 @@ main {
     transform: translateX(4px);
 }
 
-/* Rodapé — mesma família cromática do header */
+/* Rodapé - mesma cor do header */
 footer {
-    background: linear-gradient(135deg, var(--violet-deep) 0%, var(--violet-dark) 45%, var(--violet-core) 100%);
+    background: var(--blue-dark);
     text-align: center;
     padding: 20px;
     color: var(--text-color);
     margin-top: 20px;
-    border-top: 1px solid rgba(167, 139, 250, 0.2);
 }
 
 /* Acessibilidade */
@@ -407,19 +396,17 @@ footer {
 
 .search-container input[type="search"] {
     width: 100%;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-md);
     font-size: var(--font-size-base);
-    line-height: 1.35;
     border: 2px solid var(--blue-secondary);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     box-sizing: border-box;
     font-family: var(--font-family);
 }
 
 .search-container input[type="search"]:focus {
     outline: none;
-    border-color: var(--violet-bright);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.22);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
 #search-results {
@@ -484,13 +471,13 @@ footer {
     60%, 100% { content: '...'; }
 }
 
-/* Error State (vermelho — não usar --accent, que é a cor de marca) */
+/* Error State */
 .error-message {
-    background: rgba(220, 38, 38, 0.08);
-    color: #b91c1c;
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--accent);
     padding: var(--spacing-md);
     border-radius: var(--radius);
-    border-left: 4px solid #dc2626;
+    border-left: 4px solid var(--accent);
 }
 
 /* Success Message */
@@ -614,7 +601,7 @@ footer {
     .search-container input[type="search"],
     #search-input {
         font-size: 0.9rem;
-        padding: 0.45rem 0.8rem;
+        padding: var(--spacing-sm);
     }
 
     .section-header {

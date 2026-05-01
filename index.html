@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vida 360º - Blog de Saúde, Bem-estar e Produtividade</title>
+    <title>Vida 360º | Sono, Ansiedade Leve, Aromaterapia e Produtividade com Equilíbrio</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Blog Vida 360º - Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio para uma vida mais plena e equilibrada.">
-    <meta name="keywords" content="saúde, bem-estar, produtividade, mentalidade, equilíbrio, vida plena, desenvolvimento pessoal">
+    <meta name="description" content="No Vida 360º você encontra orientações práticas sobre sono, ansiedade leve, foco, produtividade e aromaterapia segura para uma rotina mais leve e consistente.">
+    <meta name="keywords" content="sono, ansiedade leve, aromaterapia, oleos essenciais, foco, produtividade, bem-estar, saúde integrativa">
     <meta name="author" content="Kadson Pedro">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://www.blogvida360.com.br/">
@@ -15,8 +15,8 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.blogvida360.com.br/">
-    <meta property="og:title" content="Vida 360º - Blog de Saúde, Bem-estar e Produtividade">
-    <meta property="og:description" content="Transforme sua vida com dicas práticas sobre saúde, produtividade, mentalidade e equilíbrio para uma vida mais plena.">
+    <meta property="og:title" content="Vida 360º | Sono, Ansiedade Leve, Aromaterapia e Produtividade">
+    <meta property="og:description" content="Conteúdo direto e confiável para melhorar sono, reduzir ansiedade leve e aumentar foco com práticas seguras de aromaterapia.">
     <meta property="og:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -25,12 +25,11 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://www.blogvida360.com.br/">
-    <meta name="twitter:title" content="Vida 360º - Blog de Saúde, Bem-estar e Produtividade">
-    <meta name="twitter:description" content="Transforme sua vida com dicas práticas sobre saúde, produtividade, mentalidade e equilíbrio para uma vida mais plena.">
+    <meta name="twitter:title" content="Vida 360º | Sono, Ansiedade Leve, Aromaterapia e Produtividade">
+    <meta name="twitter:description" content="Conteúdo direto e confiável para melhorar sono, reduzir ansiedade leve e aumentar foco com práticas seguras de aromaterapia.">
     <meta name="twitter:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/leads.css">
-    <link rel="stylesheet" href="assets/css/opportunity-strip.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="alternate" type="application/rss+xml" title="RSS Feed - Vida 360º" href="feed.xml">
@@ -38,71 +37,141 @@
     <!-- Favicon Novo -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <style>
-        /* Home: estilos específicos (paleta e layout vêm do style.css) */
         #home {
-            text-align: center;
+            text-align: left;
             margin-bottom: var(--spacing-xl);
         }
-
-        /* Newsletter (card abaixo dos artigos na home) */
-        #posts-container #home-newsletter-below {
-            max-width: min(100%, 820px);
-            width: 100%;
-            margin: var(--spacing-xl) auto 0;
-            padding: var(--spacing-md);
+        .home-section {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
             border-radius: var(--radius-lg);
-            box-sizing: border-box;
-            box-shadow: var(--shadow-md);
-            text-align: center;
+            box-shadow: var(--shadow-sm);
+            padding: clamp(1rem, 2vw, 2rem);
+            margin-bottom: var(--spacing-lg);
         }
-
+        .home-hero {
+            background: linear-gradient(135deg, #f7effb 0%, #ffffff 100%);
+            border-color: #e8d8f2;
+        }
+        .home-hero h1 {
+            margin-top: 0;
+            margin-bottom: var(--spacing-sm);
+            font-size: clamp(1.7rem, 3vw, 2.4rem);
+            line-height: 1.25;
+            color: var(--blue-primary);
+        }
+        .hero-subtitle {
+            margin: 0 0 var(--spacing-sm);
+            color: var(--gray-900);
+            font-size: clamp(1rem, 1.7vw, 1.2rem);
+            max-width: 66ch;
+        }
+        .hero-helper {
+            color: var(--gray-600);
+            margin: 0 0 var(--spacing-md);
+            max-width: 68ch;
+        }
+        .hero-ctas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            border-radius: var(--radius);
+            padding: 0.75rem 1.1rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background: var(--accent-light);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+            color: #fff;
+        }
+        .topics-grid,
+        .audience-grid,
+        .footer-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .topics-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+        .topic-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        .topic-card h3 {
+            margin: 0 0 0.5rem;
+            color: var(--blue-primary);
+            font-size: 1.05rem;
+        }
+        .topic-card p {
+            margin: 0;
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .audience-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        .audience-item {
+            border-left: 3px solid var(--blue-secondary);
+            padding-left: 0.8rem;
+        }
+        .audience-item strong {
+            display: block;
+            color: var(--blue-primary);
+            margin-bottom: 0.2rem;
+        }
+        .bio-box p,
+        .consulting-box p {
+            margin: 0.35rem 0;
+            color: var(--gray-900);
+        }
+        .lead-card {
+            background: linear-gradient(160deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+        }
+        .lead-card h2,
+        .lead-card p {
+            color: var(--white);
+        }
+        .lead-card .newsletter-form {
+            max-width: 520px;
+            margin: var(--spacing-sm) 0 0;
+        }
+        .lead-note {
+            margin-top: 0.7rem;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        .consulting-box {
+            background: #f8f1fb;
+            border: 1px solid #e7d9f1;
+        }
+        #search-container {
+            margin: 0 auto var(--spacing-md);
+            max-width: 720px;
+        }
         #posts-container {
             background-color: var(--blue-light);
             padding: var(--spacing-lg);
             border-radius: var(--radius-md);
         }
-
-        /* Artigos + banner de produto lado a lado (desktop) */
-        .home-posts-with-sidebar {
-            display: grid;
-            gap: var(--spacing-lg);
-            align-items: start;
-        }
-        @media (min-width: 960px) {
-            .home-posts-with-sidebar {
-                grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
-            }
-            .home-posts-with-sidebar:has(#home-product-banner-wrap.is-hidden) {
-                grid-template-columns: 1fr;
-            }
-            .home-posts-with-sidebar:has(#home-product-banner-wrap.is-hidden) .home-posts-sidebar {
-                display: none;
-            }
-            .home-posts-sidebar {
-                position: sticky;
-                top: 1rem;
-            }
-        }
-        .posts-main {
-            min-width: 0;
-        }
-
-        #posts-container .home-posts-sidebar .home-product-banner-wrap {
-            margin: 0;
-            max-width: none;
-            padding: var(--spacing-md);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-        }
-        #posts-container .home-posts-sidebar .home-product-banner-wrap img {
-            max-height: min(320px, 50vh);
-        }
-
         #posts-container .posts-grid {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: var(--spacing-lg);
         }
-
         #posts-container .post {
             background-color: var(--white);
             border: 1px solid var(--gray-200);
@@ -111,30 +180,27 @@
             overflow: hidden;
             transition: var(--transition);
         }
-
         #posts-container .post:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-md);
         }
-
         #posts-container .post-image {
             width: 100%;
             height: 200px;
             object-fit: cover;
             border-radius: var(--radius-md) var(--radius-md) 0 0;
         }
-
         #posts-container .post h3 {
             color: var(--blue-primary);
-            font-size: var(--font-size-xl);
+            font-size: 1.15rem;
             padding: var(--spacing-md);
+            margin: 0;
         }
-
         #posts-container .post p {
             padding: 0 var(--spacing-md) var(--spacing-md);
             color: var(--gray-600);
+            margin: 0;
         }
-
         #posts-container .read-more {
             display: block;
             text-align: center;
@@ -181,9 +247,41 @@
             display: block;
             vertical-align: middle;
         }
-
+        .footer-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            margin-top: 1rem;
+            text-align: left;
+        }
+        .footer-grid h3 {
+            margin: 0 0 0.6rem;
+            font-size: 0.95rem;
+            color: var(--blue-light);
+        }
+        .footer-grid a {
+            color: var(--blue-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 0.35rem;
+        }
+        .footer-grid a:hover {
+            text-decoration: underline;
+        }
         footer {
             margin-top: var(--spacing-xl);
+        }
+        @media (max-width: 768px) {
+            .hero-ctas .btn-primary,
+            .hero-ctas .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+            .home-section {
+                padding: 1rem;
+            }
+            .footer-grid {
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -191,7 +289,7 @@
 
     <header role="banner">
         <div class="container">
-            <div class="logo" role="heading" aria-level="1">Vida 360º</div>
+            <div class="logo">Vida 360º</div>
             <nav role="navigation" aria-label="Menu principal">
                 <ul>
                     <li><a href="index.html" aria-current="page">Início</a></li>
@@ -205,46 +303,108 @@
         </div>
     </header>
 
-    <!-- Faixa de oportunidade (parceria / distribuidor) — preenchida via Supabase + opportunity-strip.js -->
-    <div id="site-opportunity-strip" class="site-opportunity-strip is-hidden" role="region" aria-label="Oportunidade"></div>
-
     <main class="container">
         <section id="home">
-            <h2>Bem-vindo ao Blog "Vida 360º"</h2>
-            <p>Explore conteúdos exclusivos sobre <strong>saúde, bem-estar, produtividade, mentalidade e equilíbrio</strong> para uma vida mais plena.</p>
+            <section class="home-section home-hero">
+                <h1>Vida 360º: conteúdo prático para sono, ansiedade leve, foco e aromaterapia segura no dia a dia</h1>
+                <p class="hero-subtitle">Somos um blog de saúde e bem-estar com abordagem humana e objetiva: sem radicalismo, sem promessas milagrosas e com orientações aplicáveis à vida real.</p>
+                <p class="hero-helper">Aqui você encontra estratégias de rotina, autocuidado e aromaterapia prática para construir mais clareza mental, energia e consistência.</p>
+                <div class="hero-ctas">
+                    <a href="artigos.html" class="btn-primary">Começar pelos artigos</a>
+                    <a href="#lead-magnet" class="btn-secondary">Receber o guia gratuito</a>
+                </div>
+            </section>
 
-            <!-- Barra de Busca (acima dos artigos) -->
-            <div id="search-container" class="search-container">
-                <input type="search" id="search-input" placeholder="🔍 Buscar posts...">
-                <div id="search-results"></div>
-            </div>
+            <section class="home-section" aria-labelledby="temas-principais">
+                <h2 id="temas-principais">Temas principais do Vida 360º</h2>
+                <div class="topics-grid">
+                    <article class="topic-card">
+                        <h3>Sono</h3>
+                        <p>Rotinas noturnas simples, higiene do sono e ajustes de hábitos para acordar com mais disposição.</p>
+                    </article>
+                    <article class="topic-card">
+                        <h3>Ansiedade leve</h3>
+                        <p>Estratégias de organização, respiração e autocuidado para reduzir sobrecarga no dia a dia.</p>
+                    </article>
+                    <article class="topic-card">
+                        <h3>Foco, produtividade e aromaterapia</h3>
+                        <p>Métodos de planejamento e uso responsável de óleos essenciais para rituais de foco e recuperação mental.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-section" aria-labelledby="para-quem">
+                <h2 id="para-quem">Para quem é este blog</h2>
+                <div class="audience-grid">
+                    <div class="audience-item">
+                        <strong>Para quem vive cansado</strong>
+                        Conteúdo para reorganizar hábitos, desacelerar à noite e recuperar energia de forma sustentável.
+                    </div>
+                    <div class="audience-item">
+                        <strong>Para quem sente ansiedade leve</strong>
+                        Orientações para desacelerar, priorizar e reduzir a sensação de mente acelerada com técnicas práticas.
+                    </div>
+                    <div class="audience-item">
+                        <strong>Para quem busca foco com equilíbrio</strong>
+                        Técnicas para produzir melhor sem abrir mão da saúde, do bem-estar e do descanso.
+                    </div>
+                </div>
+            </section>
+
+            <section class="home-section bio-box" aria-labelledby="autoridade">
+                <h2 id="autoridade">Quem está por trás do Vida 360º</h2>
+                <p>O Vida 360º é um projeto editorial criado por Kadson Pedro para traduzir temas de saúde, produtividade e aromaterapia em linguagem simples, aplicável e responsável.</p>
+                <p>A proposta é reunir boas práticas de rotina e autocuidado para ajudar você a tomar decisões melhores no dia a dia, com segurança e consistência.</p>
+            </section>
+
+            <section id="lead-magnet" class="home-section lead-card" aria-labelledby="isca-digital">
+                <h2 id="isca-digital">Baixe o guia gratuito: Rotina 360º + Aromaterapia em 7 dias</h2>
+                <p>Um material objetivo para organizar manhã, trabalho e noite com hábitos de sono, foco e uso seguro de óleos essenciais.</p>
+                <form class="newsletter-form" data-origem="form_home_isca">
+                    <input type="email" name="email" placeholder="Digite seu melhor e-mail" required aria-label="Email para receber o guia gratuito">
+                    <button type="submit">Quero receber o guia</button>
+                </form>
+                <p class="lead-note">Sem spam. Você pode sair da lista quando quiser.</p>
+            </section>
+
+            <section class="home-section consulting-box" aria-labelledby="consultoria-rotinas">
+                <h2 id="consultoria-rotinas">Consultoria de rotinas (opcional)</h2>
+                <p>Se você quiser apoio individual para organizar sua rotina de sono, foco, bem-estar e autocuidado com aromaterapia, oferecemos orientações pontuais e práticas.</p>
+                <p>Não é atendimento médico. É organização de hábitos, planejamento e acompanhamento de execução.</p>
+                <a href="contato.html" class="btn-secondary">Entender como funciona</a>
+            </section>
+
+            <!-- Banner de produto (global — painel admin; oculto até ativar no Supabase) -->
+            <div id="home-product-banner-wrap" class="home-product-banner-wrap home-section is-hidden" aria-live="polite"></div>
         </section>
 
-        <section id="posts-container">
+        <section id="posts-container" aria-labelledby="posts-destaque">
             <div class="section-header">
-                <h2>📚 Últimos Artigos</h2>
+                <h2 id="posts-destaque">Posts em destaque</h2>
                 <a href="artigos.html" class="btn-secondary">Ver Todos os Artigos →</a>
             </div>
-            <div class="home-posts-with-sidebar">
-                <div class="posts-main">
-                    <div class="posts-grid" id="posts-grid">
+            <div id="search-container" class="search-container">
+                <input type="search" id="search-input" placeholder="Buscar por sono, ansiedade, foco, aromaterapia...">
+                <div id="search-results"></div>
+            </div>
+            <div class="posts-grid" id="posts-grid">
                 <!-- Posts estáticos (fallback); substituídos por JS se houver posts no Supabase -->
                 <article class="post">
                     <img src="assets/images/saude-mental.jpg" alt="Saúde Mental" class="post-image" loading="lazy">
                     <h3>Como Cuidar da Saúde Mental no Dia a Dia</h3>
-                    <p>Descubra práticas simples para manter a saúde mental em equilíbrio.</p>
+                    <p>Um passo a passo direto para incluir autocuidado emocional na rotina sem complicar.</p>
                     <a href="post.html?post=saude-mental" class="read-more" aria-label="Ler artigo sobre saúde mental">Leia mais...</a>
                 </article>
                 <article class="post">
                     <img src="assets/images/produtividade.jpg" alt="Produtividade" class="post-image" loading="lazy">
                     <h3>7 Hábitos de Pessoas Altamente Produtivas</h3>
-                    <p>Aprenda os hábitos que pessoas produtivas praticam diariamente para alcançar resultados extraordinários.</p>
+                    <p>Hábitos simples para manter foco e consistência sem depender de motivação o tempo todo.</p>
                     <a href="post.html?post=habitos-produtivos" class="read-more" aria-label="Ler artigo sobre hábitos produtivos">Leia mais...</a>
                 </article>
                 <article class="post">
                     <img src="assets/images/equilibrio-vida.jpg" alt="Equilíbrio na Vida" class="post-image" loading="lazy">
                     <h3>Encontrando o Equilíbrio entre Trabalho e Vida Pessoal</h3>
-                    <p>Saiba como conciliar suas responsabilidades sem perder o bem-estar.</p>
+                    <p>Estratégias para produzir bem durante o dia e preservar energia para sua vida pessoal.</p>
                     <a href="post.html?post=equilibrio-vida" class="read-more" aria-label="Ler artigo sobre equilíbrio">Leia mais...</a>
                 </article>
                 <article class="post">
@@ -259,22 +419,6 @@
                     <p>Aprenda como construir relações sólidas que geram resultados duradouros no seu negócio.</p>
                     <a href="post.html?post=marketing-relacionamento" class="read-more" aria-label="Ler artigo sobre marketing de relacionamento">Leia mais...</a>
                 </article>
-                    </div>
-                </div>
-                <aside class="home-posts-sidebar" aria-label="Destaque do blog">
-                    <!-- Banner de produto (global — painel admin; ao lado dos artigos no desktop) -->
-                    <div id="home-product-banner-wrap" class="home-product-banner-wrap is-hidden" aria-live="polite"></div>
-                </aside>
-            </div>
-
-            <!-- Newsletter abaixo dos artigos (id usado para inserir "Ver mais" antes deste bloco) -->
-            <div id="home-newsletter-below" class="cta-newsletter home-stack-card">
-                <h3>📧 Receba Conteúdo Exclusivo!</h3>
-                <p>Cadastre-se e receba nosso <strong>Guia Completo de Bem-Estar</strong> grátis!</p>
-                <form class="newsletter-form" data-origem="form_abaixo_artigos">
-                    <input type="email" name="email" placeholder="Seu melhor email" required aria-label="Email para newsletter">
-                    <button type="submit">Quero Receber Grátis</button>
-                </form>
             </div>
         </section>
     </main>
@@ -285,13 +429,35 @@
     </a>
 
     <footer role="contentinfo">
-        <p>© 2025 Vida 360º. Todos os direitos reservados.</p>
-        <p style="margin-top: 10px; font-size: 0.9rem;">
-            <a href="feed.xml" style="color: var(--blue-light); text-decoration: none;">📡 RSS Feed</a> | 
-            <a href="sitemap.xml" style="color: var(--blue-light); text-decoration: none;">🗺️ Sitemap</a> |
-            <a href="admin-login.html" style="color: var(--blue-light); text-decoration: none; font-weight: 600;">🔐 Painel Admin</a>
-        </p>
-        <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.9;">Alguns artigos podem conter links de indicação. Ao utilizá-los, você apoia o blog sem custo adicional.</p>
+        <div class="container">
+            <p>© 2026 Vida 360º. Todos os direitos reservados.</p>
+            <div class="footer-grid">
+                <div>
+                    <h3>Navegação</h3>
+                    <a href="index.html">Início</a><br>
+                    <a href="artigos.html">Artigos</a><br>
+                    <a href="sobre.html">Sobre</a><br>
+                    <a href="contato.html">Contato</a>
+                </div>
+                <div>
+                    <h3>Conteúdos</h3>
+                    <a href="quiz.html">Quiz</a><br>
+                    <a href="protocolos.html">Protocolos</a><br>
+                    <a href="ebooks.html">Ebooks</a><br>
+                    <a href="oportunidades.html">Oportunidades</a>
+                </div>
+                <div>
+                    <h3>Transparência</h3>
+                    <a href="politica.html">Política de Privacidade</a><br>
+                    <a href="feed.xml">RSS Feed</a><br>
+                    <a href="sitemap.xml">Sitemap</a><br>
+                    <a href="admin-login.html">Painel Admin</a>
+                </div>
+            </div>
+            <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.9;">
+                Este conteúdo é educativo e não substitui orientação de profissionais de saúde. Aromaterapia deve ser usada com responsabilidade. Alguns artigos podem conter links de indicação, sem custo adicional para você.
+            </p>
+        </div>
     </footer>
 
     <!-- Scripts -->
@@ -330,7 +496,6 @@
             }
         });
     </script>
-    <script src="assets/js/opportunity-strip.js"></script>
     
     <script src="assets/js/leads.js"></script>
     <script src="assets/js/performance.js"></script>
@@ -425,12 +590,7 @@
                         btn.onmouseover = function() { this.style.backgroundColor = 'var(--blue-primary)'; };
                         btn.onmouseout = function() { this.style.backgroundColor = 'var(--blue-secondary)'; };
                         btnDiv.appendChild(btn);
-                        var newsletterEl = document.getElementById('home-newsletter-below');
-                        if (newsletterEl && newsletterEl.parentNode === container) {
-                            container.insertBefore(btnDiv, newsletterEl);
-                        } else {
-                            container.appendChild(btnDiv);
-                        }
+                        container.appendChild(btnDiv);
                     }
                 }
             }
@@ -510,7 +670,7 @@
       "@context": "https://schema.org",
       "@type": "Blog",
       "name": "Vida 360º",
-      "description": "Blog sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio",
+      "description": "Blog sobre saúde, bem-estar, sono, ansiedade leve, aromaterapia prática e segura e produtividade com equilíbrio",
       "url": "https://www.blogvida360.com.br/",
       "author": {
         "@type": "Person",

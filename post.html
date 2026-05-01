@@ -12,7 +12,7 @@
     
     <!-- Open Graph Metatags Dinâmicos -->
     <meta property="og:title" content="Vida 360º - Blog" id="og-title">
-    <meta property="og:description" content="Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio" id="og-description">
+    <meta property="og:description" content="Conteúdos sobre sono, ansiedade leve, aromaterapia segura e produtividade com equilíbrio" id="og-description">
     <meta property="og:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png" id="og-image">
     <meta property="og:image:alt" content="Vida 360º Blog" id="og-image-alt">
     <meta property="og:url" content="" id="og-url">
@@ -23,7 +23,7 @@
     <!-- Twitter Card Metatags Dinâmicos -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Vida 360º - Blog" id="twitter-title">
-    <meta name="twitter:description" content="Conteúdos exclusivos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio" id="twitter-description">
+    <meta name="twitter:description" content="Conteúdos sobre sono, ansiedade leve, aromaterapia segura e produtividade com equilíbrio" id="twitter-description">
     <meta name="twitter:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png" id="twitter-image">
     <meta name="twitter:image:alt" content="Vida 360º Blog" id="twitter-image-alt">
     
@@ -131,59 +131,68 @@
         /* Botões de Compartilhamento */
         .share-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin: 20px 0;
-            padding: 15px;
-            background: #F8F9FA;
-            border-radius: 8px;
-            border-top: 2px solid #E74C3C;
+            align-items: center;
+            margin: 18px 0;
+            padding: 12px;
+            background: #f7f1fb;
+            border-radius: 10px;
+            border: 1px solid #d8c3e6;
         }
         
         .share-buttons h3 {
             width: 100%;
-            margin: 0 0 10px 0;
+            margin: 0 0 6px 0;
             color: var(--blue-primary);
-            font-size: 16px;
+            font-size: 1rem;
         }
         
         .share-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 10px 16px;
-            border: none;
+            padding: 8px 12px;
+            border: 1px solid transparent;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s;
-            color: white;
+            color: #fff;
+            line-height: 1.2;
         }
         
         .share-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(84, 51, 112, 0.2);
         }
         
-        .share-btn.whatsapp { background: #25D366; }
-        .share-btn.whatsapp:hover { background: #20BA5A; }
+        .share-btn.whatsapp { background: #7f3f98; border-color: #7f3f98; }
+        .share-btn.whatsapp:hover { background: #6d2d86; }
         
-        .share-btn.facebook { background: #1877F2; }
-        .share-btn.facebook:hover { background: #166FE5; }
+        .share-btn.facebook { background: #8f59ad; border-color: #8f59ad; }
+        .share-btn.facebook:hover { background: #7f3f98; }
         
-        .share-btn.twitter { background: #1DA1F2; }
-        .share-btn.twitter:hover { background: #1A91DA; }
+        .share-btn.twitter { background: #9b6db6; border-color: #9b6db6; }
+        .share-btn.twitter:hover { background: #8f59ad; }
         
-        .share-btn.linkedin { background: #0077B5; }
-        .share-btn.linkedin:hover { background: #006399; }
+        .share-btn.linkedin { background: #a97ec2; border-color: #a97ec2; }
+        .share-btn.linkedin:hover { background: #9b6db6; }
         
-        .share-btn.copy-link { background: #6C757D; }
-        .share-btn.copy-link:hover { background: #5A6268; }
+        .share-btn.copy-link { background: #6d2d86; border-color: #6d2d86; }
+        .share-btn.copy-link:hover { background: #5b2572; }
         
-        .share-btn.telegram { background: #0088CC; }
-        .share-btn.telegram:hover { background: #0077B5; }
+        .share-btn.telegram { background: #b58dcb; border-color: #b58dcb; }
+        .share-btn.telegram:hover { background: #a97ec2; }
+        
+        @media (max-width: 640px) {
+            .share-btn {
+                font-size: 0.83rem;
+                padding: 7px 10px;
+            }
+        }
 
         .comment-section {
             background-color: var(--blue-light);

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
     
     <!-- Open Graph -->
     <meta property="og:title" content="Todos os Artigos - Vida 360º">
-    <meta property="og:description" content="Explore todos os artigos sobre saúde, bem-estar, produtividade, mentalidade e equilíbrio.">
+    <meta property="og:description" content="Explore artigos sobre sono, ansiedade leve, aromaterapia prática, produtividade e bem-estar.">
     <meta property="og:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png">
     <meta property="og:url" content="https://www.blogvida360.com.br/artigos.html">
     <meta property="og:type" content="website">
@@ -214,7 +214,7 @@
     <main class="container">
         <div class="page-header">
             <h1>📚 Todos os Artigos</h1>
-            <p>Explore nosso conteúdo completo sobre saúde, bem-estar, produtividade e muito mais</p>
+            <p>Explore conteúdos sobre sono, ansiedade leve, aromaterapia, óleos essenciais e foco com equilíbrio</p>
         </div>
 
         <!-- Filtros por Categoria -->
@@ -222,6 +222,11 @@
             <button class="filter-btn active" data-categoria="">Todos</button>
             <button class="filter-btn" data-categoria="saude">Saúde</button>
             <button class="filter-btn" data-categoria="bem-estar">Bem-estar</button>
+            <button class="filter-btn" data-categoria="sono">Sono</button>
+            <button class="filter-btn" data-categoria="ansiedade-leve">Ansiedade leve</button>
+            <button class="filter-btn" data-categoria="aromaterapia">Aromaterapia</button>
+            <button class="filter-btn" data-categoria="oleos-essenciais">Óleos essenciais</button>
+            <button class="filter-btn" data-categoria="foco-produtividade">Foco e produtividade</button>
             <button class="filter-btn" data-categoria="produtividade">Produtividade</button>
             <button class="filter-btn" data-categoria="mentalidade">Mentalidade</button>
             <button class="filter-btn" data-categoria="equilibrio">Equilíbrio</button>
@@ -353,12 +358,48 @@
             }
 
             function filterPosts() {
+                function normalizeCategory(value) {
+                    return String(value || '')
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/&/g, ' e ')
+                        .replace(/\//g, ' ')
+                        .replace(/\s+/g, '-')
+                        .replace(/-+/g, '-')
+                        .replace(/^-|-$/g, '');
+                }
+
+                function hasCategoryInTags(post, normalizedSelectedCategory) {
+                    var tags = post.tags || [];
+                    if (!Array.isArray(tags)) {
+                        tags = String(tags || '').split(',');
+                    }
+                    return tags.some(function(tag) {
+                        return normalizeCategory(tag).indexOf(normalizedSelectedCategory) !== -1;
+                    });
+                }
+
                 if (currentCategoria === '') {
                     filteredPosts = allPosts;
                 } else {
+                    var selectedCategory = normalizeCategory(currentCategoria);
+                    var categoryAliases = {
+                        'foco-produtividade': ['foco-produtividade', 'produtividade', 'foco'],
+                        'oleos-essenciais': ['oleos-essenciais', 'oleo-essencial', 'aromaterapia'],
+                        'ansiedade-leve': ['ansiedade-leve', 'ansiedade', 'saude-mental']
+                    };
+                    var aliases = categoryAliases[selectedCategory] || [selectedCategory];
+
                     filteredPosts = allPosts.filter(function(post) {
-                        var categoria = (post.categoria || '').toLowerCase();
-                        return categoria === currentCategoria.toLowerCase();
+                        var normalizedPostCategory = normalizeCategory(post.categoria);
+                        var matchByCategory = aliases.some(function(alias) {
+                            return normalizedPostCategory === alias;
+                        });
+                        if (matchByCategory) return true;
+                        return aliases.some(function(alias) {
+                            return hasCategoryInTags(post, alias);
+                        });
                     });
                 }
                 renderPosts();

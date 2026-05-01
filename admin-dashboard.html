@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,6 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    <link rel="stylesheet" href="assets/css/admin-theme.css">
     
     <style>
         * {
@@ -18,12 +17,12 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--admin-page-bg, #faf5ff);
+            background: #F5F7FA;
         }
         
         /* Header */
         .admin-header {
-            background: var(--admin-header-gradient);
+            background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%);
             color: white;
             padding: 1rem 2rem;
             display: flex;
@@ -43,7 +42,7 @@
         }
         
         .btn-logout {
-            background: var(--admin-btn-logout);
+            background: #7f3f98;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -53,7 +52,7 @@
         }
         
         .btn-logout:hover {
-            background: var(--admin-btn-logout-hover);
+            background: #6d2d86;
         }
         
         .link-blog {
@@ -91,7 +90,7 @@
             display: block;
             padding: 1rem;
             text-decoration: none;
-            color: var(--admin-text-strong);
+            color: #6d2d86;
             font-weight: 600;
             text-align: center;
             border-bottom: 3px solid transparent;
@@ -100,9 +99,9 @@
         
         .admin-nav a:hover,
         .admin-nav a.active {
-            color: var(--admin-accent);
-            border-bottom-color: var(--admin-accent);
-            background: var(--admin-surface-tint);
+            color: #7f3f98;
+            border-bottom-color: #7f3f98;
+            background: #FDF6F5;
         }
         
         /* Container */
@@ -146,7 +145,7 @@
         .stat-card .number {
             font-size: 36px;
             font-weight: 700;
-            color: var(--admin-text-strong);
+            color: #6d2d86;
             margin-bottom: 5px;
         }
         
@@ -173,48 +172,37 @@
         }
         
         .table-header h2 {
-            color: var(--admin-text-strong);
+            color: #6d2d86;
             font-size: 20px;
         }
         
         .btn-primary {
-            background: var(--admin-btn-cta);
+            background: #7f3f98;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            transition: filter 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 8px rgba(91, 33, 182, 0.25);
+            transition: background 0.3s;
         }
         
         .btn-primary:hover {
-            background: var(--admin-btn-cta-hover);
-            filter: brightness(1.02);
+            background: #6d2d86;
         }
         
         .btn-secondary {
-            background: var(--admin-btn-cta);
+            background: #9b59b6;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            transition: filter 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 8px rgba(91, 33, 182, 0.2);
+            transition: background 0.3s;
         }
         .btn-secondary:hover {
-            background: var(--admin-btn-cta-hover);
-            filter: brightness(1.02);
-        }
-        
-        .table-header-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
+            background: #6d2d86;
         }
         
         table {
@@ -238,7 +226,7 @@
         td {
             padding: 15px 20px;
             border-bottom: 1px solid #ECF0F1;
-            color: var(--admin-text);
+            color: #6d2d86;
         }
         
         tbody tr:hover {
@@ -359,18 +347,10 @@
 
             <div class="table-container" style="margin-bottom: 1.5rem;">
                 <div class="table-header" style="flex-wrap: wrap; gap: 12px;">
-                    <h2>🖼️ Banner da home e faixa do topo</h2>
+                    <h2>🖼️ Banner de produto na home</h2>
                     <button type="button" class="btn-secondary" onclick="window.location.href='admin-banner-home.html'">Configurar</button>
                 </div>
-                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Banner lateral (imagem + link) e faixa de oportunidade no topo. Tabela <code style="font-size:12px;">blog360_site_settings</code> no Supabase; colunas da faixa em <code style="font-size:12px;">BLOG360_SITE_SETTINGS_FAIXA_OPORTUNIDADE.sql</code>.</p>
-            </div>
-
-            <div class="table-container" style="margin-bottom: 1.5rem;">
-                <div class="table-header" style="flex-wrap: wrap; gap: 12px;">
-                    <h2>📣 Central de marketing</h2>
-                    <button type="button" class="btn-secondary" onclick="window.location.href='admin-marketing-studio.html'">Abrir</button>
-                </div>
-                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Assistente de IA para copy de divulgação (faixa, WhatsApp, convites, CTAs) com histórico reutilizável. SQL <code style="font-size:12px;">BLOG360_MARKETING_HISTORY.sql</code>. Deploy da Edge <code style="font-size:12px;">blog-prompt-coach</code> com <code style="font-size:12px;">mode: marketing</code>.</p>
+                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Destaque global (uma imagem + link). Requer SQL <code style="font-size:12px;">blog360_site_settings</code> no Supabase.</p>
             </div>
             
             <div class="table-container">
@@ -426,9 +406,9 @@
             <div class="table-container">
                 <div class="table-header">
                     <h2>📝 Gerenciar Postagens</h2>
-                    <div class="table-header-actions">
-                        <button type="button" class="btn-primary" onclick="window.location.href='admin-editor-artigo.html'">+ Novo Artigo</button>
-                        <button type="button" class="btn-secondary" onclick="window.location.href='admin-estudio-conteudo.html'" title="IA: landing, redes, rascunhos de artigo">✨ Estúdio de conteúdo</button>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+                        <button class="btn-primary" onclick="window.location.href='admin-editor-artigo.html'">+ Novo Artigo</button>
+                        <button class="btn-secondary" onclick="window.location.href='admin-estudio-conteudo.html'" title="IA: landing, redes, rascunhos de artigo">✨ Estúdio de conteúdo</button>
                     </div>
                 </div>
                 <table>
@@ -595,7 +575,7 @@
                 <input type="hidden" id="ebook-id" value="">
                 <div style="margin-bottom: 1rem;">
                     <label style="display: block; font-weight: 600; margin-bottom: 4px;">Título *</label>
-                    <input type="text" id="ebook-titulo" placeholder="Ex: Guia Completo de Bem-Estar" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="text" id="ebook-titulo" placeholder="Ex: Guia de Aromaterapia Prática e Segura" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 <div style="margin-bottom: 1rem;">
                     <label style="display: block; font-weight: 600; margin-bottom: 4px;">Descrição curta</label>

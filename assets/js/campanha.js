@@ -1,4 +1,4 @@
-// Campanhas de Email - JavaScript
+﻿// Campanhas de Email - JavaScript
 let selectedTemplate = 'newsletter';
 let currentCampaignId = null;
 
@@ -59,7 +59,7 @@ function loadTemplate(template) {
     const templates = {
         newsletter: `
             <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-                <div style="background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); color: white; padding: 30px; text-align: center;">
+                <div style="background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%); color: white; padding: 30px; text-align: center;">
                     <h1 style="margin: 0;">Vida 360º</h1>
                     <p style="margin: 10px 0 0 0; opacity: 0.9;">Newsletter</p>
                 </div>
@@ -68,11 +68,11 @@ function loadTemplate(template) {
                     <h2>Olá, {{nome}}!</h2>
                     <p>Bem-vindo à nossa newsletter semanal com as melhores dicas de saúde, bem-estar e produtividade.</p>
                     
-                    <h3 style="color: #2C3E50; margin-top: 30px;">📚 Artigos em Destaque</h3>
+                    <h3 style="color: #6d2d86; margin-top: 30px;">📚 Artigos em Destaque</h3>
                     <p>Confira os artigos mais lidos desta semana...</p>
                     
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="#" style="background: #E74C3C; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Ler Artigos</a>
+                        <a href="#" style="background: #7f3f98; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Ler Artigos</a>
                     </div>
                 </div>
                 
@@ -84,17 +84,17 @@ function loadTemplate(template) {
         `,
         promocional: `
             <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-                <div style="background: #E74C3C; color: white; padding: 40px; text-align: center;">
+                <div style="background: #7f3f98; color: white; padding: 40px; text-align: center;">
                     <h1 style="margin: 0; font-size: 36px;">🎁 OFERTA ESPECIAL</h1>
                     <p style="margin: 10px 0 0 0; font-size: 18px;">Exclusivo para você, {{nome}}!</p>
                 </div>
                 
                 <div style="padding: 30px; background: white; text-align: center;">
-                    <h2 style="color: #2C3E50;">Aproveite esta oportunidade única!</h2>
+                    <h2 style="color: #6d2d86;">Aproveite esta oportunidade única!</h2>
                     <p style="font-size: 18px;">Descrição da oferta aqui...</p>
                     
                     <div style="background: #FFF3CD; padding: 20px; margin: 30px 0; border-radius: 10px;">
-                        <p style="font-size: 24px; font-weight: bold; color: #E74C3C; margin: 0;">50% OFF</p>
+                        <p style="font-size: 24px; font-weight: bold; color: #7f3f98; margin: 0;">50% OFF</p>
                         <p style="margin: 5px 0 0 0;">Por tempo limitado!</p>
                     </div>
                     
@@ -108,7 +108,7 @@ function loadTemplate(template) {
         `,
         educacional: `
             <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-                <div style="background: #3498DB; color: white; padding: 30px; text-align: center;">
+                <div style="background: #8e44ad; color: white; padding: 30px; text-align: center;">
                     <h1 style="margin: 0;">📚 Conteúdo Educacional</h1>
                     <p style="margin: 10px 0 0 0;">Aprenda algo novo hoje!</p>
                 </div>
@@ -117,12 +117,12 @@ function loadTemplate(template) {
                     <h2>Olá, {{nome}}!</h2>
                     <p>Preparamos um conteúdo especial para você aprender mais sobre...</p>
                     
-                    <div style="background: #F8F9FA; padding: 20px; margin: 20px 0; border-left: 4px solid #3498DB;">
-                        <h3 style="margin-top: 0; color: #2C3E50;">💡 Dica do Dia</h3>
+                    <div style="background: #F8F9FA; padding: 20px; margin: 20px 0; border-left: 4px solid #8e44ad;">
+                        <h3 style="margin-top: 0; color: #6d2d86;">💡 Dica do Dia</h3>
                         <p>Sua dica educacional aqui...</p>
                     </div>
                     
-                    <h3 style="color: #2C3E50;">📖 Recursos Recomendados</h3>
+                    <h3 style="color: #6d2d86;">📖 Recursos Recomendados</h3>
                     <ul style="line-height: 2;">
                         <li>Recurso 1</li>
                         <li>Recurso 2</li>
@@ -130,7 +130,7 @@ function loadTemplate(template) {
                     </ul>
                     
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="#" style="background: #3498DB; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Acessar Conteúdo</a>
+                        <a href="#" style="background: #8e44ad; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Acessar Conteúdo</a>
                     </div>
                 </div>
                 
@@ -141,7 +141,7 @@ function loadTemplate(template) {
         `,
         anuncio: `
             <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-                <div style="background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); color: white; padding: 30px; text-align: center;">
+                <div style="background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%); color: white; padding: 30px; text-align: center;">
                     <h1 style="margin: 0;">📢 Novidades!</h1>
                     <p style="margin: 10px 0 0 0;">Temos algo importante para compartilhar</p>
                 </div>
@@ -158,7 +158,7 @@ function loadTemplate(template) {
                     <p>Detalhes adicionais sobre o anúncio...</p>
                     
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="#" style="background: #E74C3C; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Saiba Mais</a>
+                        <a href="#" style="background: #7f3f98; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Saiba Mais</a>
                     </div>
                 </div>
                 
@@ -190,7 +190,7 @@ function insertButton() {
     const url = prompt('URL do link:', '#');
     
     if (text && url) {
-        const button = `<div style="text-align: center; margin: 30px 0;"><a href="${url}" style="background: #E74C3C; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">${text}</a></div>`;
+        const button = `<div style="text-align: center; margin: 30px 0;"><a href="${url}" style="background: #7f3f98; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">${text}</a></div>`;
         document.execCommand('insertHTML', false, button);
         updateEmailPreview();
     }

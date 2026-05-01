@@ -5,21 +5,21 @@
 (function () {
   const STORAGE_SNIPPETS = 'blog360_prompt_snippets_v1';
   const CONTENT_TYPES = {
-    landing: { label: 'Landing Page', desc: 'Headlines, benefícios e CTA para página de divulgação', gen: 'Gerar Landing Page' },
-    social_post: { label: 'Posts para redes', desc: 'Textos para Instagram, Facebook, LinkedIn', gen: 'Gerar posts para redes' },
-    article_copy: { label: 'Artigos e copy', desc: 'Rascunhos de artigo, e-mail ou copy longa', gen: 'Gerar artigo / copy' },
+    landing: { label: 'Landing Page', desc: 'Headlines, benefícios e CTA para rotina, aromaterapia e bem-estar', gen: 'Gerar Landing Page' },
+    social_post: { label: 'Posts para redes', desc: 'Textos para Instagram, Facebook e LinkedIn com foco em sono e ansiedade leve', gen: 'Gerar posts para redes' },
+    article_copy: { label: 'Artigos e copy', desc: 'Rascunhos de artigo, e-mail ou copy longa sobre aromaterapia prática', gen: 'Gerar artigo / copy' },
   };
 
   const DEFAULT_SNIPPETS = [
     {
       title: 'Artigo: estrutura completa',
       content:
-        'Escreva um artigo para o blog Vida 360º sobre [TEMA]. Público: [PÚBLICO]. Tom acolhedor e claro. Inclua: introdução que prenda atenção, 3 a 4 subtítulos em Markdown (##), dicas práticas em lista quando fizer sentido, parágrafo de conclusão com convite à reflexão. Não invente dados médicos; sugira buscar profissional quando for caso clínico. Entre 900 e 1400 palavras.',
+        'Escreva um artigo para o blog Vida 360º sobre [TEMA] ligado a sono, ansiedade leve, foco ou aromaterapia segura. Público: [PÚBLICO]. Tom acolhedor e claro. Inclua: introdução que prenda atenção, 3 a 4 subtítulos em Markdown (##), dicas práticas em lista quando fizer sentido, parágrafo de conclusão com próximo passo simples. Não faça alegações médicas; sugira buscar profissional quando for caso clínico. Entre 900 e 1400 palavras.',
     },
     {
       title: 'Post Instagram curto',
       content:
-        'Post para Instagram sobre [TEMA], tom leve e inspirador, até 400 caracteres na primeira versão, segunda versão um pouco mais longa. Hashtags relevantes ao final. Sem links inventados.',
+        'Post para Instagram sobre [TEMA] (sono, ansiedade leve ou aromaterapia), tom leve e confiável, até 400 caracteres na primeira versão e segunda versão um pouco mais longa. Inclua hashtags relevantes no final sem promessas exageradas. Sem links inventados.',
     },
   ];
 

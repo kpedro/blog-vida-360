@@ -216,8 +216,8 @@ class LeadCapture {
       <div class="popup-overlay"></div>
       <div class="popup-content">
         <button class="popup-close" aria-label="Fechar">&times;</button>
-        <h2>📧 Receba Conteúdo Exclusivo!</h2>
-        <p>Cadastre-se e receba nosso <strong>Guia Completo de Bem-Estar</strong> grátis!</p>
+        <h2>📧 Receba o Guia 360º + Aromaterapia</h2>
+        <p>Cadastre-se e receba gratuitamente um guia prático para sono, foco e ansiedade leve com uso seguro de óleos essenciais.</p>
         <form class="newsletter-form" data-origem="popup">
           <input 
             type="email" 

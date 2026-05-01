@@ -1,30 +1,29 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro Admin - Vida 360º</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-    <link rel="stylesheet" href="assets/css/admin-theme.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--admin-header-gradient); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .signup-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(30, 27, 75, 0.35); max-width: 400px; width: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .signup-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; width: 100%; }
         .logo { text-align: center; margin-bottom: 30px; }
-        .logo h1 { color: var(--admin-text-strong); font-size: 32px; margin-bottom: 5px; }
+        .logo h1 { color: #6d2d86; font-size: 32px; margin-bottom: 5px; }
         .logo p { color: #7F8C8D; font-size: 14px; }
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: var(--admin-text-strong); font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        .form-group label { display: block; color: #6d2d86; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
         .form-group input { width: 100%; padding: 12px 15px; border: 2px solid #ECF0F1; border-radius: 6px; font-size: 14px; transition: border-color 0.3s; }
-        .form-group input:focus { outline: none; border-color: var(--admin-accent); }
-        .btn-signup { width: 100%; padding: 14px; background: var(--admin-btn-cta); color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: filter 0.3s; box-shadow: 0 4px 14px rgba(91, 33, 182, 0.35); }
-        .btn-signup:hover { background: var(--admin-btn-cta-hover); filter: brightness(1.02); }
+        .form-group input:focus { outline: none; border-color: #8e44ad; }
+        .btn-signup { width: 100%; padding: 14px; background: #8e44ad; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+        .btn-signup:hover { background: #2980B9; }
         .btn-signup:disabled { background: #BDC3C7; cursor: not-allowed; }
         .message { padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; display: none; }
-        .message.error { background: #FADBD8; color: #C0392B; border: 1px solid #E74C3C; }
+        .message.error { background: #FADBD8; color: #6d2d86; border: 1px solid #7f3f98; }
         .message.success { background: #D5F4E6; color: #27AE60; border: 1px solid #27AE60; }
         .footer-link { text-align: center; margin-top: 20px; }
-        .footer-link a { color: var(--admin-accent); text-decoration: none; font-size: 14px; }
+        .footer-link a { color: #7f3f98; text-decoration: none; font-size: 14px; }
         .footer-link a:hover { text-decoration: underline; }
     </style>
 </head>
