@@ -1,15 +1,16 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="favicon-bg" x1="0" y1="32" x2="64" y2="32" gradientUnits="userSpaceOnUse" gradientTransform="rotate(135 32 32)">
-      <stop offset="0%" stop-color="#1e1b4b"/>
-      <stop offset="42%" stop-color="#4c1d95"/>
-      <stop offset="100%" stop-color="#5b21b6"/>
-    </linearGradient>
+    <clipPath id="avatar-circle">
+      <circle cx="32" cy="32" r="32" />
+    </clipPath>
   </defs>
-  <circle cx="32" cy="32" r="32" fill="url(#favicon-bg)"/>
-  <circle cx="32" cy="32" r="31.5" fill="none" stroke="#a78bfa" stroke-opacity="0.22" stroke-width="1"/>
-  <circle cx="32" cy="32" r="21" stroke="#8b5cf6" stroke-width="2.25" fill="none" stroke-dasharray="3 4.5" stroke-linecap="round"/>
-  <circle cx="32" cy="32" r="21" stroke="#a78bfa" stroke-width="1" fill="none" opacity="0.5"/>
-  <path d="M32 17v10m0 10l6 7m-6-7-6 7" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="32" y="50" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#ede9fe" text-anchor="middle">360°</text>
+  <image
+    href="avatar-vida360.png"
+    x="0"
+    y="0"
+    width="64"
+    height="64"
+    preserveAspectRatio="xMidYMid slice"
+    clip-path="url(#avatar-circle)"
+  />
 </svg>

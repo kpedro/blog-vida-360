@@ -2,7 +2,7 @@
 // Updated: 2026-02-17 - Removida declaração duplicada de supabaseClient
 // Usar apenas window.supabaseClient para evitar conflito com supabase.js
 const ABOUT_PHOTO_STORAGE_KEY = 'blog360_about_photo_url';
-const ABOUT_PHOTO_FALLBACK = 'assets/images/og-banner.png';
+const ABOUT_PHOTO_FALLBACK = 'assets/images/avatar-vida360.png';
 const ABOUT_PHOTO_BUCKET_CANDIDATES = ['blog-media', 'blog360-media', 'public'];
 let aboutPhotoPendingFile = null;
 
