@@ -332,8 +332,7 @@
                 <p class="hint">Se você gerou a imagem acima (data URL), redes sociais não mostram preview. Envie o arquivo para um local público (ex.: Storage do Supabase) e cole aqui o link <strong>https</strong> direto do arquivo. Também pode usar só este link e manter a geração apenas como referência visual.</p>
                 <input type="url" id="studio-social-image-url" placeholder="https://…/minha-capa.png" style="width:100%;padding:0.5rem 0.75rem;margin-top:0.35rem;border-radius:8px;border:1px solid #d7c2e6;background:#ffffff;color:#2d1f3d;font-size:0.9rem;" />
                 <div class="toolbar-bottom">
-                    <button type="button" class="btn btn-primary" id="btn-download-image" style="display:none" title="Guardar ficheiro no computador">⬇️ Descarregar imagem</button>
-                    <button type="button" class="btn" id="btn-copy-image-url" style="display:none">📋 Copiar data URL</button>
+                    <button type="button" class="btn" id="btn-copy-image-url" style="display:none">📋 Copiar data URL da imagem</button>
                 </div>
 
                 <p class="section-title">Texto sobre a imagem (capa estilo notícia)</p>
@@ -352,10 +351,16 @@
                 </div>
                 <div class="toolbar-bottom">
                     <button type="button" class="btn btn-primary" id="btn-overlay-apply" disabled>✨ Gerar pré-visualização com texto</button>
-                    <button type="button" class="btn" id="btn-overlay-clear" disabled>Limpar capa</button>
-                    <button type="button" class="btn btn-primary" id="btn-download-overlay" style="display:none">⬇️ Descarregar capa final (PNG)</button>
+                    <button type="button" class="btn" id="btn-overlay-clear" disabled title="Remove só a versão com texto; a imagem da IA mantém-se">Limpar texto na imagem</button>
                 </div>
                 <img id="studio-overlay-preview" alt="Pré-visualização com texto na imagem" style="display:none;max-width:100%;max-height:280px;border-radius:8px;margin-top:0.5rem;border:2px solid #9b59b6;object-fit:contain;background:#1a1024;" />
+
+                <p class="section-title" style="margin-top:1rem">Descarregar</p>
+                <p class="hint">Aparece quando existir imagem gerada. <strong>Sem texto</strong> = ficheiro original da IA. <strong>Com texto</strong> = depois de clicar em «Gerar pré-visualização com texto» (manchete / categoria / rodapé).</p>
+                <div class="toolbar-bottom" id="row-download-variants" style="display:none;flex-wrap:wrap;gap:0.5rem">
+                    <button type="button" class="btn" id="btn-download-without-text" disabled title="PNG/JPEG/WebP conforme o modelo — só o que a IA gerou">⬇️ Sem texto (só imagem da IA)</button>
+                    <button type="button" class="btn btn-primary" id="btn-download-with-text" disabled title="Gere a pré-visualização com texto primeiro">⬇️ Com texto (capa final)</button>
+                </div>
             </div>
 
             <div id="block-history" style="display:none;">
@@ -440,7 +445,7 @@
             initStudioSupabase();
         }
     </script>
-    <script src="assets/js/estudio-conteudo.js?v=20260502-overlay"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260502-download-variants"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

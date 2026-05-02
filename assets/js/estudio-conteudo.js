@@ -225,8 +225,8 @@
       $('studio-image-preview').style.display = 'none';
       $('btn-copy-image-url').style.display = 'none';
     }
-    const dl = $('btn-download-image');
-    if (dl) dl.style.display = 'none';
+    const rowDl = $('row-download-variants');
+    if (rowDl) rowDl.style.display = 'none';
 
     try {
       const res = await fetch(`${getSupabaseUrl()}/functions/v1/generate-blog-studio-content`, {
@@ -482,26 +482,28 @@
     });
   }
 
-  function refreshOverlayButtons() {
+  function refreshStudioImageUi() {
     const hasBase = !!lastImageDataUrl;
     const applyBtn = $('btn-overlay-apply');
     const clearBtn = $('btn-overlay-clear');
-    const dlOverlay = $('btn-download-overlay');
+    const rowDl = $('row-download-variants');
+    const btnNo = $('btn-download-without-text');
+    const btnYes = $('btn-download-with-text');
     if (applyBtn) applyBtn.disabled = !hasBase;
     if (clearBtn) clearBtn.disabled = !lastCompositeDataUrl;
-    if (dlOverlay && !lastCompositeDataUrl) dlOverlay.style.display = 'none';
+    if (rowDl) rowDl.style.display = hasBase ? 'flex' : 'none';
+    if (btnNo) btnNo.disabled = !hasBase;
+    if (btnYes) btnYes.disabled = !lastCompositeDataUrl;
   }
 
   function clearOverlayComposite() {
     lastCompositeDataUrl = '';
     const prev = $('studio-overlay-preview');
-    const dlOverlay = $('btn-download-overlay');
     if (prev) {
       prev.src = '';
       prev.style.display = 'none';
     }
-    if (dlOverlay) dlOverlay.style.display = 'none';
-    refreshOverlayButtons();
+    refreshStudioImageUi();
   }
 
   async function applyOverlayPreview() {
@@ -532,10 +534,7 @@
         prev.src = dataUrl;
         prev.style.display = 'block';
       }
-      const dlOverlay = $('btn-download-overlay');
-      if (dlOverlay) dlOverlay.style.display = 'inline-flex';
-      refreshOverlayButtons();
-      window.alert('Pré-visualização pronta. Use «Descarregar capa final» ou «Usar no editor de artigo».');
+      refreshStudioImageUi();
     } catch (e) {
       showError((e && e.message) || 'Erro ao compor a imagem.');
     }
@@ -545,7 +544,7 @@
     if (!lastCompositeDataUrl) return;
     const a = document.createElement('a');
     a.href = lastCompositeDataUrl;
-    a.download = `vida360-capa-${Date.now()}.png`;
+    a.download = `vida360-capa-com-texto-${Date.now()}.png`;
     a.rel = 'noopener';
     document.body.appendChild(a);
     a.click();
@@ -607,9 +606,7 @@
         img.src = lastImageDataUrl;
         img.style.display = 'block';
         $('btn-copy-image-url').style.display = 'inline-flex';
-        const dl = $('btn-download-image');
-        if (dl) dl.style.display = 'inline-flex';
-        refreshOverlayButtons();
+        refreshStudioImageUi();
       } else {
         throw new Error(
           (data && (data.details || data.error)) || 'Nenhuma imagem retornada (resposta sem base64).'
@@ -713,7 +710,7 @@
       );
     } else {
       window.alert(
-        'Não foi possível copiar automaticamente. Use «Descarregar imagem» para guardar o ficheiro.'
+        'Não foi possível copiar automaticamente. Use «Sem texto» ou «Com texto» em Descarregar.'
       );
     }
   }
@@ -725,7 +722,7 @@
       /jpeg|jpg/i.test(mime) ? 'jpg' : /webp/i.test(mime) ? 'webp' : 'png';
     const a = document.createElement('a');
     a.href = lastImageDataUrl;
-    a.download = `vida360-estudio-${Date.now()}.${ext}`;
+    a.download = `vida360-imagem-ia-sem-texto-${Date.now()}.${ext}`;
     a.rel = 'noopener';
     document.body.appendChild(a);
     a.click();
@@ -933,14 +930,14 @@
     $('btn-gen-image').addEventListener('click', generateImage);
     $('btn-copy').addEventListener('click', copyOutput);
     $('btn-copy-image-url').addEventListener('click', copyImageDataUrl);
-    const btnDl = $('btn-download-image');
-    if (btnDl) btnDl.addEventListener('click', downloadGeneratedImage);
+    const btnDlNo = $('btn-download-without-text');
+    if (btnDlNo) btnDlNo.addEventListener('click', downloadGeneratedImage);
+    const btnDlYes = $('btn-download-with-text');
+    if (btnDlYes) btnDlYes.addEventListener('click', downloadOverlayPng);
     const btnOv = $('btn-overlay-apply');
     if (btnOv) btnOv.addEventListener('click', applyOverlayPreview);
     const btnOvClear = $('btn-overlay-clear');
     if (btnOvClear) btnOvClear.addEventListener('click', clearOverlayComposite);
-    const btnDlOv = $('btn-download-overlay');
-    if (btnDlOv) btnDlOv.addEventListener('click', downloadOverlayPng);
     $('btn-to-editor').addEventListener('click', useInEditor);
 
     $('btn-coach').addEventListener('click', openCoach);
@@ -961,6 +958,6 @@
 
     setTabDescription();
     setGenerateButtonLabel();
-    refreshOverlayButtons();
+    refreshStudioImageUi();
   });
 })();
