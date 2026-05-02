@@ -156,6 +156,50 @@
     return { copy, imageSuggestion };
   }
 
+  /** Remove Markdown comum para colar em Instagram/WhatsApp sem símbolos. */
+  function stripMarkdownForPlainText(raw) {
+    let s = String(raw || '').replace(/\r\n/g, '\n');
+    s = s.replace(/^```[^\n]*\n([\s\S]*?)^```\s*$/gm, (_, inner) => String(inner));
+    for (let i = 0; i < 10; i++) {
+      const next = s.replace(/```([\s\S]*?)```/g, (_, inner) => inner);
+      if (next === s) break;
+      s = next;
+    }
+    s = s.replace(/^#{1,6}\s+/gm, '');
+    s = s.replace(/\[([^\]]+)\]\([^)]*\)/g, (_, label) => label);
+    s = s.replace(/!\[([^\]]*)\]\([^)]*\)/g, (_, alt) => alt);
+    for (let n = 0; n < 16; n++) {
+      const prev = s;
+      s = s
+        .replace(/\*\*([\s\S]+?)\*\*/g, (_, inner) => inner)
+        .replace(/__([\s\S]+?)__/g, (_, inner) => inner);
+      if (s === prev) break;
+    }
+    s = s.replace(/\*([^*\n]+)\*/g, (_, inner) => inner);
+    s = s.replace(/`([^`]+)`/g, (_, inner) => inner);
+    s = s.replace(/^\s*[-*+]\s+/gm, '');
+    s = s.replace(/^\s*\d+\.\s+/gm, '');
+    s = s.replace(/^\s*>\s?/gm, '');
+    s = s.replace(/^\s*([-*_]\s*){3,}\s*$/gm, '');
+    s = s
+      .split('\n')
+      .map((line) => line.replace(/\s+$/g, ''))
+      .join('\n');
+    s = s.replace(/\n{3,}/g, '\n\n').trim();
+    return s;
+  }
+
+  function getStudioOutputPlain() {
+    const t = $('studio-output');
+    if (!t || !String(t.value || '').trim()) return '';
+    return stripMarkdownForPlainText(t.value);
+  }
+
+  function closeGoogleExportDetails() {
+    const det = $('details-google-export');
+    if (det) det.open = false;
+  }
+
   function setTabDescription() {
     const d = $('tab-desc');
     if (!d) return;
@@ -214,7 +258,7 @@
     }
     if (isFileProtocol()) {
       showError(
-        'Abra esta página por HTTP, não como arquivo (file://). No Cursor/terminal: npm run dev e acesse http://localhost:8080/admin-estudio-conteudo.html — assim o navegador permite chamar o Supabase.',
+        'Abra esta página por HTTP, não como arquivo (file://). No Cursor/terminal: npm run dev e acesse http://localhost:5174/admin-estudio-conteudo.html — assim o navegador permite chamar o Supabase.',
         true
       );
       return;
@@ -1021,7 +1065,7 @@
     }
     if (isFileProtocol()) {
       showError(
-        'Abra por HTTP (npm run dev → http://localhost:8080/…). Com file:// o navegador bloqueia o Supabase.',
+        'Abra por HTTP (npm run dev → http://localhost:5174/…). Com file:// o navegador bloqueia o Supabase.',
         true
       );
       if (btn) btn.disabled = false;
@@ -1132,6 +1176,94 @@
       window.alert(
         'Este navegador bloqueou a cópia automática (comum no preview embutido). O texto ficou selecionado — pressione Ctrl+C (Cmd+C no Mac) e depois cole no Instagram.'
       );
+    }
+  }
+
+  async function copyOutputPlain() {
+    const plain = getStudioOutputPlain();
+    if (!plain) {
+      showError('Gere ou cole um texto no resultado antes.');
+      return;
+    }
+    let ok = false;
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      try {
+        await navigator.clipboard.writeText(plain);
+        ok = true;
+      } catch (e) {
+        ok = false;
+      }
+    }
+    if (!ok) ok = fallbackCopyString(plain);
+    if (!ok) {
+      const t = $('studio-output');
+      if (t) {
+        try {
+          t.focus();
+          t.select();
+          t.setSelectionRange(0, (t.value || '').length);
+          ok = document.execCommand('copy');
+        } catch (e2) {
+          ok = false;
+        }
+      }
+    }
+    if (ok) {
+      window.alert('Texto sem Markdown copiado. Cole no Instagram ou WhatsApp com Ctrl+V (Cmd+V no Mac).');
+    } else {
+      window.alert('Não foi possível copiar automaticamente. Use «Copiar texto», edite manualmente ou selecione o resultado e Ctrl+C.');
+    }
+  }
+
+  function openGmailWithOutput() {
+    const plain = getStudioOutputPlain();
+    if (!plain) {
+      showError('Gere ou cole um texto no resultado antes.');
+      return;
+    }
+    const GMAIL_COMPOSE_BODY_MAX = 6000;
+    let b = plain;
+    if (b.length > GMAIL_COMPOSE_BODY_MAX) {
+      b = `${b.slice(0, GMAIL_COMPOSE_BODY_MAX).trim()}…`;
+      window.alert(
+        'O texto foi encurtado no link do Gmail (limite do navegador). Para o texto completo use «Copiar sem Markdown», «Google Docs» ou divida em partes.'
+      );
+    }
+    const su = 'Blog Vida 360º — copy';
+    const params = new URLSearchParams({ view: 'cm', fs: '1', su: su, body: b });
+    window.open(`https://mail.google.com/mail/?${params.toString()}`, '_blank', 'noopener,noreferrer');
+    closeGoogleExportDetails();
+  }
+
+  async function copyPlainAndOpenDocs() {
+    const plain = getStudioOutputPlain();
+    if (!plain) {
+      showError('Gere ou cole um texto no resultado antes.');
+      return;
+    }
+    try {
+      let copied = false;
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        try {
+          await navigator.clipboard.writeText(plain);
+          copied = true;
+        } catch (e) {
+          copied = false;
+        }
+      }
+      if (!copied) copied = fallbackCopyString(plain);
+      if (!copied) {
+        showError('Não foi possível copiar. Permita acesso à área de transferência ou use «Copiar sem Markdown».');
+        return;
+      }
+      await new Promise((r) => setTimeout(r, 250));
+      window.open('https://docs.new', '_blank', 'noopener,noreferrer');
+      window.alert(
+        'Texto sem Markdown copiado. Na aba do Google Docs, clique no meio da página em branco e pressione Ctrl+V (Cmd+V no Mac).'
+      );
+      closeGoogleExportDetails();
+    } catch (e) {
+      showError('Erro ao copiar ou abrir o Docs. Tente de novo ou copie manualmente.');
     }
   }
 
@@ -1375,6 +1507,12 @@
     $('btn-generate').addEventListener('click', generateContent);
     $('btn-gen-image').addEventListener('click', generateImage);
     $('btn-copy').addEventListener('click', copyOutput);
+    const btnPlain = $('btn-copy-plain');
+    if (btnPlain) btnPlain.addEventListener('click', copyOutputPlain);
+    const btnGm = $('btn-google-gmail');
+    if (btnGm) btnGm.addEventListener('click', openGmailWithOutput);
+    const btnGd = $('btn-google-docs');
+    if (btnGd) btnGd.addEventListener('click', () => void copyPlainAndOpenDocs());
     $('btn-copy-image-url').addEventListener('click', copyImageDataUrl);
     const btnDlNo = $('btn-download-without-text');
     if (btnDlNo) btnDlNo.addEventListener('click', downloadGeneratedImage);
