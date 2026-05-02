@@ -32,6 +32,8 @@
   let coachPendingContent = '';
   let lastImageDataUrl = '';
   let lastImageMimeType = '';
+  /** PNG com texto desenhado (capa); preferido em «Usar no editor» e descarregar final */
+  let lastCompositeDataUrl = '';
 
   function $(id) {
     return document.getElementById(id);
@@ -218,6 +220,7 @@
     $('studio-image-prompt').value = '';
     lastImageDataUrl = '';
     lastImageMimeType = '';
+    clearOverlayComposite();
     if ($('studio-image-preview')) {
       $('studio-image-preview').style.display = 'none';
       $('btn-copy-image-url').style.display = 'none';
@@ -353,9 +356,207 @@
     return d.innerHTML;
   }
 
+  function wrapLinesCanvas(ctx, text, maxWidth) {
+    const blocks = String(text || '')
+      .split(/\n/)
+      .map((b) => b.trim())
+      .filter(Boolean);
+    const out = [];
+    for (const block of blocks) {
+      const words = block.split(/\s+/);
+      let line = '';
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        const test = line ? `${line} ${word}` : word;
+        if (ctx.measureText(test).width <= maxWidth) {
+          line = test;
+        } else {
+          if (line) out.push(line);
+          line = word;
+        }
+      }
+      if (line) out.push(line);
+    }
+    return out.length ? out : [];
+  }
+
+  /**
+   * Desenha gradiente + categoria (faixa amarela) + manchete + rodapé centrado (estilo capa).
+   */
+  function renderNewsStyleOverlay(sourceDataUrl, options) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const w = img.naturalWidth || img.width;
+          const h = img.naturalHeight || img.height;
+          if (!w || !h) {
+            reject(new Error('Dimensões da imagem inválidas.'));
+            return;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Canvas não disponível.'));
+            return;
+          }
+          ctx.drawImage(img, 0, 0);
+
+          const grad = ctx.createLinearGradient(0, 0, 0, h);
+          grad.addColorStop(0, 'rgba(0,0,0,0.1)');
+          grad.addColorStop(0.45, 'rgba(0,0,0,0.28)');
+          grad.addColorStop(1, 'rgba(0,0,0,0.7)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, w, h);
+
+          const pad = Math.max(14, Math.round(w * 0.045));
+          const accent = '#eeff33';
+          const upper = options.uppercase !== false;
+          let cursorY = pad + h * 0.045;
+
+          const category = (options.category || '').trim();
+          if (category) {
+            const catSize = Math.max(14, Math.round(w * 0.026));
+            const rowH = catSize * 1.85;
+            const barW = Math.max(6, Math.round(catSize * 0.34));
+            ctx.fillStyle = accent;
+            ctx.fillRect(pad, cursorY, barW, rowH);
+            ctx.font = `700 ${catSize}px "Segoe UI", Arial, sans-serif`;
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'left';
+            const chev = '» » ';
+            ctx.fillStyle = accent;
+            const chevW = ctx.measureText(chev).width;
+            ctx.fillText(chev, pad + barW + pad * 0.22, cursorY + rowH / 2);
+            ctx.fillStyle = '#ffffff';
+            const catDraw = upper ? category.toUpperCase() : category;
+            ctx.fillText(catDraw, pad + barW + pad * 0.22 + chevW, cursorY + rowH / 2);
+            cursorY += rowH + pad * 0.5;
+          }
+
+          const headline = (options.headline || '').trim();
+          if (!headline) {
+            reject(new Error('Escreva a manchete antes de gerar a capa.'));
+            return;
+          }
+
+          const headSize = Math.max(18, Math.round(w * 0.046));
+          ctx.font = `800 ${headSize}px "Segoe UI", Arial, sans-serif`;
+          ctx.textBaseline = 'top';
+          ctx.textAlign = 'left';
+          const maxTextW = w - pad * 2;
+          const displayHead = upper ? headline.toUpperCase() : headline;
+          const lines = wrapLinesCanvas(ctx, displayHead, maxTextW);
+          if (!lines.length) {
+            reject(new Error('Manchete vazia.'));
+            return;
+          }
+          ctx.fillStyle = '#ffffff';
+          const lineGap = headSize * 1.12;
+          lines.forEach((line, i) => {
+            ctx.fillText(line, pad, cursorY + i * lineGap);
+          });
+          cursorY += lines.length * lineGap + pad * 0.6;
+
+          const footer = (options.footer || '').trim();
+          if (footer) {
+            const footSize = Math.max(10, Math.round(w * 0.02));
+            ctx.font = `700 ${footSize}px "Segoe UI", Arial, sans-serif`;
+            ctx.fillStyle = 'rgba(255,255,255,0.93)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            const footDraw = upper ? footer.toUpperCase() : footer;
+            ctx.fillText(footDraw, w / 2, h - pad);
+            ctx.textAlign = 'left';
+          }
+
+          resolve(canvas.toDataURL('image/png'));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = () => reject(new Error('Não foi possível carregar a imagem gerada.'));
+      img.src = sourceDataUrl;
+    });
+  }
+
+  function refreshOverlayButtons() {
+    const hasBase = !!lastImageDataUrl;
+    const applyBtn = $('btn-overlay-apply');
+    const clearBtn = $('btn-overlay-clear');
+    const dlOverlay = $('btn-download-overlay');
+    if (applyBtn) applyBtn.disabled = !hasBase;
+    if (clearBtn) clearBtn.disabled = !lastCompositeDataUrl;
+    if (dlOverlay && !lastCompositeDataUrl) dlOverlay.style.display = 'none';
+  }
+
+  function clearOverlayComposite() {
+    lastCompositeDataUrl = '';
+    const prev = $('studio-overlay-preview');
+    const dlOverlay = $('btn-download-overlay');
+    if (prev) {
+      prev.src = '';
+      prev.style.display = 'none';
+    }
+    if (dlOverlay) dlOverlay.style.display = 'none';
+    refreshOverlayButtons();
+  }
+
+  async function applyOverlayPreview() {
+    if (!lastImageDataUrl) {
+      showError('Gere uma imagem primeiro.');
+      return;
+    }
+    const headline = ($('overlay-headline') && $('overlay-headline').value.trim()) || '';
+    if (!headline) {
+      showError('Escreva a manchete para desenhar sobre a imagem.');
+      return;
+    }
+    const category = ($('overlay-category') && $('overlay-category').value) || '';
+    const footer = ($('overlay-footer') && $('overlay-footer').value) || '';
+    const uppercase = $('overlay-uppercase') ? $('overlay-uppercase').checked : true;
+
+    clearError();
+    try {
+      const dataUrl = await renderNewsStyleOverlay(lastImageDataUrl, {
+        category,
+        headline,
+        footer,
+        uppercase,
+      });
+      lastCompositeDataUrl = dataUrl;
+      const prev = $('studio-overlay-preview');
+      if (prev) {
+        prev.src = dataUrl;
+        prev.style.display = 'block';
+      }
+      const dlOverlay = $('btn-download-overlay');
+      if (dlOverlay) dlOverlay.style.display = 'inline-flex';
+      refreshOverlayButtons();
+      window.alert('Pré-visualização pronta. Use «Descarregar capa final» ou «Usar no editor de artigo».');
+    } catch (e) {
+      showError((e && e.message) || 'Erro ao compor a imagem.');
+    }
+  }
+
+  function downloadOverlayPng() {
+    if (!lastCompositeDataUrl) return;
+    const a = document.createElement('a');
+    a.href = lastCompositeDataUrl;
+    a.download = `vida360-capa-${Date.now()}.png`;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
   async function generateImage() {
     const session = await requireAuth();
     if (!session) return;
+
+    clearOverlayComposite();
 
     const desc =
       ($('studio-image-prompt') && $('studio-image-prompt').value.trim()) ||
@@ -408,6 +609,7 @@
         $('btn-copy-image-url').style.display = 'inline-flex';
         const dl = $('btn-download-image');
         if (dl) dl.style.display = 'inline-flex';
+        refreshOverlayButtons();
       } else {
         throw new Error(
           (data && (data.details || data.error)) || 'Nenhuma imagem retornada (resposta sem base64).'
@@ -555,7 +757,7 @@
       title: title || 'Novo artigo',
       excerpt: excerpt || '',
       body: plain,
-      imageDataUrl: lastImageDataUrl || '',
+      imageDataUrl: lastCompositeDataUrl || lastImageDataUrl || '',
       socialImageUrl: socialUrl,
     };
     try {
@@ -733,6 +935,12 @@
     $('btn-copy-image-url').addEventListener('click', copyImageDataUrl);
     const btnDl = $('btn-download-image');
     if (btnDl) btnDl.addEventListener('click', downloadGeneratedImage);
+    const btnOv = $('btn-overlay-apply');
+    if (btnOv) btnOv.addEventListener('click', applyOverlayPreview);
+    const btnOvClear = $('btn-overlay-clear');
+    if (btnOvClear) btnOvClear.addEventListener('click', clearOverlayComposite);
+    const btnDlOv = $('btn-download-overlay');
+    if (btnDlOv) btnDlOv.addEventListener('click', downloadOverlayPng);
     $('btn-to-editor').addEventListener('click', useInEditor);
 
     $('btn-coach').addEventListener('click', openCoach);
@@ -753,5 +961,6 @@
 
     setTabDescription();
     setGenerateButtonLabel();
+    refreshOverlayButtons();
   });
 })();

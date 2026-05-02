@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -122,6 +122,16 @@
             color: #2d1f3d;
         }
         #studio-image-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 0.5rem; display: none; }
+        .overlay-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.35rem;
+            border-radius: 8px;
+            border: 1px solid #d7c2e6;
+            background: #ffffff;
+            color: #2d1f3d;
+            font-size: 0.9rem;
+        }
         .history-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         .history-table th, .history-table td {
             border: 1px solid #d7c2e6;
@@ -325,6 +335,27 @@
                     <button type="button" class="btn btn-primary" id="btn-download-image" style="display:none" title="Guardar ficheiro no computador">⬇️ Descarregar imagem</button>
                     <button type="button" class="btn" id="btn-copy-image-url" style="display:none">📋 Copiar data URL</button>
                 </div>
+
+                <p class="section-title">Texto sobre a imagem (capa estilo notícia)</p>
+                <p class="hint">Depois de gerar a imagem acima, use campos semelhantes ao Estúdio PedagoFlow: <strong>categoria</strong> com faixa amarela, <strong>manchete</strong> em destaque e <strong>rodapé</strong> (marca ou URL). O fundo escurece para a leitura. Gere a pré-visualização e descarregue a <strong>capa final</strong> para Instagram ou WhatsApp.</p>
+                <label class="lbl" for="overlay-category">Categoria / selo (opcional)</label>
+                <input type="text" id="overlay-category" class="overlay-input" placeholder="Ex.: BEM-ESTAR, DICAS, EVENTOS" maxlength="80" />
+                <label class="lbl" for="overlay-headline" style="margin-top:0.65rem">Manchete</label>
+                <textarea id="overlay-headline" class="input-lg" style="min-height:100px" maxlength="2000" placeholder="Use Enter para quebrar linhas. Ex.:&#10;ÓLEOS ESSENCIAIS NA ROTINA&#10;SEM COMPLICAR O SEU DIA"></textarea>
+                <label class="lbl" for="overlay-footer" style="margin-top:0.65rem">Rodapé (marca ou site)</label>
+                <input type="text" id="overlay-footer" class="overlay-input" placeholder="WWW.BLOGVIDA360.COM.BR" maxlength="120" />
+                <div class="image-row" style="margin-top:0.5rem">
+                    <label class="lbl" style="display:inline-flex;align-items:center;gap:0.35rem;font-weight:500;margin:0;">
+                        <input type="checkbox" id="overlay-uppercase" checked />
+                        Texto da manchete e rodapé em maiúsculas
+                    </label>
+                </div>
+                <div class="toolbar-bottom">
+                    <button type="button" class="btn btn-primary" id="btn-overlay-apply" disabled>✨ Gerar pré-visualização com texto</button>
+                    <button type="button" class="btn" id="btn-overlay-clear" disabled>Limpar capa</button>
+                    <button type="button" class="btn btn-primary" id="btn-download-overlay" style="display:none">⬇️ Descarregar capa final (PNG)</button>
+                </div>
+                <img id="studio-overlay-preview" alt="Pré-visualização com texto na imagem" style="display:none;max-width:100%;max-height:280px;border-radius:8px;margin-top:0.5rem;border:2px solid #9b59b6;object-fit:contain;background:#1a1024;" />
             </div>
 
             <div id="block-history" style="display:none;">
@@ -409,7 +440,7 @@
             initStudioSupabase();
         }
     </script>
-    <script src="assets/js/estudio-conteudo.js?v=20260501-copy-fallback"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260502-overlay"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">
