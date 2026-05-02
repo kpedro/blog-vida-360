@@ -628,7 +628,8 @@
   }
 
   /**
-   * Desenha gradiente + categoria (faixa amarela) + manchete + rodapé centrado (estilo capa).
+   * Desenha gradiente + categoria (faixa amarela) + manchete alinhados à esquerda no terço INFERIOR
+   * (padrão comum em artes para Instagram / citação) + rodapé centrado na base.
    */
   function renderNewsStyleOverlay(sourceDataUrl, options) {
     return new Promise((resolve, reject) => {
@@ -651,38 +652,20 @@
           }
           ctx.drawImage(img, 0, 0);
 
+          /* Escurece sobretudo a base (terço inferior): padrão habitual em artes para redes / “quote cards”. */
           const grad = ctx.createLinearGradient(0, 0, 0, h);
-          grad.addColorStop(0, 'rgba(0,0,0,0.1)');
-          grad.addColorStop(0.45, 'rgba(0,0,0,0.28)');
-          grad.addColorStop(1, 'rgba(0,0,0,0.7)');
+          grad.addColorStop(0, 'rgba(0,0,0,0.06)');
+          grad.addColorStop(0.5, 'rgba(0,0,0,0.18)');
+          grad.addColorStop(0.72, 'rgba(0,0,0,0.45)');
+          grad.addColorStop(1, 'rgba(0,0,0,0.78)');
           ctx.fillStyle = grad;
           ctx.fillRect(0, 0, w, h);
 
           const pad = Math.max(14, Math.round(w * 0.045));
           const accent = '#eeff33';
           const upper = options.uppercase !== false;
-          let cursorY = pad + h * 0.045;
 
           const category = (options.category || '').trim();
-          if (category) {
-            const catSize = Math.max(14, Math.round(w * 0.026));
-            const rowH = catSize * 1.85;
-            const barW = Math.max(6, Math.round(catSize * 0.34));
-            ctx.fillStyle = accent;
-            ctx.fillRect(pad, cursorY, barW, rowH);
-            ctx.font = `700 ${catSize}px "Segoe UI", Arial, sans-serif`;
-            ctx.textBaseline = 'middle';
-            ctx.textAlign = 'left';
-            const chev = '» » ';
-            ctx.fillStyle = accent;
-            const chevW = ctx.measureText(chev).width;
-            ctx.fillText(chev, pad + barW + pad * 0.22, cursorY + rowH / 2);
-            ctx.fillStyle = '#ffffff';
-            const catDraw = upper ? category.toUpperCase() : category;
-            ctx.fillText(catDraw, pad + barW + pad * 0.22 + chevW, cursorY + rowH / 2);
-            cursorY += rowH + pad * 0.5;
-          }
-
           const headline = (options.headline || '').trim();
           if (!headline) {
             reject(new Error('Escreva a manchete antes de gerar a capa.'));
@@ -700,16 +683,62 @@
             reject(new Error('Manchete vazia.'));
             return;
           }
-          ctx.fillStyle = '#ffffff';
           const lineGap = headSize * 1.12;
-          lines.forEach((line, i) => {
-            ctx.fillText(line, pad, cursorY + i * lineGap);
-          });
-          cursorY += lines.length * lineGap + pad * 0.6;
+          const headlineBlockH = lines.length * lineGap;
+
+          let catSize = 14;
+          let rowH = 0;
+          let barW = 6;
+          if (category) {
+            catSize = Math.max(14, Math.round(w * 0.026));
+            rowH = catSize * 1.85;
+            barW = Math.max(6, Math.round(catSize * 0.34));
+          }
 
           const footer = (options.footer || '').trim();
+          let footSize = 0;
           if (footer) {
-            const footSize = Math.max(10, Math.round(w * 0.02));
+            footSize = Math.max(10, Math.round(w * 0.02));
+          }
+
+          const catGap = pad * 0.45;
+          const footReserve = footer ? footSize * 1.38 + pad * 0.42 : 0;
+          const blockBottom = h - pad - footReserve - pad * 0.2;
+
+          let headlineTop = blockBottom - headlineBlockH;
+          let categoryTop = category ? headlineTop - catGap - rowH : headlineTop;
+
+          const minTop = pad * 0.85;
+          if (categoryTop < minTop) {
+            const shift = minTop - categoryTop;
+            categoryTop += shift;
+            headlineTop += shift;
+          }
+
+          if (category) {
+            ctx.fillStyle = accent;
+            ctx.fillRect(pad, categoryTop, barW, rowH);
+            ctx.font = `700 ${catSize}px "Segoe UI", Arial, sans-serif`;
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'left';
+            const chev = '» » ';
+            ctx.fillStyle = accent;
+            const chevW = ctx.measureText(chev).width;
+            ctx.fillText(chev, pad + barW + pad * 0.22, categoryTop + rowH / 2);
+            ctx.fillStyle = '#ffffff';
+            const catDraw = upper ? category.toUpperCase() : category;
+            ctx.fillText(catDraw, pad + barW + pad * 0.22 + chevW, categoryTop + rowH / 2);
+          }
+
+          ctx.font = `800 ${headSize}px "Segoe UI", Arial, sans-serif`;
+          ctx.textBaseline = 'top';
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#ffffff';
+          lines.forEach((line, i) => {
+            ctx.fillText(line, pad, headlineTop + i * lineGap);
+          });
+
+          if (footer) {
             ctx.font = `700 ${footSize}px "Segoe UI", Arial, sans-serif`;
             ctx.fillStyle = 'rgba(255,255,255,0.93)';
             ctx.textAlign = 'center';
