@@ -107,3 +107,72 @@ GRANT EXECUTE ON FUNCTION public.blog360_match_rag_chunks(VECTOR(1536), DOUBLE P
 -- Quiser painel admin no futuro: políticas SELECT/INSERT para role ou utilizadores específicos.
 -- ---------------------------------------------------------------------------
 ALTER TABLE public.blog360_rag_chunks ENABLE ROW LEVEL SECURITY;
+
+-- ---------------------------------------------------------------------------
+-- RPC compatível com n8n / LangChain Supabase Vector Store
+-- (Supabase quickstart: query_embedding + match_count + filter jsonb → id, content, metadata, similarity)
+-- Query Name no nó: match_blog360_documents ou alias match_assistant_knowledge
+-- Table Name no nó: blog360_rag_chunks
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.match_blog360_documents(
+  query_embedding VECTOR(1536),
+  match_count INTEGER DEFAULT NULL,
+  filter JSONB DEFAULT '{}'::jsonb
+)
+RETURNS TABLE (
+  id UUID,
+  content TEXT,
+  metadata JSONB,
+  similarity REAL
+)
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  lim INTEGER := LEAST(GREATEST(COALESCE(match_count, 10), 1), 100);
+BEGIN
+  RETURN QUERY
+  SELECT
+    c.id,
+    c.content,
+    c.metadata,
+    (1 - (c.embedding <=> query_embedding))::REAL AS similarity
+  FROM public.blog360_rag_chunks c
+  WHERE c.is_active = true
+    AND c.embedding IS NOT NULL
+    AND (filter = '{}'::jsonb OR c.metadata @> filter)
+  ORDER BY c.embedding <=> query_embedding
+  LIMIT lim;
+END;
+$$;
+
+COMMENT ON FUNCTION public.match_blog360_documents IS
+  'LangChain/n8n Supabase Vector Store: mesma assinatura que match_documents do quickstart Supabase.';
+
+CREATE OR REPLACE FUNCTION public.match_assistant_knowledge(
+  query_embedding VECTOR(1536),
+  match_count INTEGER DEFAULT NULL,
+  filter JSONB DEFAULT '{}'::jsonb
+)
+RETURNS TABLE (
+  id UUID,
+  content TEXT,
+  metadata JSONB,
+  similarity REAL
+)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT *
+  FROM public.match_blog360_documents(query_embedding, match_count, filter);
+$$;
+
+COMMENT ON FUNCTION public.match_assistant_knowledge IS
+  'Alias para fluxos n8n já configurados com Query Name match_assistant_knowledge; usa blog360_rag_chunks.';
+
+GRANT EXECUTE ON FUNCTION public.match_blog360_documents(VECTOR(1536), INTEGER, JSONB) TO service_role;
+GRANT EXECUTE ON FUNCTION public.match_assistant_knowledge(VECTOR(1536), INTEGER, JSONB) TO service_role;

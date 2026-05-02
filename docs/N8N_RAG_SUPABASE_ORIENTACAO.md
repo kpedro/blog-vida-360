@@ -6,7 +6,7 @@ Este documento alinha o **cérebro do chat** (workflow n8n copiado/adaptado do M
 
 | Ficheiro | Função |
 |----------|--------|
-| `supabase/BLOG360_RAG_KNOWLEDGE.sql` | Extensão **pgvector**, tabela **`blog360_rag_chunks`**, índice IVFFLAT e RPC **`blog360_match_rag_chunks`**. |
+| `supabase/BLOG360_RAG_KNOWLEDGE.sql` | Extensão **pgvector**, tabela **`blog360_rag_chunks`**, índice IVFFLAT, RPC **`blog360_match_rag_chunks`** (threshold manual) e RPCs **`match_blog360_documents`** / **`match_assistant_knowledge`** (compatíveis com o **Supabase Vector Store** do n8n / LangChain). |
 
 ### Modelo de dados (resumo)
 
@@ -31,6 +31,24 @@ Parâmetros:
 Devolve: `id`, `content`, `metadata`, `source_title`, `chunk_index`, `similarity`.
 
 **Segurança:** a função é **`SECURITY DEFINER`** com `search_path = public`. **`EXECUTE`** foi concedido a **`service_role`** — uso típico: **n8n com chave service_role**, não expor a RPC ao browser com anon key sem avaliar risco.
+
+### Nó **Supabase Vector Store** no n8n (modo “Retrieve Documents…”)
+
+O nó segue o [quickstart LangChain + Supabase](https://supabase.com/docs/guides/ai/langchain): a **Query Name** não é opcional — tem de ser uma RPC com os parâmetros `query_embedding`, `match_count` e `filter` (e devolver `id`, `content`, `metadata`, `similarity`). Por isso existem **`match_blog360_documents`** e o alias **`match_assistant_knowledge`** (mesma lógica).
+
+Configuração recomendada no painel do nó:
+
+| Campo | Valor |
+|--------|--------|
+| **Credential** | Supabase com URL do projeto + **`service_role`** (ou API key com permissão para RPC/tabela, conforme a tua política). |
+| **Operation Mode** | Retrieve Documents (As Vector Store for Chain/Tool) — ou o modo que estavas a usar. |
+| **Table Name** | **`blog360_rag_chunks`** (substitui `assistant_knowledge`). |
+| **Options → Query Name** | **`match_blog360_documents`** **ou** **`match_assistant_knowledge`** (se já tinhas este nome no fluxo copiado). |
+| **Rerank Results** | Opcional; só activar se ligares um nó de rerank. |
+
+**Importante:** o nome da **tabela** na base tem de ser **`blog360_rag_chunks`**. O nome da **função** (`Query Name`) é que escolhes entre `match_blog360_documents` e `match_assistant_knowledge` — ambos apontam para os mesmos dados depois de executares o SQL actualizado no Supabase.
+
+Se mudares só o nome da tabela no nó e **não** correres o script SQL no projeto, a função `match_assistant_knowledge` antiga (outro agente) pode continuar a referir outra tabela — por isso convém **recriar** estas funções a partir de `BLOG360_RAG_KNOWLEDGE.sql`.
 
 ---
 
