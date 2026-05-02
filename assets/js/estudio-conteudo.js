@@ -132,7 +132,7 @@
       return { connected: false, features: {} };
     }
     try {
-      const res = await fetch(`${base}/functions/v1/google-calendar-auth?action=status`, {
+      const res = await fetch(`${base}/functions/v1/blog360-google-auth?action=status`, {
         headers: authHeadersForEdge(session),
       });
       const data = await res.json().catch(() => ({}));
@@ -146,7 +146,7 @@
 
   /** Proxy PedagoFlow: `google-workspace-api` (Docs, Drive, etc.). */
   async function googleWorkspaceApi(session, body) {
-    const res = await fetch(`${getSupabaseUrl()}/functions/v1/google-workspace-api`, {
+    const res = await fetch(`${getSupabaseUrl()}/functions/v1/blog360-google-workspace-api`, {
       method: 'POST',
       headers: fnHeaders(session),
       body: JSON.stringify(body),
@@ -159,7 +159,7 @@
     return data;
   }
 
-  /** OAuth igual ao PedagoFlow (`google-calendar-auth?action=start`). Após autorizar, o redirect usa FRONTEND_URL do servidor (costuma abrir o PedagoFlow em Integrações Google). */
+  /** OAuth do Blog (`blog360-google-auth?action=start`). Após autorizar, volta ao admin-estudio-conteudo.html (ver BLOG360_FRONTEND_URL no deploy). */
   async function startGoogleOAuthConnect() {
     clearError();
     const session = await requireAuth();
@@ -173,7 +173,7 @@
       return;
     }
     try {
-      const res = await fetch(`${getSupabaseUrl()}/functions/v1/google-calendar-auth?action=start`, {
+      const res = await fetch(`${getSupabaseUrl()}/functions/v1/blog360-google-auth?action=start`, {
         headers: authHeadersForEdge(session),
       });
       const data = await res.json().catch(() => ({}));
@@ -1307,8 +1307,8 @@
   }
 
   /**
-   * Igual ao PedagoFlow: com conta Google ligada (mesmo projeto Supabase + tokens em pedagoflow_google_calendar_tokens),
-   * cria o documento via API. Senão, copia o texto plano e abre docs.new (fallback).
+   * Com conta Google ligada neste Estúdio (tokens em blog360_google_workspace_tokens), cria o Doc via API.
+   * Senão, copia o texto plano e abre docs.new (fallback).
    */
   async function copyPlainAndOpenDocs() {
     const plain = getStudioOutputPlain();
@@ -1332,7 +1332,7 @@
         if (result && result.webViewLink) {
           window.open(result.webViewLink, '_blank', 'noopener,noreferrer');
           window.alert(
-            'Documento criado no Google Docs com o texto (API partilhada com o PedagoFlow).'
+            'Documento criado no Google Docs com o texto (API do Blog Vida 360º, tokens na tabela dedicada).'
           );
           closeGoogleExportDetails();
           return;
@@ -1355,14 +1355,14 @@
       if (!copied) copied = fallbackCopyString(plain);
       if (!copied) {
         showError(
-          'Não foi possível copiar. Permita acesso à área de transferência ou use «Copiar sem Markdown». Para criar o ficheiro direto na API, ligue o Google no PedagoFlow em Gestão → Integrações Google (mesmo Supabase).'
+          'Não foi possível copiar. Permita acesso à área de transferência ou use «Copiar sem Markdown». Para criar o documento pela API, use «Conectar conta Google» neste Estúdio (OAuth próprio do blog).'
         );
         return;
       }
       await new Promise((r) => setTimeout(r, 250));
       window.open('https://docs.new', '_blank', 'noopener,noreferrer');
       window.alert(
-        'Texto sem Markdown copiado. Na aba do Google Docs, clique no meio da página em branco e pressione Ctrl+V (Cmd+V no Mac). Se ligar a conta Google ao PedagoFlow, o Estúdio pode criar o documento automaticamente na próxima vez.'
+        'Texto sem Markdown copiado. Na aba do Google Docs, clique no meio da página em branco e pressione Ctrl+V (Cmd+V no Mac). Se usar «Conectar conta Google» neste Estúdio, na próxima vez o documento pode ser criado automaticamente.'
       );
       closeGoogleExportDetails();
     } catch (e2) {
@@ -1602,6 +1602,21 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     await requireAuth();
+
+    try {
+      const qs = new URLSearchParams(window.location.search || '');
+      if (qs.get('google_workspace') === 'connected') {
+        clearError();
+        window.alert(
+          'Conta Google ligada ao Blog Vida 360º (tokens guardados na tabela dedicada). Já pode usar «Google Docs — criar documento (API)».'
+        );
+        const u = new URL(window.location.href);
+        u.searchParams.delete('google_workspace');
+        window.history.replaceState({}, document.title, u.pathname + u.search + (u.hash || ''));
+      }
+    } catch (_) {
+      /* ignore */
+    }
 
     document.querySelectorAll('#type-tabs .tab').forEach((btn) => {
       btn.addEventListener('click', () => switchTab(btn.dataset.type));
