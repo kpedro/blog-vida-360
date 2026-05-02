@@ -4,6 +4,7 @@
  */
 (function () {
   const STORAGE_SNIPPETS = 'blog360_prompt_snippets_v1';
+  const STORAGE_OVERLAY_ACCENT = 'blog360_overlay_accent_v1';
   const CONTENT_TYPES = {
     landing: { label: 'Landing Page', desc: 'Headlines, benefícios e CTA para rotina, aromaterapia e bem-estar', gen: 'Gerar Landing Page' },
     social_post: {
@@ -621,6 +622,109 @@
     }
   }
 
+  function normalizeAccentColor(hex) {
+    if (hex == null || typeof hex !== 'string') return '';
+    const h = hex.trim();
+    if (/^#[0-9A-Fa-f]{6}$/.test(h)) return h.toUpperCase();
+    if (/^#[0-9A-Fa-f]{3}$/.test(h)) {
+      return (
+        '#' +
+        h[1] +
+        h[1] +
+        h[2] +
+        h[2] +
+        h[3] +
+        h[3]
+      ).toUpperCase();
+    }
+    return '';
+  }
+
+  function getSelectedAccentColor() {
+    const input = $('overlay-accent-custom');
+    if (input && input.value) {
+      const n = normalizeAccentColor(input.value);
+      if (n) return n;
+    }
+    const active = document.querySelector('#overlay-palette .overlay-swatch.active');
+    if (active && active.getAttribute('data-color')) {
+      return normalizeAccentColor(active.getAttribute('data-color')) || '#EEFF33';
+    }
+    return '#EEFF33';
+  }
+
+  function saveAccentPreference(hex) {
+    const n = normalizeAccentColor(hex);
+    if (!n) return;
+    try {
+      localStorage.setItem(STORAGE_OVERLAY_ACCENT, n);
+    } catch (e) {}
+  }
+
+  function initOverlayPalette() {
+    const palette = $('overlay-palette');
+    const colorInput = $('overlay-accent-custom');
+    if (!palette || !colorInput) return;
+
+    let saved = '';
+    try {
+      saved = localStorage.getItem(STORAGE_OVERLAY_ACCENT) || '';
+    } catch (e) {}
+    const normalized = normalizeAccentColor(saved);
+    if (normalized) {
+      colorInput.value = normalized.length === 7 ? normalized : '#EEFF33';
+      let matched = false;
+      palette.querySelectorAll('.overlay-swatch').forEach((btn) => {
+        const c = normalizeAccentColor(btn.getAttribute('data-color') || '');
+        btn.classList.toggle('active', c === normalized);
+        if (c === normalized) matched = true;
+      });
+      if (!matched) {
+        palette.querySelectorAll('.overlay-swatch').forEach((b) => b.classList.remove('active'));
+      }
+    }
+
+    palette.querySelectorAll('.overlay-swatch').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const c = btn.getAttribute('data-color');
+        const n = normalizeAccentColor(c);
+        if (!n) return;
+        palette.querySelectorAll('.overlay-swatch').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        colorInput.value = n.length === 7 ? n : '#EEFF33';
+        saveAccentPreference(n);
+      });
+    });
+
+    colorInput.addEventListener('input', () => {
+      const n = normalizeAccentColor(colorInput.value);
+      if (n) {
+        palette.querySelectorAll('.overlay-swatch').forEach((b) => b.classList.remove('active'));
+        colorInput.value = n.length === 7 ? n : colorInput.value;
+        saveAccentPreference(n);
+      }
+    });
+  }
+
+  /** Atualiza os três moldes (desktop / tablet / telemóvel) com a capa atual ou só a imagem da IA. */
+  function updatePostDevicePreviews() {
+    const url = lastCompositeDataUrl || lastImageDataUrl || '';
+    const section = $('post-preview-section');
+    const ids = ['preview-desktop-inner', 'preview-tablet-inner', 'preview-phone-inner'];
+    ids.forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      if (url) {
+        el.src = url;
+        el.style.display = 'block';
+      } else {
+        el.removeAttribute('src');
+        el.style.display = 'none';
+      }
+    });
+    if (section) section.style.display = url ? 'block' : 'none';
+  }
+
   function wrapLinesCanvas(ctx, text, maxWidth) {
     const blocks = String(text || '')
       .split(/\n/)
@@ -680,7 +784,8 @@
           ctx.fillRect(0, 0, w, h);
 
           const pad = Math.max(14, Math.round(w * 0.045));
-          const accent = '#eeff33';
+          const accentRaw = options.accent != null ? String(options.accent).trim() : '';
+          const accent = normalizeAccentColor(accentRaw) || '#EEFF33';
           const upper = options.uppercase !== false;
 
           const category = (options.category || '').trim();
@@ -798,6 +903,7 @@
       prev.style.display = 'none';
     }
     refreshStudioImageUi();
+    updatePostDevicePreviews();
   }
 
   async function applyOverlayPreview() {
@@ -821,6 +927,7 @@
         headline,
         footer,
         uppercase,
+        accent: getSelectedAccentColor(),
       });
       lastCompositeDataUrl = dataUrl;
       const prev = $('studio-overlay-preview');
@@ -829,6 +936,7 @@
         prev.style.display = 'block';
       }
       refreshStudioImageUi();
+      updatePostDevicePreviews();
     } catch (e) {
       showError((e && e.message) || 'Erro ao compor a imagem.');
     }
@@ -943,6 +1051,7 @@
         img.style.display = 'block';
         $('btn-copy-image-url').style.display = 'inline-flex';
         refreshStudioImageUi();
+        updatePostDevicePreviews();
         offerOverlaySuggestionsAfterImage();
       } else {
         throw new Error(
@@ -1307,6 +1416,8 @@
 
     setTabDescription();
     setGenerateButtonLabel();
+    initOverlayPalette();
     refreshStudioImageUi();
+    updatePostDevicePreviews();
   });
 })();
