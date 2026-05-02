@@ -35,6 +35,12 @@ ALTER TABLE public.blog360_site_settings
   ADD COLUMN IF NOT EXISTS faixa_oportunidade_link TEXT,
   ADD COLUMN IF NOT EXISTS faixa_oportunidade_cta TEXT;
 
+-- Foto da página Sobre (URL https ou data URL reduzido); idempotente
+ALTER TABLE public.blog360_site_settings
+  ADD COLUMN IF NOT EXISTS sobre_foto_url TEXT;
+
+COMMENT ON COLUMN public.blog360_site_settings.sobre_foto_url IS 'URL público da foto na página Sobre (Storage) ou data URL curto; gravado pelo admin-dashboard.';
+
 DROP TRIGGER IF EXISTS blog360_site_settings_updated_at ON public.blog360_site_settings;
 CREATE TRIGGER blog360_site_settings_updated_at
   BEFORE UPDATE ON public.blog360_site_settings
