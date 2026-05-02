@@ -117,6 +117,77 @@
     return h;
   }
 
+  /** Cabeçalho só com JWT + anon key (ex.: GET status OAuth). */
+  function authHeadersForEdge(session) {
+    const h = { Authorization: `Bearer ${session.access_token}` };
+    const k = getAnonKey();
+    if (k) h.apikey = k;
+    return h;
+  }
+
+  /** Mesmo fluxo PedagoFlow: `google-calendar-auth?action=status`. */
+  async function fetchGoogleWorkspaceStatus(session) {
+    const base = getSupabaseUrl().trim();
+    if (!base || !session) {
+      return { connected: false, features: {} };
+    }
+    try {
+      const res = await fetch(`${base}/functions/v1/google-calendar-auth?action=status`, {
+        headers: authHeadersForEdge(session),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return { connected: false, features: {} };
+      return data;
+    } catch (e) {
+      console.warn('[Estúdio] fetchGoogleWorkspaceStatus', e);
+      return { connected: false, features: {} };
+    }
+  }
+
+  /** Proxy PedagoFlow: `google-workspace-api` (Docs, Drive, etc.). */
+  async function googleWorkspaceApi(session, body) {
+    const res = await fetch(`${getSupabaseUrl()}/functions/v1/google-workspace-api`, {
+      method: 'POST',
+      headers: fnHeaders(session),
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const msg = (data && (data.error || data.details)) || `Erro HTTP ${res.status}`;
+      throw new Error(typeof msg === 'string' ? msg : 'Falha na API Google');
+    }
+    return data;
+  }
+
+  /** OAuth igual ao PedagoFlow (`google-calendar-auth?action=start`). Após autorizar, o redirect usa FRONTEND_URL do servidor (costuma abrir o PedagoFlow em Integrações Google). */
+  async function startGoogleOAuthConnect() {
+    clearError();
+    const session = await requireAuth();
+    if (!session) return;
+    if (!getSupabaseUrl().trim()) {
+      showError('URL do Supabase não definida.', true);
+      return;
+    }
+    if (isFileProtocol()) {
+      showError('Abra por HTTP (npm run dev), não como file://.', true);
+      return;
+    }
+    try {
+      const res = await fetch(`${getSupabaseUrl()}/functions/v1/google-calendar-auth?action=start`, {
+        headers: authHeadersForEdge(session),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Falha ao iniciar conexão Google');
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+        return;
+      }
+      throw new Error('Resposta sem URL de autorização');
+    } catch (e) {
+      showError((e && e.message) || 'Erro ao conectar Google', true);
+    }
+  }
+
   async function getSession() {
     let c = window.supabaseClient;
     if (!c && typeof window.initSupabase === 'function') {
@@ -1235,34 +1306,66 @@
     closeGoogleExportDetails();
   }
 
+  /**
+   * Igual ao PedagoFlow: com conta Google ligada (mesmo projeto Supabase + tokens em pedagoflow_google_calendar_tokens),
+   * cria o documento via API. Senão, copia o texto plano e abre docs.new (fallback).
+   */
   async function copyPlainAndOpenDocs() {
     const plain = getStudioOutputPlain();
     if (!plain) {
       showError('Gere ou cole um texto no resultado antes.');
       return;
     }
+    const session = await requireAuth();
+    if (!session) return;
+
+    try {
+      const st = await fetchGoogleWorkspaceStatus(session);
+      if (st && st.connected && st.features && st.features.docsWrite) {
+        const dateIso = new Date().toISOString().split('T')[0];
+        const title = `Blog Vida 360º — ${dateIso}`.slice(0, 200);
+        const result = await googleWorkspaceApi(session, {
+          action: 'doc_create',
+          title,
+          text: plain,
+        });
+        if (result && result.webViewLink) {
+          window.open(result.webViewLink, '_blank', 'noopener,noreferrer');
+          window.alert(
+            'Documento criado no Google Docs com o texto (API partilhada com o PedagoFlow).'
+          );
+          closeGoogleExportDetails();
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('[Estúdio] doc_create → fallback docs.new', e);
+    }
+
     try {
       let copied = false;
       if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
         try {
           await navigator.clipboard.writeText(plain);
           copied = true;
-        } catch (e) {
+        } catch (err) {
           copied = false;
         }
       }
       if (!copied) copied = fallbackCopyString(plain);
       if (!copied) {
-        showError('Não foi possível copiar. Permita acesso à área de transferência ou use «Copiar sem Markdown».');
+        showError(
+          'Não foi possível copiar. Permita acesso à área de transferência ou use «Copiar sem Markdown». Para criar o ficheiro direto na API, ligue o Google no PedagoFlow em Gestão → Integrações Google (mesmo Supabase).'
+        );
         return;
       }
       await new Promise((r) => setTimeout(r, 250));
       window.open('https://docs.new', '_blank', 'noopener,noreferrer');
       window.alert(
-        'Texto sem Markdown copiado. Na aba do Google Docs, clique no meio da página em branco e pressione Ctrl+V (Cmd+V no Mac).'
+        'Texto sem Markdown copiado. Na aba do Google Docs, clique no meio da página em branco e pressione Ctrl+V (Cmd+V no Mac). Se ligar a conta Google ao PedagoFlow, o Estúdio pode criar o documento automaticamente na próxima vez.'
       );
       closeGoogleExportDetails();
-    } catch (e) {
+    } catch (e2) {
       showError('Erro ao copiar ou abrir o Docs. Tente de novo ou copie manualmente.');
     }
   }
@@ -1513,6 +1616,8 @@
     if (btnGm) btnGm.addEventListener('click', openGmailWithOutput);
     const btnGd = $('btn-google-docs');
     if (btnGd) btnGd.addEventListener('click', () => void copyPlainAndOpenDocs());
+    const btnGc = $('btn-google-connect');
+    if (btnGc) btnGc.addEventListener('click', () => void startGoogleOAuthConnect());
     $('btn-copy-image-url').addEventListener('click', copyImageDataUrl);
     const btnDlNo = $('btn-download-without-text');
     if (btnDlNo) btnDlNo.addEventListener('click', downloadGeneratedImage);

@@ -459,13 +459,14 @@
                     <details class="details-google" id="details-google-export">
                         <summary class="btn details-google-summary">🔽 Google</summary>
                         <div class="details-google-panel" role="menu">
-                            <button type="button" class="btn" id="btn-google-gmail" role="menuitem">Abrir Gmail (rascunho com o texto)</button>
-                            <button type="button" class="btn" id="btn-google-docs" role="menuitem">Copiar texto e abrir Google Docs</button>
+                            <button type="button" class="btn btn-primary" id="btn-google-connect" role="menuitem">Conectar conta Google (OAuth PedagoFlow)</button>
+                            <button type="button" class="btn" id="btn-google-gmail" role="menuitem">Gmail — rascunho com o texto</button>
+                            <button type="button" class="btn" id="btn-google-docs" role="menuitem">Google Docs — criar documento (API)</button>
                         </div>
                     </details>
                     <button type="button" class="btn btn-primary" id="btn-to-editor">📝 Usar no editor de artigo</button>
                 </div>
-                <p class="hint" style="margin-top:0.35rem">Google Docs: o texto (sem Markdown) é copiado para a área de transferência e abre-se <code style="font-size:0.75rem">docs.new</code> — na página em branco pressione Ctrl+V (Cmd+V no Mac). Gmail usa um link de composição; textos muito longos podem ser encurtados pelo limite do navegador.</p>
+                <p class="hint" style="margin-top:0.35rem"><strong>Google (mesmo backend do PedagoFlow):</strong> com a conta ligada em <strong>PedagoFlow → Gestão → Integrações Google</strong> (mesmo projeto Supabase), «Google Docs» cria o ficheiro pela API e abre o documento. Sem ligação, copia-se o texto sem Markdown e abre-se <code style="font-size:0.75rem">docs.new</code> para colar (Ctrl+V). «Conectar conta Google» inicia o mesmo OAuth do PedagoFlow (após autorizar pode redirecionar para o app PedagoFlow). Gmail usa composição web; textos longos podem ser encurtados.</p>
 
                 <p class="section-title">Imagem (opcional)</p>
                 <p class="hint">Usa a sugestão automática após gerar texto, ou descreva abaixo. Para Instagram em formato retrato clássico do feed, experimente <strong>4:5</strong>.</p>
@@ -659,7 +660,7 @@
             initStudioSupabase();
         }
     </script>
-    <script src="assets/js/estudio-conteudo.js?v=20260506-palette-preview"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260501-google-pedagoflow-api"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">
