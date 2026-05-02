@@ -113,7 +113,40 @@ ALTER TABLE public.blog360_rag_chunks ENABLE ROW LEVEL SECURITY;
 -- (Supabase quickstart: query_embedding + match_count + filter jsonb → id, content, metadata, similarity)
 -- Query Name no nó: match_blog360_documents ou alias match_assistant_knowledge
 -- Table Name no nó: blog360_rag_chunks
+--
+-- Se aparecer erro 42725 ("function name is not unique"), já existiam overloads
+-- de outro agente — os blocos abaixo removem todas as assinaturas antigas.
 -- ---------------------------------------------------------------------------
+DO $$
+DECLARE
+  fn_oid OID;
+BEGIN
+  FOR fn_oid IN
+    SELECT p.oid
+    FROM pg_catalog.pg_proc p
+    JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname = 'match_assistant_knowledge'
+  LOOP
+    EXECUTE format('DROP FUNCTION IF EXISTS %s CASCADE', fn_oid::regprocedure);
+  END LOOP;
+END $$;
+
+DO $$
+DECLARE
+  fn_oid OID;
+BEGIN
+  FOR fn_oid IN
+    SELECT p.oid
+    FROM pg_catalog.pg_proc p
+    JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname = 'match_blog360_documents'
+  LOOP
+    EXECUTE format('DROP FUNCTION IF EXISTS %s CASCADE', fn_oid::regprocedure);
+  END LOOP;
+END $$;
+
 CREATE OR REPLACE FUNCTION public.match_blog360_documents(
   query_embedding VECTOR(1536),
   match_count INTEGER DEFAULT NULL,

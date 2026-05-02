@@ -144,3 +144,13 @@ Se usares modelo com **outro tamanho** (ex. 3072):
 
 - Prompt do chat: `docs/PROMPT_SISTEMA_AGENTE_CHAT_VIDA360.md`
 - Inspiração de agente / ferramentas (outro produto): `mini-portal-ia/docs/n8n-cerebro-mini-portal-prompt.md` (conceitos **RAG1 / Base Athena** — aqui a implementação Supabase é **`blog360_rag_chunks`** + **`blog360_match_rag_chunks`**).
+
+---
+
+## 8. Erro `42725: function name "match_assistant_knowledge" is not unique`
+
+Significa que no projeto já existiam **várias funções** com o mesmo nome e **assinaturas diferentes** (overload), vindas de outro fluxo/agente. O PostgreSQL não sabe qual substituir só com `CREATE OR REPLACE`.
+
+**Solução:** usa o script **`BLOG360_RAG_KNOWLEDGE.sql` actualizado** no SQL Editor — no início da secção LangChain há blocos `DO $$ ... $$` que fazem **`DROP FUNCTION ... CASCADE`** de **todas** as overloads de `match_assistant_knowledge` e `match_blog360_documents` antes de voltar a criá-las.
+
+Volta a executar o ficheiro **completo** (ou desde esses blocos `DO` até ao final).
