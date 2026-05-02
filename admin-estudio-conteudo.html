@@ -223,6 +223,30 @@
             display: none;
         }
         .error-banner.show { display: block; }
+        .overlay-suggest-panel {
+            margin: 0.65rem 0 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #d7c2e6;
+            background: #faf6fc;
+        }
+        .overlay-suggest-row { margin-bottom: 0.5rem; font-size: 0.85rem; color: #2d1f3d; }
+        .overlay-suggest-k { font-weight: 600; color: #6d2d86; display: inline-block; min-width: 5.5rem; vertical-align: top; }
+        .overlay-suggest-pre {
+            display: block;
+            margin: 0.35rem 0 0;
+            padding: 0.5rem 0.65rem;
+            background: #fff;
+            border: 1px solid #e8d8f2;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 140px;
+            overflow-y: auto;
+        }
         /* admin-global-footer */
     .admin-global-footer {
         background: #7f3f98;
@@ -337,6 +361,26 @@
 
                 <p class="section-title">Texto sobre a imagem (capa estilo notícia)</p>
                 <p class="hint">Depois de gerar a imagem acima, use campos semelhantes ao Estúdio PedagoFlow: <strong>categoria</strong> com faixa amarela, <strong>manchete</strong> em destaque e <strong>rodapé</strong> (marca ou URL). O fundo escurece para a leitura. Gere a pré-visualização e descarregue a <strong>capa final</strong> para Instagram ou WhatsApp.</p>
+                <div class="toolbar-bottom" style="margin-top:0.35rem">
+                    <button type="button" class="btn" id="btn-overlay-suggest-from-copy" title="Usa o texto da área Resultado">💡 Sugerir manchete e categoria a partir do resultado</button>
+                </div>
+                <div id="overlay-suggest-panel" class="overlay-suggest-panel" style="display:none" role="region" aria-label="Sugestões para categoria e manchete">
+                    <p class="hint" style="margin-bottom:0.5rem">Sugestões automáticas (pode <strong>usar</strong>, <strong>ignorar</strong> ou <strong>editar</strong> nos campos abaixo).</p>
+                    <div class="overlay-suggest-row">
+                        <span class="overlay-suggest-k">Categoria</span>
+                        <span id="overlay-suggest-category-text" class="overlay-suggest-v"></span>
+                    </div>
+                    <div class="overlay-suggest-row">
+                        <span class="overlay-suggest-k">Manchete</span>
+                        <pre id="overlay-suggest-headline-text" class="overlay-suggest-pre"></pre>
+                    </div>
+                    <div class="toolbar-bottom" style="margin-top:0.5rem">
+                        <button type="button" class="btn btn-primary" id="btn-overlay-suggest-use-both">Usar ambas</button>
+                        <button type="button" class="btn" id="btn-overlay-suggest-use-category">Só categoria</button>
+                        <button type="button" class="btn" id="btn-overlay-suggest-use-headline">Só manchete</button>
+                        <button type="button" class="btn" id="btn-overlay-suggest-dismiss">Dispensar</button>
+                    </div>
+                </div>
                 <label class="lbl" for="overlay-category">Categoria / selo (opcional)</label>
                 <input type="text" id="overlay-category" class="overlay-input" placeholder="Ex.: BEM-ESTAR, DICAS, EVENTOS" maxlength="80" />
                 <label class="lbl" for="overlay-headline" style="margin-top:0.65rem">Manchete</label>
@@ -445,7 +489,7 @@
             initStudioSupabase();
         }
     </script>
-    <script src="assets/js/estudio-conteudo.js?v=20260502-download-variants"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260503-suggest-overlay"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

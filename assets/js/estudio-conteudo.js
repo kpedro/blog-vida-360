@@ -34,6 +34,8 @@
   let lastImageMimeType = '';
   /** PNG com texto desenhado (capa); preferido em «Usar no editor» e descarregar final */
   let lastCompositeDataUrl = '';
+  let lastSuggestedHeadline = '';
+  let lastSuggestedCategory = '';
 
   function $(id) {
     return document.getElementById(id);
@@ -186,6 +188,9 @@
       if (blockHist) blockHist.style.display = 'none';
       setTabDescription();
       setGenerateButtonLabel();
+      if ($('studio-output') && $('studio-output').value.trim()) {
+        refreshOverlaySuggestionsFromCopy();
+      }
     }
   }
 
@@ -217,6 +222,7 @@
     const btn = $('btn-generate');
     if (btn) btn.disabled = true;
     clearError();
+    hideOverlaySuggestionPanel();
     $('studio-image-prompt').value = '';
     lastImageDataUrl = '';
     lastImageMimeType = '';
@@ -256,6 +262,8 @@
       }
 
       await saveHistoryRow(contentType, prompt.trim(), copy, imageSuggestion);
+
+      refreshOverlaySuggestionsFromCopy();
 
       window.alert('Conteúdo gerado. Revise e copie ou envie ao editor.');
     } catch (e) {
@@ -354,6 +362,183 @@
     const d = document.createElement('div');
     d.textContent = s;
     return d.innerHTML;
+  }
+
+  /**
+   * Heurísticas a partir do texto em «Resultado» (artigo, legenda, landing).
+   * Não chama API — só analisa o copy já gerado.
+   */
+  function computeHeadlineSuggestion(text, type) {
+    let body = String(text || '')
+      .replace(/\r\n/g, '\n')
+      .trim();
+    if (!body) return '';
+    body = body.replace(/\n---[\s\S]*$/m, '').trim();
+
+    const h1 = body.match(/^#\s+(.+)$/m);
+    if (h1) {
+      const title = h1[1].trim();
+      const h2 = body.match(/^##\s+(.+)$/m);
+      if (h2 && title.length < 130) {
+        return `${title}\n${h2[1].trim()}`.slice(0, 2000);
+      }
+      if (title.length > 50) {
+        const cut = title.lastIndexOf(' ', 44);
+        if (cut > 12) {
+          return `${title.slice(0, cut)}\n${title.slice(cut + 1)}`.slice(0, 2000);
+        }
+      }
+      return title.slice(0, 2000);
+    }
+
+    if (type === 'social_post') {
+      const lines = body.split('\n').map((l) => l.trim()).filter(Boolean);
+      const take = [];
+      for (let i = 0; i < lines.length && take.length < 6; i++) {
+        const ln = lines[i];
+        if (/^#{1,6}\s/.test(ln)) break;
+        if (/^[*-]\s{1,4}\S/.test(ln) && take.length >= 2) break;
+        if (/^#{3,}/.test(ln)) break;
+        const taggy = (ln.match(/#/g) || []).length >= 4 && ln.length < 80;
+        if (taggy && take.length) break;
+        if (ln.length > 200) {
+          const cut = ln.lastIndexOf(' ', 70);
+          take.push(cut > 25 ? ln.slice(0, cut) : ln.slice(0, 100));
+          break;
+        }
+        take.push(ln);
+        if (take.join('\n').length > 320) break;
+      }
+      if (take.length) return take.join('\n').slice(0, 2000);
+    }
+
+    const blocks = body.split(/\n\s*\n/);
+    const first = (blocks[0] || body).trim();
+    const linesOut = first
+      .split('\n')
+      .map((l) => l.replace(/^\*\*|\*\*$/g, '').replace(/^#+\s*/, '').trim())
+      .filter((l) => l && !/^([*_]{1,2}\s*)+$/.test(l))
+      .slice(0, 6);
+
+    if (linesOut.length >= 2) {
+      return linesOut.join('\n').slice(0, 2000);
+    }
+
+    const one = linesOut[0] || first.replace(/^#+\s*/, '').slice(0, 500);
+    if (one.length > 56) {
+      const cut = one.lastIndexOf(' ', 50);
+      if (cut > 16) {
+        return `${one.slice(0, cut)}\n${one.slice(cut + 1)}`.slice(0, 2000);
+      }
+    }
+    return one.slice(0, 2000);
+  }
+
+  function computeCategorySuggestion(text, type) {
+    const lower = String(text || '').toLowerCase();
+    const rules = [
+      ['ansiedade', 'ANSIEDADE'],
+      ['sono', 'SONO'],
+      ['insónia', 'SONO'],
+      ['insônia', 'SONO'],
+      ['insonia', 'SONO'],
+      ['aromaterapia', 'AROMATERAPIA'],
+      ['óleos essenciais', 'ÓLEOS'],
+      ['oleos essenciais', 'ÓLEOS'],
+      ['óleo essencial', 'ÓLEOS'],
+      ['doterra', 'DOTERRA'],
+      ['bem-estar', 'BEM-ESTAR'],
+      ['bem estar', 'BEM-ESTAR'],
+      ['rotina', 'ROTINA'],
+      ['foco', 'FOCO'],
+      ['respiração', 'RESPIRAÇÃO'],
+      ['respiracao', 'RESPIRAÇÃO'],
+      ['meditação', 'MEDITAÇÃO'],
+      ['meditacao', 'MEDITAÇÃO'],
+      ['pele', 'PELE'],
+      ['humidificador', 'HOGAR'],
+      ['instagram', 'REDES'],
+      ['hashtag', 'REDES'],
+      ['reels', 'REDES'],
+      ['stories', 'REDES'],
+      ['landing', 'DIVULGAÇÃO'],
+      ['cta', 'DIVULGAÇÃO'],
+    ];
+    for (let i = 0; i < rules.length; i++) {
+      if (lower.includes(rules[i][0])) return rules[i][1].slice(0, 80);
+    }
+    const fallback = {
+      landing: 'DIVULGAÇÃO',
+      social_post: 'REDES',
+      article_copy: 'ARTIGO',
+    };
+    return String(fallback[type] || 'VIDA 360').slice(0, 80);
+  }
+
+  function computeOverlaySuggestions(rawText, tabType) {
+    const headline = computeHeadlineSuggestion(rawText, tabType);
+    const category = computeCategorySuggestion(rawText, tabType);
+    return { headline, category };
+  }
+
+  function hideOverlaySuggestionPanel() {
+    const panel = $('overlay-suggest-panel');
+    if (panel) panel.style.display = 'none';
+  }
+
+  function refreshOverlaySuggestionsFromCopy() {
+    const out = ($('studio-output') && $('studio-output').value) || '';
+    const trimmed = out.trim();
+    if (!trimmed) {
+      lastSuggestedHeadline = '';
+      lastSuggestedCategory = '';
+      hideOverlaySuggestionPanel();
+      return false;
+    }
+    const p = computeOverlaySuggestions(out, contentType);
+    lastSuggestedHeadline = p.headline;
+    lastSuggestedCategory = p.category;
+
+    const panel = $('overlay-suggest-panel');
+    const catEl = $('overlay-suggest-category-text');
+    const headEl = $('overlay-suggest-headline-text');
+    if (catEl) catEl.textContent = p.category || '—';
+    if (headEl) headEl.textContent = p.headline || '—';
+
+    const has = !!(p.headline || p.category);
+    if (panel) panel.style.display = has ? 'block' : 'none';
+    return has;
+  }
+
+  function applyOverlaySuggestions(mode) {
+    if (mode === 'both' || mode === 'category') {
+      const c = $('overlay-category');
+      if (c && lastSuggestedCategory) c.value = lastSuggestedCategory;
+    }
+    if (mode === 'both' || mode === 'headline') {
+      const h = $('overlay-headline');
+      if (h && lastSuggestedHeadline) h.value = lastSuggestedHeadline;
+    }
+  }
+
+  function onSuggestFromCopyClick() {
+    const out = ($('studio-output') && $('studio-output').value) || '';
+    if (!out.trim()) {
+      showError('Gere ou cole um texto na área «Resultado» primeiro.');
+      return;
+    }
+    clearError();
+    refreshOverlaySuggestionsFromCopy();
+    if (!lastSuggestedHeadline && !lastSuggestedCategory) {
+      showError('Não foi possível extrair sugestões desse texto.');
+    }
+  }
+
+  /** Após gerar imagem: mostra painel se já houver resultado de texto. */
+  function offerOverlaySuggestionsAfterImage() {
+    const out = ($('studio-output') && $('studio-output').value.trim()) || '';
+    if (!out) return;
+    refreshOverlaySuggestionsFromCopy();
   }
 
   function wrapLinesCanvas(ctx, text, maxWidth) {
@@ -607,6 +792,7 @@
         img.style.display = 'block';
         $('btn-copy-image-url').style.display = 'inline-flex';
         refreshStudioImageUi();
+        offerOverlaySuggestionsAfterImage();
       } else {
         throw new Error(
           (data && (data.details || data.error)) || 'Nenhuma imagem retornada (resposta sem base64).'
@@ -934,6 +1120,16 @@
     if (btnDlNo) btnDlNo.addEventListener('click', downloadGeneratedImage);
     const btnDlYes = $('btn-download-with-text');
     if (btnDlYes) btnDlYes.addEventListener('click', downloadOverlayPng);
+    const btnSug = $('btn-overlay-suggest-from-copy');
+    if (btnSug) btnSug.addEventListener('click', onSuggestFromCopyClick);
+    const btnSugBoth = $('btn-overlay-suggest-use-both');
+    if (btnSugBoth) btnSugBoth.addEventListener('click', () => applyOverlaySuggestions('both'));
+    const btnSugCat = $('btn-overlay-suggest-use-category');
+    if (btnSugCat) btnSugCat.addEventListener('click', () => applyOverlaySuggestions('category'));
+    const btnSugHead = $('btn-overlay-suggest-use-headline');
+    if (btnSugHead) btnSugHead.addEventListener('click', () => applyOverlaySuggestions('headline'));
+    const btnSugDismiss = $('btn-overlay-suggest-dismiss');
+    if (btnSugDismiss) btnSugDismiss.addEventListener('click', hideOverlaySuggestionPanel);
     const btnOv = $('btn-overlay-apply');
     if (btnOv) btnOv.addEventListener('click', applyOverlayPreview);
     const btnOvClear = $('btn-overlay-clear');
