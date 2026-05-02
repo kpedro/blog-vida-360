@@ -34,6 +34,41 @@ serve(async (req) => {
       );
     }
 
+    /** Reduz risco de o modelo desenhar #tags na imagem quando o front cola legenda completa. */
+    function stripHashtagAndSuggestionBlocks(text: string): string {
+      let t = text.replace(/\r\n/g, "\n");
+      const sug = t.search(/\n---\s*\n\s*SUGESTÃO\s+DE\s+IMAGEM/i);
+      if (sug !== -1) t = t.slice(0, sug).trim();
+      const lines = t.split("\n");
+      const kept: string[] = [];
+      for (const line of lines) {
+        const tr = line.trim();
+        if (!tr) {
+          kept.push("");
+          continue;
+        }
+        const words = tr.split(/\s+/).filter(Boolean);
+        const hashWords = words.filter((w) => /^#\w/u.test(w)).length;
+        const mostlyTags =
+          hashWords >= 3 ||
+          (words.length > 0 && hashWords / words.length >= 0.5 && hashWords >= 2);
+        if (mostlyTags || (words.length >= 2 && hashWords === words.length)) break;
+        if (/^#\w/u.test(tr) && words.length <= 15 && hashWords >= 1) break;
+        kept.push(line);
+      }
+      let out = kept.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+      if (!out) out = t.split(/\n{2,}/)[0]?.trim() || t.trim();
+      return out.slice(0, 4000);
+    }
+
+    const promptClean = stripHashtagAndSuggestionBlocks(prompt);
+    if (!promptClean.trim()) {
+      return new Response(
+        JSON.stringify({ error: "Prompt vazio após remover hashtags. Edite a descrição." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const FORMAT_MAP: Record<string, { hint: string; aspectRatio: string }> = {
       "1:1": {
         hint: "Proporção QUADRADA 1:1 (feed Instagram/Facebook). Componha em quadrado.",
@@ -67,16 +102,17 @@ serve(async (req) => {
 
     const systemInstruction = `Você gera imagens para o blog Vida 360º (saúde, bem-estar, vida equilibrada no Brasil).
 
-REGRA — EVITE TEXTO LONGO NA IMAGEM:
-- NÃO inclua parágrafos, hashtags nem frases longas (modelos erram ortografia em português).
-- Prefira imagem SEM texto ou só palavras mínimas se indispensável.
-- Cena: acolhedora, luminosa, estilo limpo; cores suaves; temas: natureza, autocuidado, pessoas em momentos de calma, hábitos saudáveis, bem-estar mental (sem violência ou conteúdo sensível).`;
+REGRAS OBRIGATÓRIAS — SEM TEXTO NA ARTE:
+- Gere uma fotografia ou ilustração limpa. PROIBIDO desenhar na imagem: hashtags (#), símbolo #, linhas de rodapé com tags, texto cinza semi-transparente, marcas d’água, UI de rede social, legendas, stickers com palavras.
+- PROIBIDO incluir qualquer palavra ou caractere sobreposto à foto (nem pequeno nem “fantasma” atrás de outro texto). Se o pedido citar hashtags ou legendas, IGNORE e represente só o ASSUNTO visual (ex.: café da manhã, luz na janela), sem texto na imagem.
+- NÃO inclua parágrafos nem frases longas (modelos erram ortografia em português).
+- Cena: acolhedora, luminosa; cores suaves; temas: natureza, autocuidado, pessoas em momentos de calma, hábitos saudáveis, bem-estar mental (sem violência ou conteúdo sensível).`;
 
-    const userPrompt = `Gere uma imagem que represente este tema (cena visual, sem texto longo).
+    const userPrompt = `Gere APENAS uma cena visual (foto/ilustração) sem texto impresso, sem # e sem hashtags.
 
 ${formatHint}
 
-Tema: ${prompt.trim()}`;
+Tema visual (ignore hashtags ou lista de tags se aparecerem no texto): ${promptClean}`;
 
     const aspectRatio = resolved.aspectRatio;
 
@@ -121,7 +157,7 @@ Tema: ${prompt.trim()}`;
         JSON.stringify({
           error: "Geração de imagem não disponível",
           details: "Verifique a chave Gemini ou use a descrição em Canva ou outro gerador.",
-          suggestion: prompt.trim(),
+          suggestion: promptClean,
         }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -145,7 +181,7 @@ Tema: ${prompt.trim()}`;
         JSON.stringify({
           error: "Nenhuma imagem retornada",
           details: "O modelo não gerou imagem. Use a descrição em outra ferramenta.",
-          suggestion: textPart || prompt.trim(),
+          suggestion: textPart || promptClean,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -159,7 +195,7 @@ Tema: ${prompt.trim()}`;
       JSON.stringify({
         imageBase64,
         mimeType,
-        prompt: prompt.trim(),
+        prompt: promptClean,
         format: formatKey,
         aspectRatio,
       }),

@@ -845,18 +845,60 @@
     a.remove();
   }
 
+  /**
+   * Modelos de imagem tendem a desenhar #tags na arte se o prompt copia legenda de redes.
+   * Remove linhas de hashtags e o que vier depois; corta bloco «SUGESTÃO DE IMAGEM» se existir.
+   */
+  function sanitizePromptForImageGeneration(raw) {
+    let text = String(raw || '').replace(/\r\n/g, '\n');
+    const sugIdx = text.search(/\n---\s*\n\s*SUGESTÃO\s+DE\s+IMAGEM/i);
+    if (sugIdx !== -1) text = text.slice(0, sugIdx).trim();
+
+    const lines = text.split('\n');
+    const kept = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const tr = line.trim();
+      if (!tr) {
+        kept.push('');
+        continue;
+      }
+      const words = tr.split(/\s+/).filter(Boolean);
+      const hashWords = words.filter((w) => /^#\w/u.test(w)).length;
+      const mostlyTags =
+        hashWords >= 3 ||
+        (words.length > 0 && hashWords / words.length >= 0.5 && hashWords >= 2);
+      const looksLikeTagLine =
+        mostlyTags || (words.length >= 2 && hashWords === words.length);
+      if (looksLikeTagLine) break;
+      if (/^#\w/u.test(tr) && words.length <= 15 && hashWords >= 1) break;
+      kept.push(line);
+    }
+    let out = kept.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    if (!out) {
+      out = text.split(/\n{2,}/)[0] || text;
+      out = out.replace(/\s+#\w+/g, '').trim();
+    }
+    return out.slice(0, 4000);
+  }
+
   async function generateImage() {
     const session = await requireAuth();
     if (!session) return;
 
     clearOverlayComposite();
 
-    const desc =
+    let desc =
       ($('studio-image-prompt') && $('studio-image-prompt').value.trim()) ||
       ($('studio-output') && $('studio-output').value.trim().slice(0, 1500)) ||
       ($('studio-prompt') && $('studio-prompt').value.trim());
     if (!desc) {
       showError('Preencha a descrição da imagem ou gere um texto antes.');
+      return;
+    }
+    desc = sanitizePromptForImageGeneration(desc);
+    if (!desc.trim()) {
+      showError('Depois de remover hashtags do texto, ficou vazio. Edite a descrição da imagem ou o resultado.');
       return;
     }
 
