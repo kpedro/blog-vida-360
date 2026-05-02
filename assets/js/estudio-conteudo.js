@@ -394,20 +394,38 @@
     if (type === 'social_post') {
       const lines = body.split('\n').map((l) => l.trim()).filter(Boolean);
       const take = [];
-      for (let i = 0; i < lines.length && take.length < 6; i++) {
-        const ln = lines[i];
-        if (/^#{1,6}\s/.test(ln)) break;
-        if (/^[*-]\s{1,4}\S/.test(ln) && take.length >= 2) break;
-        if (/^#{3,}/.test(ln)) break;
-        const taggy = (ln.match(/#/g) || []).length >= 4 && ln.length < 80;
-        if (taggy && take.length) break;
-        if (ln.length > 200) {
-          const cut = ln.lastIndexOf(' ', 70);
-          take.push(cut > 25 ? ln.slice(0, cut) : ln.slice(0, 100));
-          break;
+      const maxBundle = 900;
+      function softTruncateParagraph(text, maxLen) {
+        const t = (text || '').trim();
+        if (t.length <= maxLen) return t;
+        const slice = t.slice(0, maxLen);
+        const endSentence = Math.max(
+          slice.lastIndexOf('. '),
+          slice.lastIndexOf('! '),
+          slice.lastIndexOf('? ')
+        );
+        if (endSentence > maxLen * 0.45) {
+          return slice.slice(0, endSentence + 1).trim();
         }
-        take.push(ln);
-        if (take.join('\n').length > 320) break;
+        const sp = slice.lastIndexOf(' ');
+        if (sp > maxLen * 0.5) return slice.slice(0, sp).trim();
+        return slice.trim();
+      }
+      for (let i = 0; i < lines.length && take.length < 8; i++) {
+        const raw = lines[i];
+        if (/^#{1,6}\s/.test(raw)) break;
+        if (/^[*-]\s{1,4}\S/.test(raw) && take.length >= 2) break;
+        const taggy = (raw.match(/#/g) || []).length >= 4 && raw.length < 80;
+        if (taggy && take.length) break;
+        let ln = raw.replace(/^\*\*|\*\*$/g, '').trim();
+        if (!ln) continue;
+        if (take.join('\n').length >= maxBundle) break;
+        const room = maxBundle - take.join('\n').length - (take.length ? 1 : 0);
+        if (room < 12) break;
+        if (ln.length > room) {
+          ln = softTruncateParagraph(ln, room);
+        }
+        if (ln) take.push(ln);
       }
       if (take.length) return take.join('\n').slice(0, 2000);
     }

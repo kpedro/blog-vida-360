@@ -38,9 +38,10 @@ Responda APENAS com um único objeto JSON válido em UTF-8 (sem markdown, sem te
 
 Regras:
 - category: selo curto em MAIÚSCULAS, 1 a 4 palavras (ex.: BEM-ESTAR, REDES, ROTINA, DICAS). Sem ponto final.
-- headline: manchete para ler na imagem; use "\\n" (barra+n) dentro da string JSON para separar 2 a 5 linhas curtas com impacto. Português brasileiro. Sem hashtags, sem URLs, sem aspas internas.
+- headline: manchete para ler na imagem; use "\\n" dentro da string JSON para separar 2 a 5 linhas curtas com impacto. Português brasileiro. Sem hashtags, sem URLs. Evite ** e markdown na manchete.
+- CRÍTICO: cada linha deve ser frases COMPLETAS (sujeito + predicado). Não termine uma linha no meio de uma frase, nem em preposições ou artigos soltos (ex.: nunca termine em «pela», «para», «no», «de» sem completar o pensamento). Se usar «no cheiro do café pela manhã», inclua «manhã».
 - Baseie-se só no conteúdo enviado; não invente dados médicos nem promessas de cura.
-- Se o texto for muito longo, sintetize o ângulo principal em poucas linhas.
+- Se o texto for muito longo, sintetize em poucas linhas completas, sem cortar frases.
 `;
 
 serve(async (req) => {
@@ -94,7 +95,7 @@ serve(async (req) => {
           systemInstruction: { parts: [{ text: SYSTEM }] },
           generationConfig: {
             temperature: 0.35,
-            maxOutputTokens: 1024,
+            maxOutputTokens: 2048,
           },
         }),
       },
