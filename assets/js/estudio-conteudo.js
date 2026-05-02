@@ -486,6 +486,19 @@
     if (panel) panel.style.display = 'none';
   }
 
+  function fillSuggestionPanel(category, headline) {
+    lastSuggestedCategory = category != null ? String(category).trim() : '';
+    lastSuggestedHeadline = headline != null ? String(headline).trim() : '';
+    const panel = $('overlay-suggest-panel');
+    const catEl = $('overlay-suggest-category-text');
+    const headEl = $('overlay-suggest-headline-text');
+    if (catEl) catEl.textContent = lastSuggestedCategory || '—';
+    if (headEl) headEl.textContent = lastSuggestedHeadline || '—';
+    const has = !!(lastSuggestedHeadline || lastSuggestedCategory);
+    if (panel) panel.style.display = has ? 'block' : 'none';
+    return has;
+  }
+
   function refreshOverlaySuggestionsFromCopy() {
     const out = ($('studio-output') && $('studio-output').value) || '';
     const trimmed = out.trim();
@@ -496,18 +509,7 @@
       return false;
     }
     const p = computeOverlaySuggestions(out, contentType);
-    lastSuggestedHeadline = p.headline;
-    lastSuggestedCategory = p.category;
-
-    const panel = $('overlay-suggest-panel');
-    const catEl = $('overlay-suggest-category-text');
-    const headEl = $('overlay-suggest-headline-text');
-    if (catEl) catEl.textContent = p.category || '—';
-    if (headEl) headEl.textContent = p.headline || '—';
-
-    const has = !!(p.headline || p.category);
-    if (panel) panel.style.display = has ? 'block' : 'none';
-    return has;
+    return fillSuggestionPanel(p.category, p.headline);
   }
 
   function applyOverlaySuggestions(mode) {
@@ -539,6 +541,66 @@
     const out = ($('studio-output') && $('studio-output').value.trim()) || '';
     if (!out) return;
     refreshOverlaySuggestionsFromCopy();
+  }
+
+  async function suggestOverlayFromAI() {
+    const out = ($('studio-output') && $('studio-output').value) || '';
+    if (!out.trim()) {
+      showError('Gere ou cole um texto na área «Resultado» primeiro.');
+      return;
+    }
+    if (!getSupabaseUrl().trim()) {
+      showError('URL do Supabase não definida.', true);
+      return;
+    }
+    if (isFileProtocol()) {
+      showError('Abra por HTTP (npm run dev), não como file://.', true);
+      return;
+    }
+
+    const session = await requireAuth();
+    if (!session) return;
+
+    clearError();
+    const btn = $('btn-overlay-suggest-ai');
+    if (btn) btn.disabled = true;
+    try {
+      const res = await fetch(`${getSupabaseUrl()}/functions/v1/blog-studio-overlay-suggest`, {
+        method: 'POST',
+        headers: fnHeaders(session),
+        body: JSON.stringify({
+          content: out.slice(0, 120000),
+          contentType: contentType,
+        }),
+      });
+      const { raw, data } = await readEdgeFunctionBody(res);
+      if (!res.ok) {
+        throw new Error(
+          explainEdgeFunctionHttpError('blog-studio-overlay-suggest', res.status, data, raw)
+        );
+      }
+      const headline = (data && data.headline) != null ? String(data.headline).trim() : '';
+      const category = (data && data.category) != null ? String(data.category).trim() : '';
+      if (!headline && !category) {
+        throw new Error('A função respondeu sem manchete nem categoria.');
+      }
+      fillSuggestionPanel(category, headline);
+    } catch (e) {
+      let msg =
+        (e && e.message) ||
+        'Erro ao obter sugestão por IA. Use «Sugestão rápida (local)» ou verifique o deploy da função.';
+      if (
+        msg === 'Failed to fetch' ||
+        /network/i.test(msg) ||
+        (typeof msg === 'string' && msg.includes('Load failed'))
+      ) {
+        msg =
+          'Sem ligação ao Supabase. Use http://localhost (npm run dev), não file://; verifique rede e deploy da função blog-studio-overlay-suggest.';
+      }
+      showError(msg, /GEMINI_API|404|não encontrada/i.test(String(msg)));
+    } finally {
+      if (btn) btn.disabled = false;
+    }
   }
 
   function wrapLinesCanvas(ctx, text, maxWidth) {
@@ -1122,6 +1184,8 @@
     if (btnDlYes) btnDlYes.addEventListener('click', downloadOverlayPng);
     const btnSug = $('btn-overlay-suggest-from-copy');
     if (btnSug) btnSug.addEventListener('click', onSuggestFromCopyClick);
+    const btnSugAi = $('btn-overlay-suggest-ai');
+    if (btnSugAi) btnSugAi.addEventListener('click', suggestOverlayFromAI);
     const btnSugBoth = $('btn-overlay-suggest-use-both');
     if (btnSugBoth) btnSugBoth.addEventListener('click', () => applyOverlaySuggestions('both'));
     const btnSugCat = $('btn-overlay-suggest-use-category');

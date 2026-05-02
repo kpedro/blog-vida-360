@@ -361,8 +361,9 @@
 
                 <p class="section-title">Texto sobre a imagem (capa estilo notícia)</p>
                 <p class="hint">Depois de gerar a imagem acima, use campos semelhantes ao Estúdio PedagoFlow: <strong>categoria</strong> com faixa amarela, <strong>manchete</strong> em destaque e <strong>rodapé</strong> (marca ou URL). O fundo escurece para a leitura. Gere a pré-visualização e descarregue a <strong>capa final</strong> para Instagram ou WhatsApp.</p>
-                <div class="toolbar-bottom" style="margin-top:0.35rem">
-                    <button type="button" class="btn" id="btn-overlay-suggest-from-copy" title="Usa o texto da área Resultado">💡 Sugerir manchete e categoria a partir do resultado</button>
+                <div class="toolbar-bottom" style="margin-top:0.35rem;flex-wrap:wrap">
+                    <button type="button" class="btn" id="btn-overlay-suggest-from-copy" title="Analisa o texto no seu navegador, sem chamada à API">💡 Sugestão rápida (local)</button>
+                    <button type="button" class="btn btn-primary" id="btn-overlay-suggest-ai" title="Requer deploy da função blog-studio-overlay-suggest e segredo GEMINI_API">✨ Sugerir com IA (Gemini)</button>
                 </div>
                 <div id="overlay-suggest-panel" class="overlay-suggest-panel" style="display:none" role="region" aria-label="Sugestões para categoria e manchete">
                     <p class="hint" style="margin-bottom:0.5rem">Sugestões automáticas (pode <strong>usar</strong>, <strong>ignorar</strong> ou <strong>editar</strong> nos campos abaixo).</p>
@@ -489,7 +490,7 @@
             initStudioSupabase();
         }
     </script>
-    <script src="assets/js/estudio-conteudo.js?v=20260503-suggest-overlay"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260503-overlay-ai"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">
