@@ -98,16 +98,26 @@
   }
 
   /**
+   * Trecho após «PROMPT PARA IA DE IMAGEM …» ou null se o título não existir.
+   * Parêntesis no título são opcionais (ex.: modelos variam a pontuação).
+   */
+  function extractImagePromptBlockOnly(raw) {
+    var t = String(raw || "");
+    var re = /PROMPT\s+PARA\s+IA\s+DE\s+IMAGEM(?:\s*\([^)]*\))?/i;
+    var m = t.match(re);
+    if (!m || typeof m.index !== "number") return null;
+    var after = t.slice(m.index + m[0].length).replace(/^[\s:\-*#\n]+/m, "").trim();
+    return after || null;
+  }
+
+  /**
    * Se o utilizador colar uma resposta completa do assistente, usa o trecho após
    * «PROMPT PARA IA DE IMAGEM (Canva / outras)» quando existir.
    */
   function preferImagePromptBlock(raw) {
-    var t = String(raw || "");
-    var re = /PROMPT\s+PARA\s+IA\s+DE\s+IMAGEM\s*\([^)]*\)/i;
-    var idx = t.search(re);
-    if (idx === -1) return t;
-    var after = t.slice(idx).replace(re, "").replace(/^[\s:\-*#\n]+/m, "").trim();
-    return after || t;
+    var ex = extractImagePromptBlockOnly(raw);
+    if (ex !== null) return ex;
+    return String(raw || "");
   }
 
   /**
@@ -677,8 +687,33 @@
         if (ok) flashBtn(copyBtn, "Copiado!");
       });
     });
+    var actionsWrap = document.createElement("div");
+    actionsWrap.className = "msg-toolbar-actions";
+    actionsWrap.appendChild(copyBtn);
+    if (!isUser && renderMarkdown) {
+      var imgPromptBtn = document.createElement("button");
+      imgPromptBtn.type = "button";
+      imgPromptBtn.className = "msg-copy msg-copy-img";
+      imgPromptBtn.textContent = "Copiar prompt IA imagem";
+      imgPromptBtn.title =
+        "Copia só o texto após «PROMPT PARA IA DE IMAGEM (Canva / outras)», se existir. Pode colar no Canva ou na caixa Imagem rápida.";
+      imgPromptBtn.addEventListener("click", function () {
+        var ex = extractImagePromptBlockOnly(text);
+        if (!ex || !String(ex).trim()) {
+          window.alert(
+            "Nesta mensagem não há o bloco «PROMPT PARA IA DE IMAGEM (Canva / outras)». Peça ao assistente um prompt para gerar imagem no Canva ou noutra IA."
+          );
+          return;
+        }
+        void copyPlainToClipboard(ex).then(function (ok) {
+          if (ok) flashBtn(imgPromptBtn, "Copiado!");
+          else window.alert("Não foi possível copiar. Tente de novo ou seleccione o texto na mensagem.");
+        });
+      });
+      actionsWrap.appendChild(imgPromptBtn);
+    }
     toolbar.appendChild(whoSpan);
-    toolbar.appendChild(copyBtn);
+    toolbar.appendChild(actionsWrap);
 
     var bubble = document.createElement("div");
     bubble.className = bubbleClass;
