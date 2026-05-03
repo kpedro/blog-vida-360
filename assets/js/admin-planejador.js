@@ -18,6 +18,16 @@
     return window.VITE_SUPABASE_ANON_KEY || "";
   }
 
+  function fnHeaders(session) {
+    var h = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + session.access_token,
+    };
+    var k = getAnonKey();
+    if (k) h.apikey = k;
+    return h;
+  }
+
   async function getSession() {
     var c = window.supabaseClient;
     if (!c && typeof window.initSupabase === "function") {
@@ -239,6 +249,93 @@
     return "## Fila do planejador (ordem)\n\n" + lines.join("\n") + tail;
   }
 
+  function hidePlannerIaPanel() {
+    var pan = $("planner-ia-panel");
+    var pre = $("planner-ia-pre");
+    if (pre) pre.textContent = "";
+    if (pan) pan.setAttribute("hidden", "");
+  }
+
+  function showPlannerIaPanel(text) {
+    var pan = $("planner-ia-panel");
+    var pre = $("planner-ia-pre");
+    if (pre) pre.textContent = text || "";
+    if (pan) {
+      pan.removeAttribute("hidden");
+      try {
+        pan.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } catch (e) {}
+    }
+  }
+
+  function buildSuggestIaPrompt() {
+    var md = buildPlannerSummaryMarkdown();
+    if (md.length > 9000) md = md.slice(0, 9000) + "\n\n[… fila truncada]";
+    return [
+      "És o assistente editorial do Blog Vida 360º (bem-estar, aromaterapia segura, rotina). Segue o resumo da minha fila de posts — a ordem é a sequência sugerida na narrativa.",
+      "",
+      "Foca no bloco «Próximo na sequência». Responde em português, de forma compacta:",
+      "",
+      "1) Três opções de título atractivo para esse próximo post (lista numerada).",
+      "2) Uma linha de gancho opcional para Instagram ou redes.",
+      "3) Diz «Ordem: ok» ou «Ordem: ajustar» e uma frase curta se sugerires trocar a prioridade de algum item.",
+      "",
+      "Não inventes dados médicos. Se faltar contexto, assinala-o numa linha.",
+      "",
+      md,
+    ].join("\n");
+  }
+
+  async function suggestNextWithIa() {
+    var next = getNextQueueItem();
+    if (!next) {
+      window.alert("Não há próximo item na fila para sugerir.");
+      return;
+    }
+    if (location.protocol === "file:") {
+      window.alert("Abra o painel por http://localhost (npm run dev), não como file://.");
+      return;
+    }
+    if (!getSupabaseUrl()) {
+      window.alert("URL do Supabase não definida.");
+      return;
+    }
+    var session = await getSession();
+    if (!session) return;
+
+    var btn = $("btn-planner-suggest-ia");
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "A gerar…";
+    }
+    hidePlannerIaPanel();
+    try {
+      var res = await fetch(getSupabaseUrl() + "/functions/v1/blog-admin-assistant", {
+        method: "POST",
+        headers: fnHeaders(session),
+        body: JSON.stringify({
+          messages: [{ role: "user", content: buildSuggestIaPrompt() }],
+          mode: "padrao",
+        }),
+      });
+      var data = await res.json().catch(function () {
+        return {};
+      });
+      if (!res.ok) throw new Error(data.error || data.details || "Erro na função blog-admin-assistant");
+      var reply = String((data && data.reply) || "").trim();
+      if (!reply) throw new Error("Resposta vazia da IA.");
+      showPlannerIaPanel(reply);
+      showBanner("planner-banner", "Sugestão da IA pronta (modo rápido). Pode copiar ou levar ao assistente para aprofundar.", false);
+    } catch (e) {
+      showBanner("planner-banner", (e && e.message) || "Erro ao pedir sugestão. Deploy blog-admin-assistant e GEMINI_API?", true);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Sugerir títulos (IA)";
+      }
+    }
+  }
+
   function goPlannerToAssistant() {
     if (!items.length) return;
     var md = buildPlannerSummaryMarkdown();
@@ -265,6 +362,7 @@
     if (!items.length) {
       root.style.display = "none";
       root.innerHTML = "";
+      hidePlannerIaPanel();
       return;
     }
     root.style.display = "block";
@@ -273,6 +371,7 @@
       root.innerHTML =
         "<p class=\"next-title\"><strong>Fila</strong></p>" +
         "<p>Todos os itens estão <strong>publicados</strong> ou em <strong>skip</strong>. Adicione uma nova ideia ou reabra um item.</p>";
+      hidePlannerIaPanel();
       return;
     }
     var r = next.row;
@@ -302,13 +401,22 @@
         : "") +
       (r.planned_date ? "<p class=\"next-date\"><em>Data planeada:</em> " + escapeHtml(r.planned_date) + "</p>" : "") +
       hintsHtml +
+      "<div class=\"planner-next-actions\">" +
+      "<button type=\"button\" class=\"btn secondary\" id=\"btn-planner-suggest-ia\">Sugerir títulos (IA)</button>" +
       "<button type=\"button\" class=\"btn secondary\" id=\"btn-planner-assistant\">Discutir com o assistente do painel</button>" +
-      "<p class=\"hint small\">Envia o resumo da fila + o próximo post para o chat onde a IA ajuda a priorizar, ângulos e encaixe na história.</p>";
+      "</div>" +
+      "<p class=\"hint small\">«Sugerir títulos» usa a mesma API em modo rápido. «Discutir» abre o chat completo. Envie o resumo da fila + o próximo post para priorizar e afinar.</p>";
 
-    var btn = $("btn-planner-assistant");
-    if (btn) {
-      btn.onclick = function () {
+    var btnA = $("btn-planner-assistant");
+    if (btnA) {
+      btnA.onclick = function () {
         goPlannerToAssistant();
+      };
+    }
+    var btnS = $("btn-planner-suggest-ia");
+    if (btnS) {
+      btnS.onclick = function () {
+        void suggestNextWithIa();
       };
     }
   }
@@ -474,6 +582,25 @@
     $("btn-planner-copy") &&
       $("btn-planner-copy").addEventListener("click", function () {
         copyNarrativeSummary();
+      });
+
+    $("btn-planner-ia-copy") &&
+      $("btn-planner-ia-copy").addEventListener("click", function () {
+        var pre = $("planner-ia-pre");
+        var t = (pre && pre.textContent) || "";
+        if (!t.trim()) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          void navigator.clipboard.writeText(t).then(
+            function () {
+              showBanner("planner-banner", "Sugestão copiada.", false);
+            },
+            function () {
+              window.prompt("Copie o texto:", t);
+            }
+          );
+        } else {
+          window.prompt("Copie o texto:", t);
+        }
       });
 
     var tbody = $("planner-tbody");
