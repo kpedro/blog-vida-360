@@ -149,6 +149,7 @@
             <strong>Copiar</strong> em cada mensagem ou <strong>Copiar conversa</strong> para colar no Estúdio / n8n / outro prompt.
             O <strong>histórico</strong> fica neste navegador (localStorage) e actualiza ao receber cada resposta.
             Pode <strong>colar prints</strong> (Ctrl+V) na caixa de texto ou usar <strong>Anexar print</strong> — a IA analisa a imagem (requer redeploy da função <code style="font-size:0.8rem">blog-admin-assistant</code>).
+            Quando a ideia estiver madura, use <strong>Afinar no Estúdio</strong>: leva a conversa (texto) para o <strong>Montar com assistente</strong> do Estúdio, que transforma o contexto num prompt pronto para gerar conteúdo.
         </p>
 
         <div class="mode-row">
@@ -157,6 +158,9 @@
             <label><input type="radio" name="assist-mode" value="dedicado"> IA dedicada</label>
             <button type="button" class="btn-ghost" id="assist-new" title="Guarda a conversa actual e começa outra">Nova conversa</button>
             <button type="button" class="btn-ghost" id="assist-copy-thread" title="Markdown: Você / Assistente">Copiar conversa</button>
+            <button type="button" class="btn-ghost" id="assist-to-studio-coach" disabled title="Abre o Estúdio com «Montar com assistente» e cola o contexto">
+                Afinar no Estúdio
+            </button>
             <button type="button" class="btn-ghost" id="assist-history-toggle">Histórico</button>
             <button type="button" class="btn-ghost" id="assist-clear" title="Limpa o ecrã; a conversa é guardada no histórico antes">Limpar ecrã</button>
         </div>
@@ -167,7 +171,7 @@
                 <button type="button" class="btn-ghost btn-tiny" id="assist-history-close">Fechar</button>
             </div>
             <ul id="assist-history-list"></ul>
-            <p class="hint" style="margin-top:0.5rem;">«Abrir» substitui a conversa actual. «Apagar» remove só esta entrada local.</p>
+            <p class="hint" style="margin-top:0.5rem;">«Abrir» substitui a conversa actual. «Estúdio» envia essa conversa ao assistente de prompt do Estúdio. «Apagar» remove só esta entrada local.</p>
         </div>
 
         <div class="card">

@@ -1556,6 +1556,51 @@
     $('modal-coach').classList.add('open');
   }
 
+  /** Abre o modal com texto já colado (ex.: vindo do Assistente do painel). */
+  function openCoachWithPrefill(prefillText) {
+    coachMessages = [];
+    coachPendingContent = '';
+    const tip =
+      '<div class="chat-msg coach-handoff"><div class="who">Painel → Estúdio</div><div>Texto trazido do <strong>Assistente do painel</strong>. Revise a caixa abaixo e prima <strong>Enviar</strong> para o assistente montar o prompt de geração.</div></div>';
+    $('coach-chat').innerHTML =
+      '<div class="chat-msg"><div class="who">Assistente</div><div>Olá. O que você quer produzir hoje no blog? (tema, tom, tamanho)</div></div>' +
+      tip;
+    const ci = $('coach-input');
+    if (ci) ci.value = typeof prefillText === 'string' ? prefillText : '';
+    $('coach-apply').disabled = true;
+    $('modal-coach').classList.add('open');
+    try {
+      if (ci) ci.focus();
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  /** Handoff: admin-assistente-painel grava `blog360_coach_seed` e redireciona com ?open_coach=1 */
+  function consumeCoachSeedFromPanel() {
+    try {
+      const qs = new URLSearchParams(window.location.search || '');
+      if (qs.get('open_coach') !== '1') return;
+      const raw = sessionStorage.getItem('blog360_coach_seed');
+      if (raw) sessionStorage.removeItem('blog360_coach_seed');
+      const u = new URL(window.location.href);
+      u.searchParams.delete('open_coach');
+      window.history.replaceState({}, document.title, u.pathname + (u.search ? u.search : '') + (u.hash || ''));
+      if (!raw) return;
+      let data = null;
+      try {
+        data = JSON.parse(raw);
+      } catch (_) {
+        return;
+      }
+      const seed = data && typeof data.initialUserMessage === 'string' ? data.initialUserMessage.trim() : '';
+      if (!seed) return;
+      openCoachWithPrefill(seed);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   function closeCoach() {
     $('modal-coach').classList.remove('open');
   }
@@ -1778,5 +1823,7 @@
     initOverlayPalette();
     refreshStudioImageUi();
     updatePostDevicePreviews();
+
+    consumeCoachSeedFromPanel();
   });
 })();

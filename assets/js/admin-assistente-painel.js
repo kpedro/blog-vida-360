@@ -14,6 +14,8 @@
 
   var STORAGE_KEY = "blog360_admin_assistant_history_v1";
   var SESS_STORAGE_KEY = "blog360_admin_assist_current_sess";
+  /** Handoff para Estúdio → «Montar com assistente» (blog-prompt-coach) */
+  var STORAGE_COACH_SEED = "blog360_coach_seed";
   var MAX_SESSIONS = 25;
   var MAX_MSG_CHARS = 32000;
 
@@ -495,6 +497,7 @@
         });
       });
     }
+    updateStudioCoachButton();
   }
 
   function selectedMode() {
@@ -506,14 +509,63 @@
     return mode === "dedicado" ? "Assistente (IA dedicada)" : "Assistente (IA padrão)";
   }
 
-  function buildThreadMarkdown() {
-    if (!messages.length) return "";
+  function buildThreadMarkdownFromMsgs(msgs) {
+    if (!msgs || !msgs.length) return "";
     var parts = [];
-    messages.forEach(function (m) {
+    msgs.forEach(function (m) {
       if (m.role === "user") parts.push("## Você\n\n" + String(m.content || "").trim());
-      else if (m.role === "assistant") parts.push("## Assistente\n\n" + String(m.content || "").trim());
+      else if (m.role === "assistant") parts.push("## Assistente do painel\n\n" + String(m.content || "").trim());
     });
     return parts.join("\n\n---\n\n");
+  }
+
+  function buildThreadMarkdown() {
+    return buildThreadMarkdownFromMsgs(messages);
+  }
+
+  function buildCoachSeedWrap(md) {
+    return [
+      "Quero transformar o contexto abaixo (conversa com o Assistente do painel do blog) num único PROMPT completo e reutilizável para o campo «Comando / instruções» deste Estúdio.",
+      "",
+      "Requisitos do prompt final: tema claro, público-alvo, tom acolhedor, formato (artigo / post para redes / landing), tamanho aproximado e o que evitar (por exemplo: sem promessas médicas).",
+      "",
+      "Se faltar só um ou dois detalhes essenciais, faça no máximo 2 perguntas curtas; caso contrário avance para entregar o prompt completo.",
+      "",
+      "--- INÍCIO DO CONTEXTO ---",
+      "",
+      String(md || "").trim(),
+      "",
+      "--- FIM DO CONTEXTO ---",
+    ].join("\n");
+  }
+
+  function goToStudioCoachFromMarkdown(md) {
+    var core = String(md || "").trim();
+    if (!core) {
+      window.alert("Não há conversa com mensagens para enviar ao Estúdio.");
+      return;
+    }
+    var seed = buildCoachSeedWrap(core);
+    if (seed.length > 24000) seed = seed.slice(0, 24000) + "\n\n[… contexto truncado]";
+    try {
+      sessionStorage.setItem(STORAGE_COACH_SEED, JSON.stringify({ v: 1, initialUserMessage: seed }));
+    } catch (e) {
+      window.alert(
+        "Armazenamento cheio ou bloqueado. Use «Copiar conversa» e depois no Estúdio abra «Montar com assistente» e cole."
+      );
+      return;
+    }
+    window.location.href = "admin-estudio-conteudo.html?open_coach=1";
+  }
+
+  function goToStudioCoachCurrent() {
+    goToStudioCoachFromMarkdown(buildThreadMarkdown());
+  }
+
+  function updateStudioCoachButton() {
+    var b = $("assist-to-studio-coach");
+    if (!b) return;
+    b.disabled = !messages.length;
   }
 
   function rebuildFromSession(sess) {
@@ -540,6 +592,7 @@
       if (m.role === "user") appendUserBubble(m.content || "", []);
       else appendLine(label, m.content, false, true);
     });
+    updateStudioCoachButton();
   }
 
   /** Nova conversa: guarda a actual, reinicia ID e ecrã. */
@@ -594,6 +647,7 @@
           "</span></div>" +
           '<div class="history-actions">' +
           '<button type="button" class="btn-ghost btn-tiny" data-act="open">Abrir</button>' +
+          '<button type="button" class="btn-ghost btn-tiny" data-act="studio" title="Montar com assistente no Estúdio">Estúdio</button>' +
           '<button type="button" class="btn-ghost btn-tiny danger" data-act="del">Apagar</button>' +
           "</div></li>"
         );
@@ -675,6 +729,7 @@
       stripImagesFromLastUserMessage();
       appendLine(assistantLabelForMode(mode), reply, false, true);
       persistCurrentSession();
+      updateStudioCoachButton();
     } catch (e) {
       messages.pop();
       removeLastUserBubbleFromDom();
@@ -682,6 +737,7 @@
       pendingImages = snapPending;
       renderPendingImages();
       appendLine("Sistema", (e && e.message) || "Erro", false, false);
+      updateStudioCoachButton();
     } finally {
       if (btn) btn.disabled = false;
     }
@@ -709,6 +765,12 @@
     });
     if (cur && cur.messages && cur.messages.length) rebuildFromSession(cur);
     else renderWelcome();
+
+    $("assist-to-studio-coach") &&
+      $("assist-to-studio-coach").addEventListener("click", function () {
+        if (!messages.length) return;
+        goToStudioCoachCurrent();
+      });
 
     $("assist-send") && $("assist-send").addEventListener("click", function () {
       void send();
@@ -773,6 +835,14 @@
             var panel = $("assist-history-panel");
             if (panel) panel.setAttribute("hidden", "");
           }
+        } else if (act === "studio") {
+          var p3 = loadHistoryPack();
+          var s3 = p3.sessions.find(function (x) {
+            return x.id === id;
+          });
+          if (s3 && s3.messages && s3.messages.length) {
+            goToStudioCoachFromMarkdown(buildThreadMarkdownFromMsgs(s3.messages));
+          } else window.alert("Esta entrada não tem mensagens para enviar.");
         } else if (act === "del") {
           if (!window.confirm("Apagar esta entrada do histórico neste navegador?")) return;
           deleteSessionById(id);
@@ -827,5 +897,7 @@
         fin.value = "";
       });
     }
+
+    updateStudioCoachButton();
   });
 })();
