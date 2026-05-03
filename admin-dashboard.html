@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -464,6 +464,22 @@
             </div>
 
             <div class="table-container" style="margin-bottom: 1.5rem;">
+                <div class="table-header" style="flex-wrap: wrap; gap: 12px;">
+                    <h2>📅 Planejador de postagens</h2>
+                    <button type="button" class="btn-secondary" onclick="window.location.href='admin-planejador-posts.html'">Abrir planejador</button>
+                </div>
+                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Fila editorial, fio narrativo e sequência entre categorias. Requer SQL <code style="font-size:12px;">blog360_post_plan_items</code> (<code style="font-size:12px;">BLOG360_POST_PLANNER.sql</code>).</p>
+            </div>
+
+            <div class="table-container" style="margin-bottom: 1.5rem;">
+                <div class="table-header" style="flex-wrap: wrap; gap: 12px;">
+                    <h2>💬 Assistente do painel (IA)</h2>
+                    <button type="button" class="btn-secondary" onclick="window.location.href='admin-assistente-painel.html'">Abrir assistente</button>
+                </div>
+                <p style="padding: 0 1.5rem 1.25rem; color: #5D6D7E; font-size: 14px; margin: 0;">Dúvidas sobre calendário, coerência e o que postar. Escolha entre IA padrão e IA dedicada. Deploy da função <code style="font-size:12px;">blog-admin-assistant</code> e secret <code style="font-size:12px;">GEMINI_API</code>.</p>
+            </div>
+
+            <div class="table-container" style="margin-bottom: 1.5rem;">
                 <div class="table-header">
                     <h2>👤 Foto da página Sobre</h2>
                 </div>
@@ -578,6 +594,8 @@
                     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
                         <button class="btn-primary" onclick="window.location.href='admin-editor-artigo.html'">+ Novo Artigo</button>
                         <button class="btn-secondary" onclick="window.location.href='admin-estudio-conteudo.html'" title="IA: landing, redes, rascunhos de artigo">✨ Estúdio de conteúdo</button>
+                        <button class="btn-secondary" onclick="window.location.href='admin-planejador-posts.html'" title="Sequência e fio narrativo">📅 Planejador</button>
+                        <button class="btn-secondary" onclick="window.location.href='admin-assistente-painel.html'" title="Dúvidas e orientação (IA padrão ou dedicada)">💬 Assistente</button>
                     </div>
                 </div>
                 <table>

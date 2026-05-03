@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente do painel — Vida 360º</title>
+    <link rel="icon" type="image/png" href="assets/images/avatar-vida360.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #2d1f3d; min-height: 100vh; }
+        .top {
+            background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .top h1 { font-size: 1.1rem; font-weight: 700; }
+        .top-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .top-actions a {
+            color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.88rem;
+        }
+        .top-actions a:hover { background: rgba(255,255,255,0.14); }
+        .wrap { max-width: 720px; margin: 0 auto; padding: 1.25rem; }
+        .intro {
+            background: #fff; border: 1px solid #e8d8f2; border-radius: 10px;
+            padding: 1rem; margin-bottom: 1rem; color: #5d4b70; font-size: 0.92rem; line-height: 1.55;
+        }
+        .mode-row {
+            display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+            margin-bottom: 0.75rem; font-size: 0.9rem;
+        }
+        .mode-row label { display: flex; align-items: center; gap: 0.35rem; cursor: pointer; }
+        .card {
+            background: #fff; border: 1px solid #e8d8f2; border-radius: 12px;
+            padding: 1rem; min-height: 320px; display: flex; flex-direction: column;
+        }
+        #assist-chat {
+            flex: 1; overflow-y: auto; max-height: 420px; padding: 0.5rem;
+            background: #faf7fc; border-radius: 8px; margin-bottom: 0.75rem; font-size: 0.9rem;
+        }
+        .msg { margin-bottom: 0.85rem; }
+        .msg .who { font-size: 0.72rem; color: #6f6280; display: block; margin-bottom: 0.2rem; }
+        .msg.user .who { color: #7f3f98; }
+        .bubble {
+            background: #fff; border: 1px solid #e4d2f0; border-radius: 8px;
+            padding: 0.55rem 0.7rem; line-height: 1.45; word-break: break-word;
+        }
+        .msg.user .bubble { background: #f0e6f6; border-color: #d7c2e6; }
+        .row-input { display: flex; gap: 0.5rem; align-items: flex-end; flex-wrap: wrap; }
+        textarea#assist-input {
+            flex: 1; min-width: 200px; min-height: 72px; resize: vertical;
+            font: inherit; padding: 0.55rem 0.65rem; border: 1px solid #ddd; border-radius: 8px;
+        }
+        .btn {
+            background: #7f3f98; color: #fff; border: none; border-radius: 8px;
+            padding: 0.55rem 1rem; font-weight: 600; cursor: pointer; font-size: 0.9rem;
+        }
+        .btn:hover { background: #6d2d86; }
+        .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .btn-ghost {
+            background: transparent; color: #6d2d86; border: 1px solid #d7c2e6;
+            padding: 0.45rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem;
+        }
+        .hint { font-size: 0.8rem; color: #7f8c8d; margin-top: 0.5rem; }
+        .admin-global-footer {
+            background: #7f3f98; color: #fff; margin-top: 24px; padding: 20px; text-align: center;
+        }
+        .admin-global-footer .container { width: 90%; max-width: 1200px; margin: 0 auto; }
+        .admin-global-footer a { color: #f4ecf7; }
+    </style>
+</head>
+<body>
+    <header class="top">
+        <h1>💬 Assistente do painel</h1>
+        <div class="top-actions">
+            <a href="admin-dashboard.html">Painel</a>
+            <a href="admin-planejador-posts.html">Planejador</a>
+            <a href="admin-estudio-conteudo.html">Estúdio</a>
+            <a href="index.html">Ver blog</a>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <p class="intro">
+            Tire dúvidas sobre <strong>sequência de posts</strong>, categorias, calendário e coerência da marca.
+            <strong>IA padrão</strong> — respostas mais curtas e rápidas (modelo configurável por secret
+            <code style="font-size:0.8rem">BLOG360_ADMIN_GEMINI_MODEL_PADRAO</code>, padrão <code style="font-size:0.8rem">gemini-2.0-flash</code>).
+            <strong>IA dedicada</strong> — orientação mais profunda (secret
+            <code style="font-size:0.8rem">BLOG360_ADMIN_GEMINI_MODEL_DEDICADO</code>, padrão <code style="font-size:0.8rem">gemini-2.5-flash</code>).
+            Requer deploy da Edge Function <code style="font-size:0.8rem">blog-admin-assistant</code> e secret <code style="font-size:0.8rem">GEMINI_API</code> no Supabase.
+        </p>
+
+        <div class="mode-row">
+            <span style="font-weight:600;color:#6d2d86;">Motor:</span>
+            <label><input type="radio" name="assist-mode" value="padrao" checked> IA padrão</label>
+            <label><input type="radio" name="assist-mode" value="dedicado"> IA dedicada</label>
+            <button type="button" class="btn-ghost" id="assist-clear">Limpar conversa</button>
+        </div>
+
+        <div class="card">
+            <div id="assist-chat" aria-live="polite"></div>
+            <div class="row-input">
+                <textarea id="assist-input" placeholder="Ex.: Tenho três categorias diferentes esta semana — como encaixar numa história sem parecer aleatório?"></textarea>
+                <button type="button" class="btn" id="assist-send">Enviar</button>
+            </div>
+            <p class="hint">Use Enter para enviar; Shift+Enter quebra linha. Abra esta página via <strong>http://localhost</strong> (npm run dev), não file://.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/admin-assistente-painel.js"></script>
+
+    <footer class="admin-global-footer" role="contentinfo">
+        <div class="container">
+            <p>© 2026 Vida 360º · Assistente do painel</p>
+            <p style="margin-top:0.5rem;"><a href="admin-dashboard.html">Voltar ao painel</a></p>
+        </div>
+    </footer>
+</body>
+</html>

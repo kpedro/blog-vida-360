@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planejador de postagens — Vida 360º</title>
+    <link rel="icon" type="image/png" href="assets/images/avatar-vida360.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #2d1f3d; min-height: 100vh; }
+        .top {
+            background: linear-gradient(135deg, #6d2d86 0%, #9b59b6 100%);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .top h1 { font-size: 1.1rem; font-weight: 700; }
+        .top-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .top-actions a {
+            color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 6px; padding: 0.35rem 0.7rem; font-size: 0.88rem;
+        }
+        .top-actions a:hover { background: rgba(255,255,255,0.14); }
+        .container { max-width: 1280px; margin: 0 auto; padding: 1.25rem; }
+        .intro {
+            background: #fff; border: 1px solid #e8d8f2; border-radius: 10px;
+            padding: 1rem; margin-bottom: 1rem; color: #5d4b70; font-size: 0.92rem; line-height: 1.55;
+        }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; align-items: center; }
+        .btn {
+            background: #7f3f98; color: #fff; border: none; border-radius: 8px;
+            padding: 0.5rem 0.9rem; font-weight: 600; cursor: pointer; font-size: 0.88rem;
+        }
+        .btn:hover { background: #6d2d86; }
+        .btn.secondary { background: #fff; color: #6d2d86; border: 1px solid #d7c2e6; }
+        .btn.secondary:hover { background: #f4ecf7; }
+        .banner { display: none; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.75rem; font-size: 0.88rem; }
+        .banner.ok { background: #d5f4e6; color: #1e8449; border: 1px solid #27ae60; }
+        .banner.err { background: #fadbd8; color: #6d2d86; border: 1px solid #7f3f98; }
+        .table-wrap { overflow-x: auto; background: #fff; border: 1px solid #e8d8f2; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 920px; }
+        th, td { border-bottom: 1px solid #eee; padding: 0.45rem 0.35rem; vertical-align: top; }
+        th { text-align: left; background: #faf7fc; color: #6d2d86; font-weight: 600; }
+        td.num { width: 2rem; color: #7f8c8d; text-align: center; }
+        td.actions { white-space: nowrap; }
+        td.actions .btn-sm { margin: 0.15rem 0.15rem 0 0; }
+        input[type="text"], input[type="date"], select, textarea {
+            width: 100%; max-width: 100%; font: inherit; padding: 0.35rem 0.4rem;
+            border: 1px solid #ddd; border-radius: 6px;
+        }
+        textarea { resize: vertical; min-height: 2.5rem; }
+        .btn-sm {
+            font-size: 0.75rem; padding: 0.25rem 0.45rem; border-radius: 6px;
+            border: 1px solid #d7c2e6; background: #fff; color: #6d2d86; cursor: pointer;
+        }
+        .btn-sm:hover { background: #f4ecf7; }
+        .btn-sm.danger { color: #c0392b; border-color: #f5b7b1; }
+        .muted { color: #7f8c8d; }
+        .admin-global-footer {
+            background: #7f3f98; color: #fff; margin-top: 24px; padding: 20px; text-align: center;
+        }
+        .admin-global-footer .container { width: 90%; max-width: 1200px; margin: 0 auto; }
+        .admin-global-footer .footer-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem; margin: 1rem 0; text-align: left;
+        }
+        .admin-global-footer .footer-grid h3 { margin: 0 0 0.6rem; font-size: 0.95rem; color: #f4ecf7; }
+        .admin-global-footer .footer-grid a { color: #f4ecf7; text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 0.35rem; }
+        .admin-global-footer .footer-grid a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header class="top">
+        <h1>📅 Planejador de postagens</h1>
+        <div class="top-actions">
+            <a href="admin-dashboard.html">Painel</a>
+            <a href="admin-estudio-conteudo.html">Estúdio</a>
+            <a href="admin-assistente-painel.html">Assistente do painel</a>
+            <a href="index.html">Ver blog</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <p class="intro">
+            Organize o <strong>fio editorial</strong>: ordem na tabela = sequência sugerida. Use «Gancho / papel na história» para lembrar como cada post encaixa na narrativa geral, mesmo mudando de categoria.
+            Campos «Ideia» e «Notas» ajudam quando não souber o que postar. «Slug publicado» é opcional, para ligar à peça já no ar.
+            <strong>Primeira vez:</strong> execute <code style="font-size:0.85rem">BLOG360_POST_PLANNER.sql</code> no Supabase (cria a tabela, RLS e a função <code style="font-size:0.85rem">blog360_updated_at</code> se ainda não existir).
+        </p>
+
+        <div id="planner-banner" class="banner" role="status"></div>
+
+        <div class="toolbar">
+            <button type="button" class="btn" id="btn-planner-add">+ Adicionar ideia</button>
+            <button type="button" class="btn secondary" id="btn-planner-refresh">Recarregar</button>
+            <button type="button" class="btn secondary" id="btn-planner-copy">Copiar resumo (fio narrativo)</button>
+        </div>
+
+        <datalist id="planner-cats">
+            <option value="geral"></option>
+            <option value="aromaterapia"></option>
+            <option value="bem-estar"></option>
+            <option value="rotina"></option>
+            <option value="sono"></option>
+            <option value="negocio"></option>
+            <option value="historias"></option>
+        </datalist>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Estado</th>
+                        <th>Categoria</th>
+                        <th>Título / tema</th>
+                        <th>Gancho na narrativa</th>
+                        <th>Ideia</th>
+                        <th>Data</th>
+                        <th>Slug</th>
+                        <th>Notas</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="planner-tbody">
+                    <tr><td colspan="10" class="muted" style="padding:1.5rem;">A carregar…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/admin-planejador.js"></script>
+
+    <footer class="admin-global-footer" role="contentinfo">
+        <div class="container">
+            <p>© 2026 Vida 360º · Planejador editorial</p>
+            <div class="footer-grid">
+                <div>
+                    <h3>Navegação</h3>
+                    <a href="admin-dashboard.html">Painel</a><br>
+                    <a href="admin-login.html">Login</a>
+                </div>
+                <div>
+                    <h3>Produção</h3>
+                    <a href="admin-estudio-conteudo.html">Estúdio de conteúdo</a><br>
+                    <a href="admin-editor-artigo.html">Editor de artigo</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
