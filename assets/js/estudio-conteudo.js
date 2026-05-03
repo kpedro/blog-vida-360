@@ -208,6 +208,105 @@
     return session;
   }
 
+  /** Corta o bloco «--- / SUGESTÃO DE IMAGEM» antes de adaptar ou reutilizar só o copy principal. */
+  function sliceBeforeImageSuggestionBlock(raw) {
+    let text = String(raw || '').replace(/\r\n/g, '\n');
+    const sugIdx = text.search(/\n---\s*\n\s*SUGESTÃO\s+DE\s+IMAGEM/i);
+    if (sugIdx !== -1) text = text.slice(0, sugIdx).trim();
+    return text.trim();
+  }
+
+  /**
+   * Reformula o «Resultado» como legenda Instagram (mesma Edge Function que «Posts para redes», tipo social_post).
+   */
+  async function adaptResultToInstagram() {
+    const session = await requireAuth();
+    if (!session) return;
+
+    const outEl = $('studio-output');
+    const rawIn = (outEl && outEl.value) || '';
+    let source = sliceBeforeImageSuggestionBlock(rawIn);
+    if (!source.trim()) {
+      showError('Gere ou cole um texto em «Resultado» antes de adaptar.');
+      return;
+    }
+    if (source.length > 12000) source = source.slice(0, 12000);
+
+    if (!getSupabaseUrl().trim()) {
+      showError('URL do Supabase não definida.', true);
+      return;
+    }
+    if (isFileProtocol()) {
+      showError(
+        'Abra por HTTP (npm run dev → localhost), não como file:// — assim o navegador permite chamar o Supabase.',
+        true
+      );
+      return;
+    }
+
+    const btn = $('btn-adapt-instagram');
+    if (btn) btn.disabled = true;
+    clearError();
+
+    const prompt =
+      'Transforme o texto abaixo numa legenda completa para Instagram do Blog Vida 360º.\n\n' +
+      'Requisitos: (1) primeira linha — gancho forte para a pré-visualização; (2) corpo curto com valor e tom acolhedor; ' +
+      '(3) CTA honesto (comentar, guardar, «link na bio» sem inventar URL); (4) bloco final com 5 a 12 hashtags em português. ' +
+      'Limite total até 2200 caracteres. Não invente benefícios de saúde nem links. Use quebras de linha; evite Markdown pesado (títulos com #).\n\n' +
+      'Texto de origem:\n---\n' +
+      source.trim();
+
+    try {
+      const res = await fetch(`${getSupabaseUrl()}/functions/v1/generate-blog-studio-content`, {
+        method: 'POST',
+        headers: fnHeaders(session),
+        body: JSON.stringify({ type: 'social_post', prompt, temperature: 0.75 }),
+      });
+      const { raw: bodyRaw, data } = await readEdgeFunctionBody(res);
+      if (!res.ok) {
+        console.error('[Estúdio] adapt Instagram', res.status, bodyRaw);
+        throw new Error(
+          explainEdgeFunctionHttpError('generate-blog-studio-content', res.status, data, bodyRaw)
+        );
+      }
+
+      const generated =
+        (data && (data.content || data.generatedText || data.text || data.result || data.output)) || '';
+      if (!generated.trim()) {
+        throw new Error(
+          'A função respondeu sem texto. Confirme GEMINI_API no Supabase e o deploy de generate-blog-studio-content.'
+        );
+      }
+
+      const { copy, imageSuggestion } = parseGeneratedContent(generated);
+      $('studio-output').value = copy;
+      if (imageSuggestion && $('studio-image-prompt')) {
+        $('studio-image-prompt').value = imageSuggestion;
+      }
+
+      await saveHistoryRow('social_post', '[Adaptar para Instagram]', copy, imageSuggestion);
+      refreshOverlaySuggestionsFromCopy();
+      window.alert(
+        'Legenda para Instagram gerada no resultado. Revise e use «Copiar sem Markdown» para colar no app.'
+      );
+    } catch (e) {
+      let msg =
+        (e && e.message) ||
+        'Erro ao adaptar. Verifique rede, GEMINI_API e deploy da função generate-blog-studio-content.';
+      if (
+        msg === 'Failed to fetch' ||
+        /network/i.test(msg) ||
+        (typeof msg === 'string' && msg.includes('Load failed'))
+      ) {
+        msg =
+          'Sem ligação ao Supabase. Use http://localhost com npm run dev (não file://); confirme rede/VPN.';
+      }
+      showError(msg, true);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
   function parseGeneratedContent(raw) {
     const sep = '---';
     const idx = raw.indexOf(sep);
@@ -1627,6 +1726,8 @@
     $('btn-copy').addEventListener('click', copyOutput);
     const btnPlain = $('btn-copy-plain');
     if (btnPlain) btnPlain.addEventListener('click', copyOutputPlain);
+    const btnAdaptIg = $('btn-adapt-instagram');
+    if (btnAdaptIg) btnAdaptIg.addEventListener('click', () => void adaptResultToInstagram());
     const btnGm = $('btn-google-gmail');
     if (btnGm) btnGm.addEventListener('click', openGmailWithOutput);
     const btnGd = $('btn-google-docs');
