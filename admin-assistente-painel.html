@@ -31,10 +31,38 @@
             padding: 1rem; margin-bottom: 1rem; color: #5d4b70; font-size: 0.92rem; line-height: 1.55;
         }
         .mode-row {
-            display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+            display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center;
             margin-bottom: 0.75rem; font-size: 0.9rem;
         }
         .mode-row label { display: flex; align-items: center; gap: 0.35rem; cursor: pointer; }
+        .msg-toolbar {
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+            gap: 0.35rem; margin-bottom: 0.25rem;
+        }
+        .msg-toolbar .who { margin-bottom: 0; }
+        button.msg-copy {
+            font-size: 0.72rem; padding: 0.2rem 0.45rem; border-radius: 6px;
+            border: 1px solid #d7c2e6; background: #fff; color: #6d2d86; cursor: pointer;
+            font-weight: 600;
+        }
+        button.msg-copy:hover { background: #f4ecf7; }
+        .history-panel {
+            background: #fff; border: 1px solid #e8d8f2; border-radius: 10px;
+            padding: 0.85rem 1rem; margin-bottom: 0.85rem; font-size: 0.88rem;
+        }
+        .history-panel h3 { font-size: 0.95rem; color: #6d2d86; margin-bottom: 0.5rem; }
+        .history-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        #assist-history-list { list-style: none; margin: 0; padding: 0; max-height: 240px; overflow-y: auto; }
+        .history-item {
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start;
+            gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid #eee;
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-meta span { font-size: 0.78rem; color: #7f8c8d; }
+        .history-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+        .history-empty { color: #7f8c8d; padding: 0.5rem 0; font-size: 0.85rem; }
+        .btn-tiny { font-size: 0.75rem !important; padding: 0.25rem 0.5rem !important; }
+        .btn-ghost.danger { color: #c0392b; border-color: #f5b7b1; }
         .card {
             background: #fff; border: 1px solid #e8d8f2; border-radius: 12px;
             padding: 1rem; min-height: 320px; display: flex; flex-direction: column;
@@ -103,13 +131,27 @@
             <strong>IA dedicada</strong> — orientação mais profunda (secret
             <code style="font-size:0.8rem">BLOG360_ADMIN_GEMINI_MODEL_DEDICADO</code>, padrão <code style="font-size:0.8rem">gemini-2.5-flash</code>).
             Requer deploy da Edge Function <code style="font-size:0.8rem">blog-admin-assistant</code> e secret <code style="font-size:0.8rem">GEMINI_API</code> no Supabase.
+            <strong>Copiar</strong> em cada mensagem ou <strong>Copiar conversa</strong> para colar no Estúdio / n8n / outro prompt.
+            O <strong>histórico</strong> fica neste navegador (localStorage) e actualiza ao receber cada resposta.
         </p>
 
         <div class="mode-row">
             <span style="font-weight:600;color:#6d2d86;">Motor:</span>
             <label><input type="radio" name="assist-mode" value="padrao" checked> IA padrão</label>
             <label><input type="radio" name="assist-mode" value="dedicado"> IA dedicada</label>
-            <button type="button" class="btn-ghost" id="assist-clear">Limpar conversa</button>
+            <button type="button" class="btn-ghost" id="assist-new" title="Guarda a conversa actual e começa outra">Nova conversa</button>
+            <button type="button" class="btn-ghost" id="assist-copy-thread" title="Markdown: Você / Assistente">Copiar conversa</button>
+            <button type="button" class="btn-ghost" id="assist-history-toggle">Histórico</button>
+            <button type="button" class="btn-ghost" id="assist-clear" title="Limpa o ecrã; a conversa é guardada no histórico antes">Limpar ecrã</button>
+        </div>
+
+        <div id="assist-history-panel" class="history-panel" hidden>
+            <div class="history-head">
+                <h3>Histórico (neste navegador)</h3>
+                <button type="button" class="btn-ghost btn-tiny" id="assist-history-close">Fechar</button>
+            </div>
+            <ul id="assist-history-list"></ul>
+            <p class="hint" style="margin-top:0.5rem;">«Abrir» substitui a conversa actual. «Apagar» remove só esta entrada local.</p>
         </div>
 
         <div class="card">
