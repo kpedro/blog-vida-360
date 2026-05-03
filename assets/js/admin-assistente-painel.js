@@ -16,6 +16,8 @@
   var SESS_STORAGE_KEY = "blog360_admin_assist_current_sess";
   /** Handoff para Estúdio → «Montar com assistente» (blog-prompt-coach) */
   var STORAGE_COACH_SEED = "blog360_coach_seed";
+  /** Handoff do planejador → caixa de mensagem do assistente */
+  var STORAGE_PLANNER_SEED = "blog360_assist_planner_seed";
   var MAX_SESSIONS = 25;
   var MAX_MSG_CHARS = 32000;
 
@@ -568,6 +570,32 @@
     b.disabled = !messages.length;
   }
 
+  /** Vindo do planejador: ?from_planner=1 + sessionStorage */
+  function consumePlannerSeedIfAny() {
+    try {
+      var qs = new URLSearchParams(window.location.search || "");
+      if (qs.get("from_planner") !== "1") return;
+      var raw = sessionStorage.getItem(STORAGE_PLANNER_SEED);
+      if (raw) sessionStorage.removeItem(STORAGE_PLANNER_SEED);
+      var u = new URL(window.location.href);
+      u.searchParams.delete("from_planner");
+      window.history.replaceState({}, document.title, u.pathname + (u.search ? u.search : "") + (u.hash || ""));
+      var notice = $("assist-planner-notice");
+      if (notice) {
+        notice.removeAttribute("hidden");
+        notice.textContent =
+          "Texto do planejador colado na caixa de mensagem em baixo. Pode editar antes de enviar. Se quiser conversa só sobre isto, use «Nova conversa» antes.";
+      }
+      var inp2 = $("assist-input");
+      if (raw && inp2) {
+        var data = JSON.parse(raw);
+        if (data && typeof data.prefill === "string" && data.prefill.trim()) inp2.value = data.prefill;
+      }
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
   function rebuildFromSession(sess) {
     if (!sess || !Array.isArray(sess.messages)) return;
     messages = sess.messages.map(function (m) {
@@ -899,5 +927,6 @@
     }
 
     updateStudioCoachButton();
+    consumePlannerSeedIfAny();
   });
 })();

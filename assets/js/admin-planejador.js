@@ -4,6 +4,7 @@
  */
 (function () {
   const TABLE = "blog360_post_plan_items";
+  const STORAGE_ASSIST_PLANNER = "blog360_assist_planner_seed";
 
   function $(id) {
     return document.getElementById(id);
@@ -82,6 +83,7 @@
     if (!items.length) {
       body.innerHTML =
         '<tr><td colspan="10" class="muted" style="padding:1.5rem;">Nenhum item ainda. Use «Adicionar ideia» para começar a trilha.</td></tr>';
+      renderNextFocusPanel();
       return;
     }
     body.innerHTML = items
@@ -168,6 +170,147 @@
         );
       })
       .join("");
+    renderNextFocusPanel();
+  }
+
+  function getNextQueueItem() {
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].status !== "published" && items[i].status !== "skipped") {
+        return { row: items[i], position: i + 1 };
+      }
+    }
+    return null;
+  }
+
+  function plannerHints(next) {
+    if (!next || !next.row) return [];
+    var r = next.row;
+    var h = [];
+    if (!(String(r.idea || "").trim())) {
+      h.push("A «Ideia» deste próximo slot está vazia — bom momento para detalhar ou pedir brainstorming ao assistente.");
+    }
+    if (!(String(r.narrative_beat || "").trim())) {
+      h.push("Preencha o «Gancho na narrativa» para manter o fio editorial coerente.");
+    }
+    if (r.planned_date) {
+      var t = Date.parse(r.planned_date + "T12:00:00");
+      if (!isNaN(t) && t < Date.now() - 86400000) {
+        h.push("A data planeada já passou — actualize a data ou o estado quando fizer sentido.");
+      }
+    }
+    if ((r.status || "") === "idea") {
+      h.push("Ainda em «Ideia» — quando firmar o tema, pode mudar para «Planeado» ou «Em progresso».");
+    }
+    return h;
+  }
+
+  function buildPlannerSummaryMarkdown() {
+    var lines = items.map(function (r, i) {
+      return (
+        (i + 1) +
+        ". **" +
+        String(r.title || "sem título").replace(/\*\*/g, "") +
+        "** — " +
+        labelStatus(r.status) +
+        (r.category ? " · " + r.category : "")
+      );
+    });
+    var next = getNextQueueItem();
+    var tail = "";
+    if (next) {
+      var nr = next.row;
+      tail =
+        "\n\n### Próximo na sequência\n\n" +
+        "- **Título:** " +
+        String(nr.title || "").replace(/\*\*/g, "") +
+        "\n- **Estado:** " +
+        labelStatus(nr.status) +
+        "\n- **Categoria:** " +
+        (nr.category || "") +
+        "\n- **Gancho na narrativa:** " +
+        (String(nr.narrative_beat || "").trim() || "_vazio_") +
+        "\n- **Ideia:** " +
+        (String(nr.idea || "").trim().replace(/\n+/g, " ") || "_vazio_") +
+        "\n- **Data planeada:** " +
+        (nr.planned_date || "_sem data_") +
+        "\n- **Notas:** " +
+        (String(nr.notes || "").trim().replace(/\n+/g, " ") || "_vazio_");
+    }
+    return "## Fila do planejador (ordem)\n\n" + lines.join("\n") + tail;
+  }
+
+  function goPlannerToAssistant() {
+    if (!items.length) return;
+    var md = buildPlannerSummaryMarkdown();
+    var pre = [
+      "Tenho o planejamento editorial abaixo no quadro do blog. O **próximo na fila** é o indicado em «Próximo na sequência».",
+      "",
+      "Ajuda-me a: (1) definir o melhor ângulo para esse próximo post; (2) sugerir 2–3 ganchos de abertura; (3) dizer se a ordem da fila faz sentido ou se devo trocar prioridades.",
+      "",
+      md,
+    ].join("\n");
+    var text = pre.length > 20000 ? pre.slice(0, 20000) + "\n\n[… truncado]" : pre;
+    try {
+      sessionStorage.setItem(STORAGE_ASSIST_PLANNER, JSON.stringify({ v: 1, prefill: text }));
+    } catch (e) {
+      window.alert("Armazenamento cheio. Copie o resumo do planejador manualmente.");
+      return;
+    }
+    window.location.href = "admin-assistente-painel.html?from_planner=1";
+  }
+
+  function renderNextFocusPanel() {
+    var root = $("planner-next-panel");
+    if (!root) return;
+    if (!items.length) {
+      root.style.display = "none";
+      root.innerHTML = "";
+      return;
+    }
+    root.style.display = "block";
+    var next = getNextQueueItem();
+    if (!next) {
+      root.innerHTML =
+        "<p class=\"next-title\"><strong>Fila</strong></p>" +
+        "<p>Todos os itens estão <strong>publicados</strong> ou em <strong>skip</strong>. Adicione uma nova ideia ou reabra um item.</p>";
+      return;
+    }
+    var r = next.row;
+    var hints = plannerHints(next);
+    var hintsHtml = hints.length
+      ? "<ul class=\"next-hints\">" +
+        hints
+          .map(function (x) {
+            return "<li>" + escapeHtml(x) + "</li>";
+          })
+          .join("") +
+        "</ul>"
+      : "";
+    root.innerHTML =
+      "<p class=\"next-title\"><strong>Próximo na sequência</strong> (posição " +
+      next.position +
+      ")</p>" +
+      "<p class=\"next-meta\">" +
+      escapeHtml(r.title || "(sem título)") +
+      " · <span>" +
+      escapeHtml(labelStatus(r.status)) +
+      "</span>" +
+      (r.category ? " · " + escapeHtml(r.category) : "") +
+      "</p>" +
+      (String(r.narrative_beat || "").trim()
+        ? "<p class=\"next-beat\"><em>Gancho na narrativa:</em> " + escapeHtml(r.narrative_beat) + "</p>"
+        : "") +
+      (r.planned_date ? "<p class=\"next-date\"><em>Data planeada:</em> " + escapeHtml(r.planned_date) + "</p>" : "") +
+      hintsHtml +
+      "<button type=\"button\" class=\"btn secondary\" id=\"btn-planner-assistant\">Discutir com o assistente do painel</button>" +
+      "<p class=\"hint small\">Envia o resumo da fila + o próximo post para o chat onde a IA ajuda a priorizar, ângulos e encaixe na história.</p>";
+
+    var btn = $("btn-planner-assistant");
+    if (btn) {
+      btn.onclick = function () {
+        goPlannerToAssistant();
+      };
+    }
   }
 
   function labelStatus(st) {

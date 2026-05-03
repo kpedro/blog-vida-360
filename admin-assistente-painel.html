@@ -105,6 +105,11 @@
             padding: 0.45rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem;
         }
         .hint { font-size: 0.8rem; color: #7f8c8d; margin-top: 0.5rem; }
+        #assist-planner-notice {
+            background: #eafaf1; border: 1px solid #abebc6; color: #1e563f;
+            padding: 0.65rem 0.85rem; border-radius: 8px; margin-bottom: 0.75rem; font-size: 0.86rem; line-height: 1.45;
+        }
+        #assist-planner-notice[hidden] { display: none !important; }
         #assist-pending-preview {
             display: none; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 0.6rem;
             padding: 0.45rem; background: #faf7fc; border: 1px dashed #d7c2e6; border-radius: 8px;
@@ -151,6 +156,8 @@
             Pode <strong>colar prints</strong> (Ctrl+V) na caixa de texto ou usar <strong>Anexar print</strong> — a IA analisa a imagem (requer redeploy da função <code style="font-size:0.8rem">blog-admin-assistant</code>).
             Quando a ideia estiver madura, use <strong>Afinar no Estúdio</strong>: leva a conversa (texto) para o <strong>Montar com assistente</strong> do Estúdio, que transforma o contexto num prompt pronto para gerar conteúdo.
         </p>
+
+        <div id="assist-planner-notice" hidden role="status"></div>
 
         <div class="mode-row">
             <span style="font-weight:600;color:#6d2d86;">Motor:</span>

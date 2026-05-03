@@ -60,6 +60,18 @@
         .btn-sm:hover { background: #f4ecf7; }
         .btn-sm.danger { color: #c0392b; border-color: #f5b7b1; }
         .muted { color: #7f8c8d; }
+        .next-focus-card {
+            background: linear-gradient(135deg, #faf7fc 0%, #f0e8f7 100%);
+            border: 1px solid #e4d2f0; border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 1rem;
+            font-size: 0.9rem; color: #4a3d5c; line-height: 1.45;
+        }
+        .next-focus-card .next-title { margin: 0 0 0.35rem; font-size: 0.95rem; color: #6d2d86; }
+        .next-focus-card .next-meta { margin: 0 0 0.5rem; font-weight: 600; }
+        .next-focus-card .next-meta span { font-weight: 500; color: #7f3f98; }
+        .next-focus-card .next-beat, .next-focus-card .next-date { margin: 0.25rem 0; font-size: 0.86rem; }
+        .next-focus-card .next-hints { margin: 0.5rem 0 0.65rem 1.1rem; color: #5d4b70; font-size: 0.84rem; }
+        .next-focus-card .next-hints li { margin-bottom: 0.25rem; }
+        .next-focus-card .hint.small { margin: 0.45rem 0 0; font-size: 0.78rem; color: #7f8c8d; }
         .admin-global-footer {
             background: #7f3f98; color: #fff; margin-top: 24px; padding: 20px; text-align: center;
         }
@@ -88,10 +100,13 @@
         <p class="intro">
             Organize o <strong>fio editorial</strong>: ordem na tabela = sequência sugerida. Use «Gancho / papel na história» para lembrar como cada post encaixa na narrativa geral, mesmo mudando de categoria.
             Campos «Ideia» e «Notas» ajudam quando não souber o que postar. «Slug publicado» é opcional, para ligar à peça já no ar.
+            O cartão <strong>Próximo na sequência</strong> destaca o próximo item activo e dicas leves; a análise mais rica fica no <strong>Assistente do painel</strong> (não duplicamos outra IA aqui).
             <strong>Primeira vez:</strong> execute <code style="font-size:0.85rem">BLOG360_POST_PLANNER.sql</code> no Supabase (cria a tabela, RLS e a função <code style="font-size:0.85rem">blog360_updated_at</code> se ainda não existir).
         </p>
 
         <div id="planner-banner" class="banner" role="status"></div>
+
+        <div id="planner-next-panel" class="next-focus-card" style="display:none;" aria-live="polite"></div>
 
         <div class="toolbar">
             <button type="button" class="btn" id="btn-planner-add">+ Adicionar ideia</button>
