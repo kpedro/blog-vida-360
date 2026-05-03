@@ -105,6 +105,21 @@
             padding: 0.45rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem;
         }
         .hint { font-size: 0.8rem; color: #7f8c8d; margin-top: 0.5rem; }
+        #assist-pending-preview {
+            display: none; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 0.6rem;
+            padding: 0.45rem; background: #faf7fc; border: 1px dashed #d7c2e6; border-radius: 8px;
+        }
+        .pending-thumb { position: relative; width: 72px; height: 72px; border-radius: 6px; overflow: hidden; border: 1px solid #e4d2f0; }
+        .pending-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .pending-remove {
+            position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; border: none; border-radius: 50%;
+            background: rgba(0,0,0,0.55); color: #fff; font-size: 14px; line-height: 1; cursor: pointer; padding: 0;
+        }
+        .pending-remove:hover { background: rgba(0,0,0,0.75); }
+        .bubble-user-images .user-images-row { margin-top: 0.45rem; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .bubble-user-images .user-images-row img {
+            max-width: 100%; max-height: 220px; border-radius: 6px; border: 1px solid #e4d2f0; object-fit: contain;
+        }
         .admin-global-footer {
             background: #7f3f98; color: #fff; margin-top: 24px; padding: 20px; text-align: center;
         }
@@ -133,6 +148,7 @@
             Requer deploy da Edge Function <code style="font-size:0.8rem">blog-admin-assistant</code> e secret <code style="font-size:0.8rem">GEMINI_API</code> no Supabase.
             <strong>Copiar</strong> em cada mensagem ou <strong>Copiar conversa</strong> para colar no Estúdio / n8n / outro prompt.
             O <strong>histórico</strong> fica neste navegador (localStorage) e actualiza ao receber cada resposta.
+            Pode <strong>colar prints</strong> (Ctrl+V) na caixa de texto ou usar <strong>Anexar print</strong> — a IA analisa a imagem (requer redeploy da função <code style="font-size:0.8rem">blog-admin-assistant</code>).
         </p>
 
         <div class="mode-row">
@@ -156,6 +172,12 @@
 
         <div class="card">
             <div id="assist-chat" aria-live="polite"></div>
+            <input type="file" id="assist-file-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" multiple style="display:none" aria-hidden="true">
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
+                <button type="button" class="btn-ghost" id="assist-attach-btn" title="PNG, JPEG, WebP ou GIF (máx. 4 por mensagem)">Anexar print</button>
+                <span class="hint" style="margin:0;">Ou cole um print com Ctrl+V na caixa abaixo.</span>
+            </div>
+            <div id="assist-pending-preview" aria-live="polite"></div>
             <div class="row-input">
                 <textarea id="assist-input" placeholder="Ex.: Tenho três categorias diferentes esta semana — como encaixar numa história sem parecer aleatório?"></textarea>
                 <button type="button" class="btn" id="assist-send">Enviar</button>

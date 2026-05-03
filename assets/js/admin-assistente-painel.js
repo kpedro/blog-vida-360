@@ -4,8 +4,13 @@
  * Histórico: localStorage (neste navegador)
  */
 (function () {
-  /** Mensagens enviadas à API: só { role, content } */
+  /** Mensagens: { role, content, images? } — images só na última mensagem do utilizador ao chamar a API */
   var messages = [];
+
+  /** Anexos antes de enviar: { mimeType, dataBase64 }[] (sem prefixo data:) */
+  var pendingImages = [];
+  var MAX_PENDING_IMAGES = 4;
+  var MAX_IMAGE_FILE_BYTES = 4 * 1024 * 1024;
 
   var STORAGE_KEY = "blog360_admin_assistant_history_v1";
   var SESS_STORAGE_KEY = "blog360_admin_assist_current_sess";
@@ -84,6 +89,226 @@
     var t = String(s || "");
     if (t.length > MAX_MSG_CHARS) t = t.slice(0, MAX_MSG_CHARS) + "\n… [texto truncado]";
     return t;
+  }
+
+  function clearPendingImages() {
+    pendingImages = [];
+    renderPendingImages();
+  }
+
+  function dataUrlToPart(dataUrl) {
+    var m = String(dataUrl || "").match(/^data:([^;]+);base64,([\s\S]+)$/i);
+    if (!m) return null;
+    var mime = m[1].toLowerCase().trim().split(";")[0];
+    var b64 = m[2].replace(/\s/g, "");
+    if (!b64 || b64.length < 40) return null;
+    return { mimeType: mime, dataBase64: b64 };
+  }
+
+  function renderPendingImages() {
+    var wrap = $("assist-pending-preview");
+    if (!wrap) return;
+    if (!pendingImages.length) {
+      wrap.innerHTML = "";
+      wrap.style.display = "none";
+      return;
+    }
+    wrap.style.display = "flex";
+    wrap.innerHTML = pendingImages
+      .map(function (p, idx) {
+        var src = "data:" + p.mimeType + ";base64," + p.dataBase64;
+        return (
+          '<div class="pending-thumb" data-idx="' +
+          idx +
+          '">' +
+          '<img src="' +
+          escapeHtml(src) +
+          '" alt="">' +
+          '<button type="button" class="pending-remove" data-idx="' +
+          idx +
+          '" title="Remover">×</button></div>'
+        );
+      })
+      .join("");
+    wrap.querySelectorAll(".pending-remove").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var i = parseInt(btn.getAttribute("data-idx"), 10);
+        if (!isNaN(i)) {
+          pendingImages.splice(i, 1);
+          renderPendingImages();
+        }
+      });
+    });
+  }
+
+  function readFileAsImagePart(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file || !file.type || file.type.indexOf("image/") !== 0) {
+        reject(new Error("Seleccione uma imagem (PNG, JPEG, WebP ou GIF)."));
+        return;
+      }
+      if (file.size > MAX_IMAGE_FILE_BYTES) {
+        reject(new Error("Imagem demasiado grande (máx. 4 MB por ficheiro)."));
+        return;
+      }
+      if (file.type === "image/gif" && file.size > 1.5 * 1024 * 1024) {
+        reject(new Error("GIF muito grande; use PNG ou JPEG, ou um GIF até ~1,5 MB."));
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function () {
+        var dataUrl = String(reader.result || "");
+        var direct = dataUrlToPart(dataUrl);
+        if (!direct) {
+          reject(new Error("Não foi possível ler a imagem."));
+          return;
+        }
+        if (file.size <= 1.25 * 1024 * 1024 && file.type !== "image/gif") {
+          resolve(direct);
+          return;
+        }
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var maxW = 1600;
+            var w = img.width;
+            var h = img.height;
+            var cw = w;
+            var ch = h;
+            if (w > maxW) {
+              cw = maxW;
+              ch = Math.round((h * maxW) / w);
+            }
+            var canvas = document.createElement("canvas");
+            canvas.width = cw;
+            canvas.height = ch;
+            var ctx = canvas.getContext("2d");
+            if (!ctx) {
+              resolve(direct);
+              return;
+            }
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, cw, ch);
+            ctx.drawImage(img, 0, 0, cw, ch);
+            var mime = file.type === "image/png" ? "image/png" : "image/jpeg";
+            var out =
+              mime === "image/png"
+                ? canvas.toDataURL("image/png")
+                : canvas.toDataURL("image/jpeg", 0.82);
+            var part = dataUrlToPart(out);
+            if (!part) resolve(direct);
+            else resolve(part);
+          } catch (e) {
+            resolve(direct);
+          }
+        };
+        img.onerror = function () {
+          resolve(direct);
+        };
+        img.src = dataUrl;
+      };
+      reader.onerror = function () {
+        reject(new Error("Falha ao ler o ficheiro."));
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function addPendingFromFile(file) {
+    if (pendingImages.length >= MAX_PENDING_IMAGES) {
+      window.alert("No máximo " + MAX_PENDING_IMAGES + " imagens por mensagem.");
+      return;
+    }
+    try {
+      var part = await readFileAsImagePart(file);
+      pendingImages.push(part);
+      renderPendingImages();
+    } catch (e) {
+      window.alert((e && e.message) || "Erro ao anexar imagem.");
+    }
+  }
+
+  function appendUserBubble(text, imagePartsForPreview) {
+    var box = $("assist-chat");
+    if (!box) return;
+    var div = document.createElement("div");
+    div.className = "msg user";
+    var toolbar = document.createElement("div");
+    toolbar.className = "msg-toolbar";
+    var whoSpan = document.createElement("span");
+    whoSpan.className = "who";
+    whoSpan.textContent = "Você";
+    var copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.className = "msg-copy";
+    copyBtn.textContent = "Copiar";
+    var nImg = imagePartsForPreview && imagePartsForPreview.length ? imagePartsForPreview.length : 0;
+    var copyPlain =
+      String(text || "").trim() +
+      (nImg ? "\n\n[" + nImg + " print(s) anexo(s) — a cópia é só o texto; use o print no ecrã se precisar do ficheiro]" : "");
+    copyBtn.addEventListener("click", function () {
+      void copyPlainToClipboard(copyPlain).then(function (ok) {
+        if (ok) flashBtn(copyBtn, "Copiado!");
+      });
+    });
+    toolbar.appendChild(whoSpan);
+    toolbar.appendChild(copyBtn);
+
+    var bubble = document.createElement("div");
+    bubble.className = "bubble bubble-user-images";
+    var inner = escapeHtml(text || "").replace(/\n/g, "<br>");
+    if (nImg) {
+      inner +=
+        '<div class="user-images-row">' +
+        imagePartsForPreview
+          .map(function (p) {
+            var src = "data:" + p.mimeType + ";base64," + p.dataBase64;
+            return '<img src="' + escapeHtml(src) + '" alt="Print anexo">';
+          })
+          .join("") +
+        "</div>";
+    }
+    bubble.innerHTML = inner;
+
+    div.appendChild(toolbar);
+    div.appendChild(bubble);
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function removeLastUserBubbleFromDom() {
+    var box = $("assist-chat");
+    if (!box) return;
+    var nodes = box.querySelectorAll(".msg.user");
+    var last = nodes[nodes.length - 1];
+    if (last) last.remove();
+  }
+
+  function serializeMessagesForApi(msgs) {
+    var lastUser = -1;
+    for (var i = msgs.length - 1; i >= 0; i--) {
+      if (msgs[i].role === "user") {
+        lastUser = i;
+        break;
+      }
+    }
+    return msgs.map(function (m, i) {
+      if (m.role === "user" && i === lastUser) {
+        var o = { role: "user", content: m.content || "" };
+        if (m.images && m.images.length) o.images = m.images;
+        return o;
+      }
+      return { role: m.role, content: m.content || "" };
+    });
+  }
+
+  function stripImagesFromLastUserMessage() {
+    for (var i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === "user") {
+        if (messages[i].images) delete messages[i].images;
+        break;
+      }
+    }
   }
 
   function loadHistoryPack() {
@@ -312,7 +537,7 @@
     box.innerHTML = "";
     var label = assistantLabelForMode(mode);
     messages.forEach(function (m) {
-      if (m.role === "user") appendLine("Você", m.content, true, false);
+      if (m.role === "user") appendUserBubble(m.content || "", []);
       else appendLine(label, m.content, false, true);
     });
   }
@@ -321,6 +546,7 @@
   function startNewConversation() {
     persistCurrentSession();
     messages = [];
+    clearPendingImages();
     currentSessionId = makeId();
     try {
       sessionStorage.setItem(SESS_STORAGE_KEY, currentSessionId);
@@ -332,6 +558,7 @@
   function clearChat() {
     persistCurrentSession();
     messages = [];
+    clearPendingImages();
     currentSessionId = makeId();
     try {
       sessionStorage.setItem(SESS_STORAGE_KEY, currentSessionId);
@@ -387,7 +614,12 @@
   async function send() {
     var input = $("assist-input");
     var text = (input && input.value.trim()) || "";
-    if (!text) return;
+    var snapText = text;
+    var snapPending = pendingImages.map(function (p) {
+      return { mimeType: p.mimeType, dataBase64: p.dataBase64 };
+    });
+
+    if (!text && !pendingImages.length) return;
 
     var session = await requireAuth();
     if (!session) return;
@@ -401,9 +633,22 @@
       return;
     }
 
-    messages.push({ role: "user", content: text });
-    appendLine("Você", text, true, false);
+    var imgs = pendingImages.map(function (p) {
+      return { mimeType: p.mimeType, dataBase64: p.dataBase64 };
+    });
+    var bodyContent = text || (imgs.length ? "(Print em anexo)" : "");
+
+    messages.push({
+      role: "user",
+      content: bodyContent,
+      images: imgs.length ? imgs : undefined,
+    });
+
+    var displayLine = text || (imgs.length ? "Print anexo" : "");
+    appendUserBubble(displayLine, imgs);
+
     input.value = "";
+    clearPendingImages();
 
     var btn = $("assist-send");
     if (btn) btn.disabled = true;
@@ -413,7 +658,10 @@
       var res = await fetch(getSupabaseUrl() + "/functions/v1/blog-admin-assistant", {
         method: "POST",
         headers: fnHeaders(session),
-        body: JSON.stringify({ messages: messages, mode: mode }),
+        body: JSON.stringify({
+          messages: serializeMessagesForApi(messages),
+          mode: mode,
+        }),
       });
       var data = await res.json().catch(function () {
         return {};
@@ -424,10 +672,15 @@
       var reply = (data.reply || "").trim();
       if (!reply) throw new Error("Resposta vazia da IA.");
       messages.push({ role: "assistant", content: reply });
+      stripImagesFromLastUserMessage();
       appendLine(assistantLabelForMode(mode), reply, false, true);
       persistCurrentSession();
     } catch (e) {
       messages.pop();
+      removeLastUserBubbleFromDom();
+      if (input) input.value = snapText;
+      pendingImages = snapPending;
+      renderPendingImages();
       appendLine("Sistema", (e && e.message) || "Erro", false, false);
     } finally {
       if (btn) btn.disabled = false;
@@ -543,6 +796,35 @@
           e.preventDefault();
           void send();
         }
+      });
+      inp.addEventListener("paste", function (e) {
+        var cd = e.clipboardData;
+        if (!cd || !cd.items) return;
+        for (var i = 0; i < cd.items.length; i++) {
+          if (cd.items[i].type && cd.items[i].type.indexOf("image") === 0) {
+            e.preventDefault();
+            var f = cd.items[i].getAsFile();
+            if (f) void addPendingFromFile(f);
+            return;
+          }
+        }
+      });
+    }
+
+    var fin = $("assist-file-input");
+    var fab = $("assist-attach-btn");
+    if (fab && fin) {
+      fab.addEventListener("click", function () {
+        fin.click();
+      });
+      fin.addEventListener("change", function () {
+        var files = fin.files;
+        if (!files || !files.length) return;
+        for (var j = 0; j < files.length; j++) {
+          if (pendingImages.length >= MAX_PENDING_IMAGES) break;
+          void addPendingFromFile(files[j]);
+        }
+        fin.value = "";
       });
     }
   });
