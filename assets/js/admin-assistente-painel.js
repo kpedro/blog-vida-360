@@ -55,18 +55,42 @@
       .replace(/"/g, "&quot;");
   }
 
-  function appendLine(who, text, isUser) {
+  /** Respostas da IA vêm em Markdown; utilizador e erros ficam em texto puro. */
+  function markdownToSafeHtml(md) {
+    var raw = String(md || "");
+    if (typeof marked !== "undefined" && typeof DOMPurify !== "undefined") {
+      try {
+        var parseOpts = { breaks: true, gfm: true };
+        var html =
+          typeof marked.parse === "function"
+            ? marked.parse(raw, parseOpts)
+            : typeof marked === "function"
+              ? marked(raw, parseOpts)
+              : "";
+        return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+      } catch (err) {
+        console.warn("[Assistente] Markdown:", err);
+      }
+    }
+    return escapeHtml(raw).replace(/\n/g, "<br>");
+  }
+
+  /**
+   * @param {string} who
+   * @param {string} text
+   * @param {boolean} isUser
+   * @param {boolean} [renderMarkdown] — só para bolhas do assistente (não «Sistema»)
+   */
+  function appendLine(who, text, isUser, renderMarkdown) {
     var box = $("assist-chat");
     if (!box) return;
     var div = document.createElement("div");
     div.className = "msg" + (isUser ? " user" : "");
+    var useMd = !isUser && !!renderMarkdown;
+    var bubbleClass = "bubble" + (useMd ? " bubble-md" : "");
+    var inner = useMd ? markdownToSafeHtml(text) : escapeHtml(text).replace(/\n/g, "<br>");
     div.innerHTML =
-      '<span class="who">' +
-      escapeHtml(who) +
-      "</span>" +
-      '<div class="bubble">' +
-      escapeHtml(text).replace(/\n/g, "<br>") +
-      "</div>";
+      '<span class="who">' + escapeHtml(who) + "</span>" + '<div class="' + bubbleClass + '">' + inner + "</div>";
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
   }
@@ -94,7 +118,7 @@
     }
 
     messages.push({ role: "user", content: text });
-    appendLine("Você", text, true);
+    appendLine("Você", text, true, false);
     input.value = "";
 
     var btn = $("assist-send");
@@ -116,10 +140,15 @@
       var reply = (data.reply || "").trim();
       if (!reply) throw new Error("Resposta vazia da IA.");
       messages.push({ role: "assistant", content: reply });
-      appendLine(mode === "dedicado" ? "Assistente (IA dedicada)" : "Assistente (IA padrão)", reply, false);
+      appendLine(
+        mode === "dedicado" ? "Assistente (IA dedicada)" : "Assistente (IA padrão)",
+        reply,
+        false,
+        true
+      );
     } catch (e) {
       messages.pop();
-      appendLine("Sistema", (e && e.message) || "Erro", false);
+      appendLine("Sistema", (e && e.message) || "Erro", false, false);
     } finally {
       if (btn) btn.disabled = false;
     }
