@@ -57,6 +57,209 @@
     return h;
   }
 
+  /** Lê corpo JSON mesmo quando a função devolve texto de erro. */
+  async function readEdgeFunctionBody(res) {
+    var raw = await res.text();
+    var data = null;
+    if (raw) {
+      try {
+        data = JSON.parse(raw);
+      } catch (_) {
+        data = { _nonJson: true };
+      }
+    }
+    return { raw: raw, data: data };
+  }
+
+  function explainEdgeFunctionHttpError(functionName, status, data, raw) {
+    var detail =
+      data && typeof data === "object" && !data._nonJson && (data.details || data.error) ? data.details || data.error : "";
+    var snippet = typeof raw === "string" && raw.length ? raw.slice(0, 500) : "";
+    if (status === 401) {
+      return "Sessão expirada ou sem permissão. Abra admin-login.html e entre de novo.";
+    }
+    if (status === 404) {
+      return "Função «" + functionName + "» não encontrada. Faça deploy dessa Edge Function no Supabase.";
+    }
+    if (status === 429) {
+      return detail || "Limite de pedidos à API. Tente daqui a pouco.";
+    }
+    if (status >= 500) {
+      if (/GEMINI_API/i.test(String(detail))) {
+        return "Configure o segredo GEMINI_API no Supabase (Edge Functions → Secrets) e faça redeploy.";
+      }
+      return detail || snippet || "Erro no servidor (" + status + "). Veja Supabase → Edge Functions → Logs.";
+    }
+    return detail || snippet || "Erro HTTP " + status;
+  }
+
+  function isFileProtocol() {
+    return typeof location !== "undefined" && location.protocol === "file:";
+  }
+
+  /**
+   * Se o utilizador colar uma resposta completa do assistente, usa o trecho após
+   * «PROMPT PARA IA DE IMAGEM (Canva / outras)» quando existir.
+   */
+  function preferImagePromptBlock(raw) {
+    var t = String(raw || "");
+    var re = /PROMPT\s+PARA\s+IA\s+DE\s+IMAGEM\s*\([^)]*\)/i;
+    var idx = t.search(re);
+    if (idx === -1) return t;
+    var after = t.slice(idx).replace(re, "").replace(/^[\s:\-*#\n]+/m, "").trim();
+    return after || t;
+  }
+
+  /**
+   * Evita que o modelo desenhe #tags na arte se o prompt copia legenda de redes.
+   * Alinha com generate-blog-studio-image / Estúdio.
+   */
+  function sanitizePromptForImageGeneration(raw) {
+    var text = String(raw || "").replace(/\r\n/g, "\n");
+    var sugIdx = text.search(/\n---\s*\n\s*SUGESTÃO\s+DE\s+IMAGEM/i);
+    if (sugIdx !== -1) text = text.slice(0, sugIdx).trim();
+
+    var lines = text.split("\n");
+    var kept = [];
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      var tr = line.trim();
+      if (!tr) {
+        kept.push("");
+        continue;
+      }
+      var words = tr.split(/\s+/).filter(Boolean);
+      var hashWords = words.filter(function (w) {
+        return /^#\w/u.test(w);
+      }).length;
+      var mostlyTags =
+        hashWords >= 3 || (words.length > 0 && hashWords / words.length >= 0.5 && hashWords >= 2);
+      var looksLikeTagLine = mostlyTags || (words.length >= 2 && hashWords === words.length);
+      if (looksLikeTagLine) break;
+      if (/^#\w/u.test(tr) && words.length <= 15 && hashWords >= 1) break;
+      kept.push(line);
+    }
+    var out = kept.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    if (!out) {
+      out = text.split(/\n{2,}/)[0] || text;
+      out = out.replace(/\s+#\w+/g, "").trim();
+    }
+    return out.slice(0, 4000);
+  }
+
+  var lastQuickImgDataUrl = "";
+  var lastQuickImgMime = "";
+
+  function setQuickImgStatus(msg, kind) {
+    var el = $("assist-quick-img-status");
+    if (!el) return;
+    el.textContent = msg || "";
+    el.className = "";
+    if (kind === "ok") el.className = "ok";
+    else if (kind === "err") el.className = "err";
+  }
+
+  async function generateQuickAssistImage() {
+    var ta = $("assist-quick-img-prompt");
+    var raw = (ta && ta.value.trim()) || "";
+    if (!raw) {
+      setQuickImgStatus("Escreva uma descrição da imagem ou cole o bloco «PROMPT PARA IA DE IMAGEM».", "err");
+      return;
+    }
+
+    var session = await requireAuth();
+    if (!session) return;
+
+    if (!getSupabaseUrl()) {
+      setQuickImgStatus("URL do Supabase não definida.", "err");
+      return;
+    }
+    if (isFileProtocol()) {
+      setQuickImgStatus("Abra por http://localhost (npm run dev), não como file://.", "err");
+      return;
+    }
+
+    var desc = sanitizePromptForImageGeneration(preferImagePromptBlock(raw));
+    if (!desc.trim()) {
+      setQuickImgStatus("Depois de limpar hashtags, o prompt ficou vazio. Edite o texto.", "err");
+      return;
+    }
+
+    var fmtEl = $("assist-quick-img-format");
+    var fmt = (fmtEl && fmtEl.value) || "4:5";
+    var btn = $("assist-quick-img-generate");
+    var dl = $("assist-quick-img-download");
+    if (btn) btn.disabled = true;
+    setQuickImgStatus("A gerar…", "");
+
+    var prev = $("assist-quick-img-preview");
+    if (prev) {
+      prev.style.display = "none";
+      prev.removeAttribute("src");
+    }
+    lastQuickImgDataUrl = "";
+    lastQuickImgMime = "";
+    if (dl) dl.hidden = true;
+
+    try {
+      var res = await fetch(getSupabaseUrl() + "/functions/v1/generate-blog-studio-image", {
+        method: "POST",
+        headers: fnHeaders(session),
+        body: JSON.stringify({ prompt: desc, format: fmt }),
+      });
+      var parsed = await readEdgeFunctionBody(res);
+      var data = parsed.data;
+      var bodyRaw = parsed.raw;
+
+      if (!res.ok) {
+        console.error("[Assistente] generate-blog-studio-image", res.status, bodyRaw);
+        throw new Error(
+          explainEdgeFunctionHttpError("generate-blog-studio-image", res.status, data, bodyRaw)
+        );
+      }
+
+      if (data && data.imageBase64 && data.mimeType) {
+        lastQuickImgMime = data.mimeType;
+        lastQuickImgDataUrl = "data:" + data.mimeType + ";base64," + data.imageBase64;
+        if (prev) {
+          prev.src = lastQuickImgDataUrl;
+          prev.style.display = "block";
+        }
+        if (dl) dl.hidden = false;
+        setQuickImgStatus("Imagem gerada. Pode descarregar ou usar noutro ecrã.", "ok");
+      } else {
+        throw new Error(
+          (data && (data.details || data.error)) || "Nenhuma imagem retornada (resposta sem base64)."
+        );
+      }
+    } catch (e) {
+      var msg = (e && e.message) || "Erro ao gerar imagem.";
+      if (
+        msg === "Failed to fetch" ||
+        /network/i.test(msg) ||
+        (typeof msg === "string" && msg.indexOf("Load failed") !== -1)
+      ) {
+        msg =
+          "Sem ligação ao Supabase. Use http://localhost (npm run dev), não file://; verifique rede/VPN.";
+      }
+      setQuickImgStatus(msg, "err");
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  function downloadQuickAssistImage() {
+    if (!lastQuickImgDataUrl) return;
+    var ext = lastQuickImgMime && lastQuickImgMime.indexOf("jpeg") !== -1 ? "jpg" : "png";
+    var a = document.createElement("a");
+    a.href = lastQuickImgDataUrl;
+    a.download = "vida360-assistente-rapida-" + Date.now() + "." + ext;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
   async function getSession() {
     var c = window.supabaseClient;
     if (!c && typeof window.initSupabase === "function") {
@@ -923,6 +1126,19 @@
           void addPendingFromFile(files[j]);
         }
         fin.value = "";
+      });
+    }
+
+    var qGen = $("assist-quick-img-generate");
+    if (qGen) {
+      qGen.addEventListener("click", function () {
+        void generateQuickAssistImage();
+      });
+    }
+    var qDl = $("assist-quick-img-download");
+    if (qDl) {
+      qDl.addEventListener("click", function () {
+        downloadQuickAssistImage();
       });
     }
 

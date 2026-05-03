@@ -35,7 +35,8 @@ Regras do JSON:
 - É PROIBIDO dizer que "montou o prompt" sem preencher suggestedContent com o texto integral. Se faltar espaço, seja mais conciso no assistantMessage, nunca no suggestedContent.
 - NUNCA use "---" ou blocos markdown no lugar de suggestedContent; o prompt integral vai na string suggestedContent.
 - assistantMessage sempre preenchido.
-- IMPORTANTE: dentro de strings JSON, use \\n para quebra de linha. Nunca coloque quebra de linha literal entre as aspas.`;
+- IMPORTANTE: dentro de strings JSON, use \\n para quebra de linha. Nunca coloque quebra de linha literal entre as aspas.
+- Se o usuário pedir capas de destaque Instagram, ícones, arte para Canva, Midjourney, Firefly ou "prompt só para imagem": em phase = "deliver", após o prompt principal do Estúdio, acrescente em suggestedContent (separado por \\n\\n) um bloco cuja primeira linha seja exactamente «PROMPT PARA IA DE IMAGEM (Canva / outras)» e na linha seguinte uma descrição visual concisa (estilo, cores, composição, proporção sugerida); pode ser em inglês se for útil para essas ferramentas. O bloco do Estúdio (texto/copy) continua a cumprir o mínimo de caracteres em conjunto com esse extra.`;
 
 const MARKETING_SYSTEM_PROMPT = `Você é um assistente de copywriting e divulgação para o time do Blog Vida 360º.
 
@@ -71,7 +72,8 @@ TEXTO_DA_FAIXA: uma linha
 TEXTO_DO_BOTAO: até 4 palavras
 - NUNCA diga que só ajuda com "artigos do blog" ou recuse copy de oportunidade/parceria: este modo é especificamente para marketing e divulgação.
 - assistantMessage sempre preenchido. Em deliver: no máximo 2 frases curtas; o conteúdo utilizável vai em suggestedContent.
-- Dentro de strings JSON use \\n para quebra de linha.`;
+- Dentro de strings JSON use \\n para quebra de linha.
+- Se o usuário pedir APENAS prompt para IA de imagem (Canva, etc.) e não copy de marketing: em deliver, suggestedContent pode ser só esse prompt visual, com primeira linha «PROMPT PARA IA DE IMAGEM (Canva / outras)» e descrição abaixo (mínimo de caracteres do deliver continua a aplicar-se ao texto total).`;
 
 type Msg = { role: string; content: string };
 

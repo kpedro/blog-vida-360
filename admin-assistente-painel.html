@@ -130,6 +130,19 @@
         }
         .admin-global-footer .container { width: 90%; max-width: 1200px; margin: 0 auto; }
         .admin-global-footer a { color: #f4ecf7; }
+        .quick-img-card {
+            background: #fff; border: 1px solid #e8d8f2; border-radius: 12px; padding: 1rem; margin-top: 1rem;
+            max-width: 720px; margin-left: auto; margin-right: auto;
+        }
+        .quick-img-card h2 { font-size: 1rem; color: #6d2d86; margin-bottom: 0.35rem; }
+        .quick-img-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-end; margin-bottom: 0.5rem; }
+        .quick-img-row label { font-size: 0.85rem; font-weight: 600; color: #2d1f3d; }
+        .quick-img-row select { padding: 0.4rem 0.5rem; border-radius: 6px; border: 1px solid #ddd; }
+        #assist-quick-img-prompt { width: 100%; min-height: 72px; resize: vertical; padding: 0.5rem; border: 1px solid #ddd; border-radius: 8px; font: inherit; margin-bottom: 0.5rem; }
+        #assist-quick-img-preview { max-width: 100%; max-height: 320px; border-radius: 8px; border: 1px solid #e4d2f0; margin-top: 0.5rem; display: none; }
+        #assist-quick-img-status { font-size: 0.82rem; min-height: 1.2em; margin: 0.35rem 0; }
+        #assist-quick-img-status.ok { color: #1e8449; }
+        #assist-quick-img-status.err { color: #c0392b; }
     </style>
 </head>
 <body>
@@ -155,6 +168,7 @@
             O <strong>histórico</strong> fica neste navegador (localStorage) e actualiza ao receber cada resposta.
             Pode <strong>colar prints</strong> (Ctrl+V) na caixa de texto ou usar <strong>Anexar print</strong> — a IA analisa a imagem (requer redeploy da função <code style="font-size:0.8rem">blog-admin-assistant</code>).
             Quando a ideia estiver madura, use <strong>Afinar no Estúdio</strong>: leva a conversa (texto) para o <strong>Montar com assistente</strong> do Estúdio, que transforma o contexto num prompt pronto para gerar conteúdo.
+            <strong>Imagem rápida</strong> (abaixo do chat) usa a mesma API do Estúdio — gera uma arte sem texto na imagem; para prompts longos para o Canva, peça no chat ou no «Montar com assistente» (o modelo pode acrescentar o bloco «PROMPT PARA IA DE IMAGEM» após redeploy das funções).
         </p>
 
         <div id="assist-planner-notice" hidden role="status"></div>
@@ -194,6 +208,28 @@
                 <button type="button" class="btn" id="assist-send">Enviar</button>
             </div>
             <p class="hint">Use Enter para enviar; Shift+Enter quebra linha. Abra esta página via <strong>http://localhost</strong> (npm run dev), não file://.</p>
+        </div>
+
+        <div class="quick-img-card">
+            <h2>Imagem rápida (sem Canva)</h2>
+            <p class="hint" style="margin-bottom:0.65rem;">Mesma função <code style="font-size:0.78rem">generate-blog-studio-image</code> do Estúdio: descreva a cena (sem hashtags na descrição). Para prompts só para o gerador de imagens do Canva, escreva no chat acima ou use «Montar com assistente» no Estúdio.</p>
+            <textarea id="assist-quick-img-prompt" placeholder="Ex.: Capa quadrada suave, tons roxo e branco do logo, ícone minimalista de folha e gota, estilo clean, luz natural"></textarea>
+            <div class="quick-img-row">
+                <div>
+                    <label for="assist-quick-img-format">Proporção</label><br>
+                    <select id="assist-quick-img-format" aria-label="Proporção da imagem">
+                        <option value="1:1">1:1 (feed)</option>
+                        <option value="4:5" selected>4:5 (Instagram)</option>
+                        <option value="9:16">9:16 (Stories)</option>
+                        <option value="16:9">16:9 (horizontal)</option>
+                    </select>
+                </div>
+                <button type="button" class="btn" id="assist-quick-img-generate">Gerar imagem</button>
+                <button type="button" class="btn-ghost" id="assist-quick-img-download" hidden>Descarregar PNG</button>
+                <a class="btn-ghost" href="admin-estudio-conteudo.html" style="display:inline-flex;align-items:center;text-decoration:none;">Abrir Estúdio (capa com texto, etc.)</a>
+            </div>
+            <p id="assist-quick-img-status" aria-live="polite"></p>
+            <img id="assist-quick-img-preview" alt="Pré-visualização da imagem gerada" />
         </div>
     </div>
 

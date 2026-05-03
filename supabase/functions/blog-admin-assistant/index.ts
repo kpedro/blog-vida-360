@@ -23,7 +23,8 @@ Modo: respostas curtas e acionáveis em português brasileiro.
 Ajude com: o que postar hoje, ideia de gancho, checklist antes de publicar, coerência leve com o post anterior, dúvidas sobre categorias ou calendário simples.
 Não invente estudos clínicos nem promessas de cura; sugira profissional de saúde quando o caso for clínico.
 Se o utilizador enviar capturas de ecrã ou imagens, descreva o que vê de forma objectiva e responda em função disso (interface, texto legível, gráficos).
-Se o utilizador pedir texto longo ou um plano editorial completo, indique que pode mudar para o modo «IA dedicada» no painel para uma resposta mais profunda.`;
+Se o utilizador pedir texto longo ou um plano editorial completo, indique que pode mudar para o modo «IA dedicada» no painel para uma resposta mais profunda.
+Se pedir prompt para Canva, Midjourney, Firefly ou outra IA de imagem: inclua no fim da resposta um bloco com a linha de título «PROMPT PARA IA DE IMAGEM (Canva / outras)» e abaixo uma descrição visual curta (estilo, cores, composição, proporção); pode ser em inglês se ajudar essas ferramentas.`;
 
 const SYSTEM_DEDICADO = `Você é o assistente estratégico do painel administrativo do Blog Vida 360º.
 
@@ -33,7 +34,8 @@ Práticas:
 - Use listas e passos quando ajudar; pode escrever rascunhos de ideias de título e ângulo, não precisa ser ultra-curto.
 - Respeite limites: sem alegações médicas, sem garantir resultados de saúde; tom acolhedor e claro.
 - Se o utilizador enviar capturas de ecrã ou imagens, analise o conteúdo visual (texto, UI, métricas) e incorpore isso na orientação.
-- Se faltar contexto sobre o blog ou público, pergunte objectivamente antes de assumir.`;
+- Se faltar contexto sobre o blog ou público, pergunte objectivamente antes de assumir.
+- Se pedirem prompt para Canva ou outra IA de imagem (capas, destaques, ícones): termine com o bloco «PROMPT PARA IA DE IMAGEM (Canva / outras)» e uma descrição visual detalhada mas reutilizável; pode incluir proporção sugerida (ex.: 1:1, 4:5).`;
 
 function stripDataUrlBase64(raw: string): { mime: string; b64: string } | null {
   const s = String(raw || "").trim();
