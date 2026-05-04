@@ -476,7 +476,7 @@
                 <p class="hint" style="margin-top:0.35rem"><strong>Google (isolado do PedagoFlow):</strong> os tokens ficam na tabela <code style="font-size:0.75rem">blog360_google_workspace_tokens</code> no Supabase. Com a conta ligada («Conectar conta Google»), «Google Docs» cria o documento pela API e abre-o. Sem ligação, copia-se o texto sem Markdown e abre-se <code style="font-size:0.75rem">docs.new</code>. Deploy: ver <code style="font-size:0.75rem">supabase/BLOG360_GOOGLE_WORKSPACE_DEPLOY.md</code>. Gmail usa composição web; textos longos podem ser encurtados.</p>
 
                 <p class="section-title">Imagem (opcional)</p>
-                <p class="hint">Usa a sugestão automática após gerar texto, ou descreva abaixo. Para Instagram em formato retrato clássico do feed, experimente <strong>4:5</strong>.</p>
+                <p class="hint">Gere com IA a partir da descrição, ou <strong>carregue do computador</strong> uma foto ou arte (nova ou já com manchete) para reutilizar no texto, nas pré-visualizações e no editor. Usa a sugestão automática após gerar texto, ou descreva abaixo. Para Instagram em formato retrato clássico do feed, experimente <strong>4:5</strong> na geração.</p>
                 <div class="image-row">
                     <select id="image-format" class="fmt" title="Proporção">
                         <option value="4:5">4:5 (Instagram feed)</option>
@@ -485,6 +485,8 @@
                         <option value="16:9">16:9 (wide)</option>
                     </select>
                     <button type="button" class="btn btn-primary" id="btn-gen-image">🖼️ Gerar imagem</button>
+                    <button type="button" class="btn" id="btn-upload-image" title="PNG, JPEG, WebP ou GIF (máx. 12 MB)">📷 Carregar imagem…</button>
+                    <input type="file" id="studio-upload-image-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" hidden aria-hidden="true" />
                 </div>
                 <textarea id="studio-image-prompt" class="input-lg" style="min-height:72px;margin-top:0.5rem" placeholder="Descrição para a imagem (preenchida automaticamente quando houver sugestão)"></textarea>
                 <img id="studio-image-preview" alt="Pré-visualização" />
@@ -496,7 +498,7 @@
                 </div>
 
                 <p class="section-title">Texto sobre a imagem (capa estilo notícia)</p>
-                <p class="hint">Depois de gerar a imagem acima, use campos semelhantes ao Estúdio PedagoFlow: <strong>categoria</strong> com faixa amarela, <strong>manchete</strong> em destaque e <strong>rodapé</strong> (marca ou URL). O fundo escurece para a leitura. Gere a pré-visualização e descarregue a <strong>capa final</strong> para Instagram ou WhatsApp.</p>
+                <p class="hint">Depois de <strong>gerar ou carregar</strong> a imagem acima, use campos semelhantes ao Estúdio PedagoFlow: <strong>categoria</strong> com faixa amarela, <strong>manchete</strong> em destaque e <strong>rodapé</strong> (marca ou URL). O fundo escurece para a leitura. Gere a pré-visualização e descarregue a <strong>capa final</strong> para Instagram ou WhatsApp.</p>
                 <div class="toolbar-bottom" style="margin-top:0.35rem;flex-wrap:wrap">
                     <button type="button" class="btn" id="btn-overlay-suggest-from-copy" title="Analisa o texto no seu navegador, sem chamada à API">💡 Sugestão rápida (local)</button>
                     <button type="button" class="btn btn-primary" id="btn-overlay-suggest-ai" title="Requer deploy da função blog-studio-overlay-suggest e segredo GEMINI_API">✨ Sugerir com IA (Gemini)</button>

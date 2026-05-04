@@ -33,6 +33,8 @@
   let coachPendingContent = '';
   let lastImageDataUrl = '';
   let lastImageMimeType = '';
+  /** Origem da imagem base em pré-visualização / descarregar: IA ou ficheiro carregado */
+  let lastImageSource = 'ai';
   /** PNG com texto desenhado (capa); preferido em «Usar no editor» e descarregar final */
   let lastCompositeDataUrl = '';
   let lastSuggestedHeadline = '';
@@ -1168,6 +1170,110 @@
   }
 
   /**
+   * Define a imagem base do Estúdio (gerada por IA ou carregada do disco).
+   * Limpa a capa com texto anterior e actualiza pré-visualizações.
+   * @param {'ai'|'upload'} source
+   */
+  function applyStudioImageFromDataUrl(dataUrl, mimeType, source = 'ai') {
+    clearOverlayComposite();
+    clearError();
+    lastImageSource = source === 'upload' ? 'upload' : 'ai';
+    lastImageMimeType = mimeType || 'image/png';
+    lastImageDataUrl = dataUrl;
+    const img = $('studio-image-preview');
+    if (img) {
+      img.src = lastImageDataUrl;
+      img.style.display = 'block';
+    }
+    const btnCopy = $('btn-copy-image-url');
+    if (btnCopy) btnCopy.style.display = 'inline-flex';
+    refreshStudioImageUi();
+    updatePostDevicePreviews();
+    offerOverlaySuggestionsAfterImage();
+  }
+
+  const MAX_STUDIO_UPLOAD_BYTES = 12 * 1024 * 1024;
+  const MAX_STUDIO_IMAGE_EDGE = 2400;
+
+  /**
+   * Lê ficheiro local; reduz dimensão ou recompressa ficheiros muito grandes para o canvas fluido.
+   */
+  async function optimizeImageFileForStudio(file) {
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+      throw new Error('Seleccione um ficheiro de imagem (PNG, JPEG, WebP ou GIF).');
+    }
+    if (file.size > MAX_STUDIO_UPLOAD_BYTES) {
+      throw new Error('Imagem demasiado grande (máx. 12 MB).');
+    }
+
+    const dataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result || ''));
+      r.onerror = () => reject(new Error('Não foi possível ler o ficheiro.'));
+      r.readAsDataURL(file);
+    });
+
+    const img = new Image();
+    await new Promise((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error('Não foi possível mostrar esta imagem.'));
+      img.src = dataUrl;
+    });
+
+    const w0 = img.naturalWidth || img.width;
+    const h0 = img.naturalHeight || img.height;
+    if (!w0 || !h0) {
+      throw new Error('Dimensões da imagem inválidas.');
+    }
+
+    const maxDim = Math.max(w0, h0);
+    let scale = maxDim > MAX_STUDIO_IMAGE_EDGE ? MAX_STUDIO_IMAGE_EDGE / maxDim : 1;
+    const heavy = file.size > 2.5 * 1024 * 1024;
+    const mustProcess = scale < 1 || heavy;
+
+    if (!mustProcess) {
+      const mt = (file.type || 'image/jpeg').split(';')[0].trim();
+      return { dataUrl, mimeType: mt };
+    }
+
+    const cw = Math.max(1, Math.round(w0 * scale));
+    const ch = Math.max(1, Math.round(h0 * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Canvas não disponível neste navegador.');
+    }
+
+    const useJpeg = !/png|webp/i.test(file.type || '');
+    if (useJpeg) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, cw, ch);
+    }
+    ctx.drawImage(img, 0, 0, cw, ch);
+
+    const mimeOut = useJpeg ? 'image/jpeg' : 'image/png';
+    const outUrl = useJpeg ? canvas.toDataURL('image/jpeg', 0.88) : canvas.toDataURL('image/png');
+    return { dataUrl: outUrl, mimeType: mimeOut };
+  }
+
+  async function onStudioImageFileSelected(ev) {
+    const input = ev.target;
+    const file = input && input.files && input.files[0];
+    if (input) input.value = '';
+    if (!file) return;
+
+    clearError();
+    try {
+      const { dataUrl, mimeType } = await optimizeImageFileForStudio(file);
+      applyStudioImageFromDataUrl(dataUrl, mimeType, 'upload');
+    } catch (e) {
+      showError((e && e.message) || 'Erro ao carregar imagem.');
+    }
+  }
+
+  /**
    * Modelos de imagem tendem a desenhar #tags na arte se o prompt copia legenda de redes.
    * Remove linhas de hashtags e o que vier depois; corta bloco «SUGESTÃO DE IMAGEM» se existir.
    */
@@ -1258,15 +1364,11 @@
       }
 
       if (data.imageBase64 && data.mimeType) {
-        lastImageMimeType = data.mimeType;
-        lastImageDataUrl = `data:${data.mimeType};base64,${data.imageBase64}`;
-        const img = $('studio-image-preview');
-        img.src = lastImageDataUrl;
-        img.style.display = 'block';
-        $('btn-copy-image-url').style.display = 'inline-flex';
-        refreshStudioImageUi();
-        updatePostDevicePreviews();
-        offerOverlaySuggestionsAfterImage();
+        applyStudioImageFromDataUrl(
+          `data:${data.mimeType};base64,${data.imageBase64}`,
+          data.mimeType,
+          'ai'
+        );
       } else {
         throw new Error(
           (data && (data.details || data.error)) || 'Nenhuma imagem retornada (resposta sem base64).'
@@ -1502,7 +1604,9 @@
       /jpeg|jpg/i.test(mime) ? 'jpg' : /webp/i.test(mime) ? 'webp' : 'png';
     const a = document.createElement('a');
     a.href = lastImageDataUrl;
-    a.download = `vida360-imagem-ia-sem-texto-${Date.now()}.${ext}`;
+    const base =
+      lastImageSource === 'upload' ? 'vida360-imagem-carregada' : 'vida360-imagem-ia-sem-texto';
+    a.download = `${base}-${Date.now()}.${ext}`;
     a.rel = 'noopener';
     document.body.appendChild(a);
     a.click();
@@ -1768,6 +1872,12 @@
 
     $('btn-generate').addEventListener('click', generateContent);
     $('btn-gen-image').addEventListener('click', generateImage);
+    const btnUp = $('btn-upload-image');
+    const inpUp = $('studio-upload-image-input');
+    if (btnUp && inpUp) {
+      btnUp.addEventListener('click', () => inpUp.click());
+      inpUp.addEventListener('change', (ev) => void onStudioImageFileSelected(ev));
+    }
     $('btn-copy').addEventListener('click', copyOutput);
     const btnPlain = $('btn-copy-plain');
     if (btnPlain) btnPlain.addEventListener('click', copyOutputPlain);
