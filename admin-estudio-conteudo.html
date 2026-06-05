@@ -317,6 +317,11 @@
             cursor: pointer;
             background: #fff;
         }
+        .share-social-card {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e8d8f2;
+        }
         .post-preview-section {
             margin-top: 1rem;
             padding-top: 1rem;
@@ -474,6 +479,22 @@
                     <button type="button" class="btn btn-primary" id="btn-to-editor">📝 Usar no editor de artigo</button>
                 </div>
                 <p class="hint" style="margin-top:0.35rem"><strong>Google (isolado do PedagoFlow):</strong> os tokens ficam na tabela <code style="font-size:0.75rem">blog360_google_workspace_tokens</code> no Supabase. Com a conta ligada («Conectar conta Google»), «Google Docs» cria o documento pela API e abre-o. Sem ligação, copia-se o texto sem Markdown e abre-se <code style="font-size:0.75rem">docs.new</code>. Deploy: ver <code style="font-size:0.75rem">supabase/BLOG360_GOOGLE_WORKSPACE_DEPLOY.md</code>. Gmail usa composição web; textos longos podem ser encurtados.</p>
+
+                <div id="share-social-card" class="share-social-card" style="display:none" aria-live="polite">
+                    <p class="section-title">Compartilhar nas redes</p>
+                    <p class="hint">Resumo com emoji, CTA e hashtags — pronto para WhatsApp, Instagram ou Facebook. O link no fim gera pré-visualização com capa quando for URL pública do blog ou artigo.</p>
+                    <label class="lbl" for="studio-share-url">Link do artigo ou do blog</label>
+                    <input type="url" id="studio-share-url" class="overlay-input" placeholder="https://www.blogvida360.com.br/…" />
+                    <label class="lbl" style="margin-top:0.75rem" for="studio-share-message">Texto para compartilhar</label>
+                    <textarea id="studio-share-message" class="out-lg" style="min-height:160px" rows="8" aria-label="Texto para compartilhar nas redes"></textarea>
+                    <div class="toolbar-bottom">
+                        <button type="button" class="btn btn-primary" id="btn-share-whatsapp">💬 WhatsApp</button>
+                        <button type="button" class="btn" id="btn-share-copy">📋 Copiar texto</button>
+                        <button type="button" class="btn" id="btn-share-telegram">✈️ Telegram</button>
+                        <button type="button" class="btn" id="btn-share-facebook">Facebook</button>
+                        <button type="button" class="btn" id="btn-share-refresh" title="Regera a partir do resultado e da categoria da capa">↻ Atualizar do resultado</button>
+                    </div>
+                </div>
 
                 <p class="section-title">Imagem (opcional)</p>
                 <p class="hint">Gere com IA a partir da descrição, ou <strong>carregue do computador</strong> uma foto ou arte (nova ou já com manchete) para reutilizar no texto, nas pré-visualizações e no editor. Usa a sugestão automática após gerar texto, ou descreva abaixo. Para Instagram em formato retrato clássico do feed, experimente <strong>4:5</strong> na geração.</p>
@@ -669,7 +690,8 @@
             initStudioSupabase();
         }
     </script>
-    <script src="assets/js/estudio-conteudo.js?v=20260502-adapt-instagram"></script>
+    <script src="assets/js/vida360-share-message.js?v=20260605-share"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260605-share"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

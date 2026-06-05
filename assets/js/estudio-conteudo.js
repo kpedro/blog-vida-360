@@ -5,6 +5,7 @@
 (function () {
   const STORAGE_SNIPPETS = 'blog360_prompt_snippets_v1';
   const STORAGE_OVERLAY_ACCENT = 'blog360_overlay_accent_v1';
+  const STORAGE_SHARE_URL = 'blog360_studio_share_url_v1';
   const CONTENT_TYPES = {
     landing: { label: 'Landing Page', desc: 'Headlines, benefícios e CTA para rotina, aromaterapia e bem-estar', gen: 'Gerar Landing Page' },
     social_post: {
@@ -288,6 +289,7 @@
 
       await saveHistoryRow('social_post', '[Adaptar para Instagram]', copy, imageSuggestion);
       refreshOverlaySuggestionsFromCopy();
+      refreshShareSocialUi(true);
       window.alert(
         'Legenda para Instagram gerada no resultado. Revise e use «Copiar sem Markdown» para colar no app.'
       );
@@ -365,6 +367,152 @@
     const t = $('studio-output');
     if (!t || !String(t.value || '').trim()) return '';
     return stripMarkdownForPlainText(t.value);
+  }
+
+  function getShareCategoryLabel() {
+    const el = $('overlay-category');
+    return el && String(el.value || '').trim() ? String(el.value).trim() : '';
+  }
+
+  function getShareUrlValue() {
+    const el = $('studio-share-url');
+    const v = el && String(el.value || '').trim();
+    if (v) return v;
+    try {
+      const saved = localStorage.getItem(STORAGE_SHARE_URL);
+      if (saved && saved.trim()) return saved.trim();
+    } catch (_) {
+      /* ignore */
+    }
+    return (window.Vida360ShareMessage && window.Vida360ShareMessage.DEFAULT_SITE) || 'https://www.blogvida360.com.br/';
+  }
+
+  function persistShareUrl(url) {
+    try {
+      localStorage.setItem(STORAGE_SHARE_URL, String(url || '').trim());
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function buildShareMessageFromStudio() {
+    const src = sliceBeforeImageSuggestionBlock(($('studio-output') && $('studio-output').value) || '');
+    if (!window.Vida360ShareMessage || typeof window.Vida360ShareMessage.buildShareMessage !== 'function') {
+      const link = getShareUrlValue();
+      const plain = stripMarkdownForPlainText(src);
+      return plain ? `${plain}\n\n👉 SAIBA MAIS:\n${link}` : '';
+    }
+    return window.Vida360ShareMessage.buildShareMessage({
+      text: src,
+      shareUrl: getShareUrlValue(),
+      category: getShareCategoryLabel(),
+    });
+  }
+
+  function refreshShareSocialUi(regenerate) {
+    const card = $('share-social-card');
+    const out = $('studio-output');
+    const msgEl = $('studio-share-message');
+    const urlEl = $('studio-share-url');
+    if (!card || !out || !msgEl) return;
+
+    const hasText = Boolean(String(out.value || '').trim());
+    card.style.display = hasText ? 'block' : 'none';
+    if (!hasText) {
+      msgEl.value = '';
+      return;
+    }
+
+    if (urlEl && !String(urlEl.value || '').trim()) {
+      urlEl.value = getShareUrlValue();
+    }
+
+    if (regenerate !== false || !String(msgEl.value || '').trim()) {
+      msgEl.value = buildShareMessageFromStudio();
+    }
+  }
+
+  async function copyShareSocialMessage() {
+    const msgEl = $('studio-share-message');
+    const text = (msgEl && String(msgEl.value || '').trim()) || buildShareMessageFromStudio();
+    if (!text) {
+      showError('Gere um texto em «Resultado» antes de compartilhar.');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      window.alert('Texto copiado. Cole no WhatsApp, Instagram ou Facebook.');
+    } catch (_) {
+      showError('Não foi possível copiar. Selecione o texto e copie manualmente.');
+    }
+  }
+
+  function shareSocialWhatsApp() {
+    const text = ($('studio-share-message') && $('studio-share-message').value.trim()) || buildShareMessageFromStudio();
+    if (!text) {
+      showError('Gere um texto em «Resultado» antes de compartilhar.');
+      return;
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+  }
+
+  function shareSocialTelegram() {
+    const text = ($('studio-share-message') && $('studio-share-message').value.trim()) || buildShareMessageFromStudio();
+    const url = getShareUrlValue();
+    if (!text && !url) return;
+    const short = text.split('\n\n👉')[0] || text.slice(0, 500);
+    window.open(
+      `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(short)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+  }
+
+  function shareSocialFacebook() {
+    const url = getShareUrlValue();
+    if (!url) {
+      showError('Informe o link do artigo ou do blog.');
+      return;
+    }
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      '_blank',
+      'noopener,noreferrer,width=600,height=400'
+    );
+  }
+
+  function initShareSocialUi() {
+    const urlEl = $('studio-share-url');
+    if (urlEl && !String(urlEl.value || '').trim()) {
+      urlEl.value = getShareUrlValue();
+    }
+    const out = $('studio-output');
+    if (out) {
+      out.addEventListener('input', () => refreshShareSocialUi(true));
+    }
+    if (urlEl) {
+      urlEl.addEventListener('change', () => {
+        persistShareUrl(urlEl.value);
+        refreshShareSocialUi(true);
+      });
+      urlEl.addEventListener('blur', () => persistShareUrl(urlEl.value));
+    }
+    const catEl = $('overlay-category');
+    if (catEl) {
+      catEl.addEventListener('change', () => refreshShareSocialUi(true));
+      catEl.addEventListener('blur', () => refreshShareSocialUi(true));
+    }
+    const btnWa = $('btn-share-whatsapp');
+    if (btnWa) btnWa.addEventListener('click', shareSocialWhatsApp);
+    const btnCp = $('btn-share-copy');
+    if (btnCp) btnCp.addEventListener('click', () => void copyShareSocialMessage());
+    const btnTg = $('btn-share-telegram');
+    if (btnTg) btnTg.addEventListener('click', shareSocialTelegram);
+    const btnFb = $('btn-share-facebook');
+    if (btnFb) btnFb.addEventListener('click', shareSocialFacebook);
+    const btnRf = $('btn-share-refresh');
+    if (btnRf) btnRf.addEventListener('click', () => refreshShareSocialUi(true));
+    refreshShareSocialUi(true);
   }
 
   function closeGoogleExportDetails() {
@@ -481,6 +629,7 @@
       await saveHistoryRow(contentType, prompt.trim(), copy, imageSuggestion);
 
       refreshOverlaySuggestionsFromCopy();
+      refreshShareSocialUi(true);
 
       window.alert('Conteúdo gerado. Revise e copie ou envie ao editor.');
     } catch (e) {
@@ -566,6 +715,7 @@
             $('studio-output').value = row.content || '';
             $('studio-prompt').value = row.prompt || '';
             switchTab(row.content_type || 'article_copy');
+            refreshShareSocialUi(true);
           }
         });
       });
@@ -1934,6 +2084,7 @@
     refreshStudioImageUi();
     updatePostDevicePreviews();
 
+    initShareSocialUi();
     consumeCoachSeedFromPanel();
   });
 })();
