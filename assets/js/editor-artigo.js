@@ -940,6 +940,20 @@ function getEditorShareUrlValue() {
     return v || getEditorShareUrlDefault();
 }
 
+function normalizeShareChunk(text) {
+    const strip = window.Vida360ShareMessage && window.Vida360ShareMessage.stripPlain;
+    const raw = strip ? strip(text) : String(text || '');
+    return raw.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function shareChunksOverlap(a, b, minProbe) {
+    const A = normalizeShareChunk(a);
+    const B = normalizeShareChunk(b);
+    if (!A || !B || A.length < minProbe) return false;
+    const probe = A.slice(0, Math.min(48, A.length));
+    return B.includes(probe);
+}
+
 function getEditorShareSourceText() {
     const title = document.getElementById('post-title') && document.getElementById('post-title').value.trim();
     const excerpt = document.getElementById('post-excerpt') && document.getElementById('post-excerpt').value.trim();
@@ -949,18 +963,37 @@ function getEditorShareSourceText() {
     } else {
         body = document.getElementById('editor-content') && document.getElementById('editor-content').innerText.trim();
     }
-    const parts = [];
-    if (title) parts.push(title);
-    if (excerpt) parts.push(excerpt);
-    if (body) parts.push(body.slice(0, 900));
-    return parts.join('\n\n');
+    const plainBody = window.Vida360ShareMessage && window.Vida360ShareMessage.stripPlain
+        ? window.Vida360ShareMessage.stripPlain(body)
+        : body.replace(/\s+/g, ' ').trim();
+
+    // Resumo SEO — evita repetir título + resumo + corpo com o mesmo início
+    if (excerpt && excerpt.length >= 40) {
+        if (!title || shareChunksOverlap(title, excerpt, 12)) return excerpt;
+        return `${title}\n\n${excerpt}`;
+    }
+
+    if (title && plainBody) {
+        let lead = plainBody;
+        const titleNorm = normalizeShareChunk(title);
+        const leadNorm = normalizeShareChunk(lead);
+        if (leadNorm.startsWith(titleNorm)) {
+            lead = lead.slice(title.length).replace(/^\s*[:\-.]?\s*/, '').trim();
+        }
+        if (lead && !shareChunksOverlap(title, lead.slice(0, 240), 18)) {
+            return `${title}\n\n${lead.slice(0, 520)}`;
+        }
+        return title;
+    }
+
+    return title || excerpt || plainBody.slice(0, 520);
 }
 
 function buildShareMessageFromEditor() {
     const src = getEditorShareSourceText();
     if (!window.Vida360ShareMessage || typeof window.Vida360ShareMessage.buildShareMessage !== 'function') {
         const link = getEditorShareUrlValue();
-        return src ? `${src}\n\n👉 SAIBA MAIS:\n${link}` : '';
+        return src ? `${src}\n\n👉 LEIA MAIS:\n${link}` : '';
     }
     return window.Vida360ShareMessage.buildShareMessage({
         text: src,

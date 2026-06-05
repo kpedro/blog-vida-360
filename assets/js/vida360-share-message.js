@@ -48,8 +48,25 @@
     return s;
   }
 
-  function summaryForShare(text, maxLen) {
+  /** Remove bloco repetido quando título/resumo/corpo foram concatenados com o mesmo início. */
+  function dedupeRepeatedBlock(text) {
     const plain = stripPlain(text).replace(/\s+/g, ' ').trim();
+    if (plain.length < 80) return plain;
+    const half = Math.floor(plain.length / 2);
+    for (let len = Math.min(220, half); len >= 36; len--) {
+      const chunk = plain.slice(0, len).trim();
+      if (chunk.length < 36) continue;
+      const again = plain.indexOf(chunk, Math.max(len - 8, 24));
+      if (again > 20 && again < half + 80) {
+        const cut = plain.slice(0, again).trim();
+        return cut.endsWith('…') ? cut : `${cut}…`;
+      }
+    }
+    return plain;
+  }
+
+  function summaryForShare(text, maxLen) {
+    const plain = dedupeRepeatedBlock(text);
     if (!plain) return '';
     if (plain.length <= maxLen) return plain;
     const cut = plain.slice(0, maxLen);
@@ -122,7 +139,7 @@
     }
 
     parts.push('');
-    parts.push('👉 SAIBA MAIS:');
+    parts.push('👉 LEIA MAIS:');
     parts.push(shareUrl);
 
     if (!opts || opts.includeHashtags !== false) {

@@ -412,7 +412,7 @@
     if (!window.Vida360ShareMessage || typeof window.Vida360ShareMessage.buildShareMessage !== 'function') {
       const link = getShareUrlValue();
       const plain = stripMarkdownForPlainText(src);
-      return plain ? `${plain}\n\n👉 SAIBA MAIS:\n${link}` : '';
+      return plain ? `${plain}\n\n👉 LEIA MAIS:\n${link}` : '';
     }
     return window.Vida360ShareMessage.buildShareMessage({
       text: src,
