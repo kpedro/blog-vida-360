@@ -39,7 +39,12 @@ ALTER TABLE public.blog360_site_settings
 ALTER TABLE public.blog360_site_settings
   ADD COLUMN IF NOT EXISTS sobre_foto_url TEXT;
 
-COMMENT ON COLUMN public.blog360_site_settings.sobre_foto_url IS 'URL público da foto na página Sobre (Storage) ou data URL curto; gravado pelo admin-dashboard.';
+-- Função/cargo do autor nos artigos (foto reutiliza sobre_foto_url)
+ALTER TABLE public.blog360_site_settings
+  ADD COLUMN IF NOT EXISTS author_role_label TEXT;
+
+COMMENT ON COLUMN public.blog360_site_settings.sobre_foto_url IS 'URL público da foto na página Sobre (Storage) ou data URL curto; gravado pelo admin-dashboard. Também usada como avatar do autor nos artigos.';
+COMMENT ON COLUMN public.blog360_site_settings.author_role_label IS 'Cargo ou função exibida ao lado do nome do autor nos artigos (ex.: Especialista em bem-estar).';
 
 DROP TRIGGER IF EXISTS blog360_site_settings_updated_at ON public.blog360_site_settings;
 CREATE TRIGGER blog360_site_settings_updated_at

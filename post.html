@@ -195,6 +195,60 @@
             }
         }
 
+        /* Cabeçalho do autor (estilo PedagoFlow) */
+        .article-author-header {
+            margin: 0.75rem 0 1.25rem;
+            text-align: left;
+        }
+        .article-author-inner {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            max-width: 100%;
+        }
+        .article-author-avatar-wrap {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1px solid #e0d4ea;
+            background: #f4ecf7;
+        }
+        .article-author-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .article-author-avatar-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #7f3f98;
+            background: #efe2f7;
+        }
+        .article-author-text { min-width: 0; flex: 1; }
+        .article-author-line {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e4a8a;
+            line-height: 1.35;
+        }
+        .article-author-sep { color: #94a3b8; font-weight: 500; }
+        .article-author-role { color: #1e4a8a; font-weight: 600; }
+        .article-author-date {
+            margin: 0.2rem 0 0;
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.35;
+        }
+
         .comment-section {
             background-color: var(--blue-light);
             padding: 1rem 1.25rem 1.5rem;
@@ -299,8 +353,9 @@
     <main class="container">
         <!-- Título, autor e data de publicação (preenchidos pelo JS) -->
         <h1 id="article-title" class="article-title" style="display:none; margin-bottom: 0.25rem;"></h1>
-        <p id="article-byline" class="article-byline" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.95rem; color: var(--blue-primary);"></p>
-        <p id="article-meta" class="article-meta" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.875rem; color: #666;"></p>
+        <div id="article-author-header" class="article-author-header" style="display:none" aria-live="polite"></div>
+        <p id="article-byline" class="article-byline" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.95rem; color: var(--blue-primary);" hidden aria-hidden="true"></p>
+        <p id="article-meta" class="article-meta" style="display:none; margin-top: 0; margin-bottom: 0.25rem; font-size: 0.875rem; color: #666;" hidden aria-hidden="true"></p>
         <p id="article-meta-local" class="article-meta-local" style="display:none; margin-top: 0; margin-bottom: 1.5rem; font-size: 0.875rem; color: #444; font-weight: 500;"></p>
         <!-- Área do Post (oculta até renderizar para não mostrar código) -->
         <div id="post-content" class="post-content-loading">
@@ -399,6 +454,7 @@
         window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
     </script>
     <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/post-author-header.js?v=20260605-author"></script>
     <script src="assets/js/opportunity-strip.js"></script>
     <script>
         // Tentar carregar artigo do Supabase (slug = ?post=)
@@ -480,30 +536,47 @@
                     titleEl.textContent = titulo;
                     titleEl.style.display = '';
                 }
-                // Exibir autor (Por autor)
-                var authorEl = document.getElementById('article-byline');
-                var autor = (p.autor || p.author || '').trim();
-                if (authorEl) {
-                    authorEl.textContent = autor ? 'Por ' + autor : '';
-                    authorEl.style.display = autor ? '' : 'none';
-                }
-                // Exibir data e horário de publicação
-                var metaEl = document.getElementById('article-meta');
-                if (metaEl) {
-                    var dataPub = p.published_at || p.created_at;
-                    var parts = [];
-                    if (dataPub) {
-                        try {
-                            var d = new Date(dataPub);
-                            var dataFmt = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                            var horaFmt = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                            parts.push('Publicado em ' + dataFmt + ' às ' + horaFmt);
-                        } catch (e) {
-                            parts.push('Publicado em ' + String(dataPub).slice(0, 10));
-                        }
+                // Autor com avatar (foto da Sobre + função no site_settings)
+                var settings = null;
+                try {
+                    if (client.getSiteSettings) {
+                        var stRes = await client.getSiteSettings();
+                        if (stRes && stRes.success) settings = stRes.data;
                     }
-                    metaEl.textContent = parts.join(' ');
-                    metaEl.style.display = parts.length ? '' : 'none';
+                } catch (authorSettingsErr) {
+                    console.warn('Configurações do autor:', authorSettingsErr);
+                }
+                var autor = (p.autor || p.author || '').trim();
+                var dataPub = p.published_at || p.created_at;
+                var dateLabel = window.Blog360PostAuthorHeader
+                    ? window.Blog360PostAuthorHeader.formatPublishedLabel(dataPub)
+                    : '';
+                var avatarUrl =
+                    (settings && settings.sobre_foto_url) ||
+                    (window.Blog360PostAuthorHeader && window.Blog360PostAuthorHeader.DEFAULT_AVATAR) ||
+                    'assets/images/avatar-vida360.png';
+                var roleLabel = (settings && settings.author_role_label) || '';
+                var authorShown = false;
+                if (window.Blog360PostAuthorHeader) {
+                    authorShown = window.Blog360PostAuthorHeader.render({
+                        mountId: 'article-author-header',
+                        authorName: autor,
+                        roleLabel: roleLabel,
+                        avatarUrl: avatarUrl,
+                        dateLabel: dateLabel,
+                    });
+                }
+                var authorEl = document.getElementById('article-byline');
+                if (authorEl) authorEl.style.display = 'none';
+                var metaEl = document.getElementById('article-meta');
+                if (metaEl) metaEl.style.display = authorShown ? 'none' : metaEl.style.display;
+                if (!authorShown && metaEl && dateLabel) {
+                    metaEl.textContent = dateLabel;
+                    metaEl.style.display = '';
+                }
+                if (!authorShown && authorEl && autor) {
+                    authorEl.textContent = 'Por ' + autor;
+                    authorEl.style.display = '';
                 }
                 // Local de publicação (em destaque)
                 var localStr = (p.local || p.location || '').trim();

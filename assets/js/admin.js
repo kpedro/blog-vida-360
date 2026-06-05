@@ -931,6 +931,10 @@ async function loadAboutPhotoSettings() {
             localStorage.setItem(ABOUT_PHOTO_STORAGE_KEY, input.value);
             renderAboutPhotoPreview(input.value);
         }
+        const roleInput = document.getElementById('author-role-label');
+        if (roleInput && res && res.success && res.data && typeof res.data.author_role_label === 'string') {
+            roleInput.value = res.data.author_role_label || '';
+        }
     } catch (error) {
         console.warn('Falha ao carregar foto da Sobre no Supabase. Usando fallback local.', error);
     }
@@ -979,13 +983,20 @@ async function saveAboutPhotoSettings() {
             return;
         }
 
-        const result = await client.saveSiteSettings({ sobre_foto_url: toSave, updated_at: new Date().toISOString() });
+        const roleInput = document.getElementById('author-role-label');
+        const roleLabel = roleInput ? String(roleInput.value || '').trim() : '';
+
+        const result = await client.saveSiteSettings({
+            sobre_foto_url: toSave,
+            author_role_label: roleLabel || null,
+            updated_at: new Date().toISOString(),
+        });
         if (!result || !result.success) {
             throw new Error((result && result.error) || 'Não foi possível salvar no Supabase');
         }
         localStorage.setItem(ABOUT_PHOTO_STORAGE_KEY, value);
         renderAboutPhotoPreview(value);
-        alert('Foto da página Sobre salva com sucesso.');
+        alert('Foto e função do autor salvas com sucesso.');
     } catch (error) {
         console.warn('Falha ao salvar foto da Sobre:', error);
         // Último fallback: salva local mesmo com erro remoto
