@@ -1,6 +1,8 @@
 // Editor de Artigos - JavaScript
 let currentPostId = null;
+let currentPostStatus = 'draft';
 let editorMode = 'html'; // 'html' ou 'markdown'
+const EDITOR_STORAGE_SHARE_URL = 'blog360_studio_share_url_v1';
 
 function extractMissingColumnFromError(err) {
     const message = (err && (err.message || err.details || err.hint || String(err))) || '';
@@ -184,6 +186,7 @@ function applyBlog360EstudioPayload(incoming) {
                 ? 'Capa do Estúdio aplicada ao artigo. O texto do rascunho foi mantido — salve o rascunho quando estiver pronto.'
                 : 'Conteúdo do Estúdio aplicado ao artigo. Revise e publique quando estiver pronto.'
         );
+        refreshEditorShareUi(true);
     } catch (e) {
         console.warn('applyBlog360EstudioPayload:', e);
     }
@@ -197,6 +200,7 @@ function initEditor() {
         document.getElementById('title-count').textContent = count;
         updatePreview();
         calculateSEOScore();
+        refreshEditorShareUi(true);
     });
     
     // Contador de caracteres do resumo
@@ -205,6 +209,7 @@ function initEditor() {
         document.getElementById('excerpt-count').textContent = count;
         updatePreview();
         calculateSEOScore();
+        refreshEditorShareUi(true);
     });
     
     // Contador de palavras do conteúdo HTML
@@ -213,6 +218,7 @@ function initEditor() {
         const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
         document.getElementById('content-count').textContent = words;
         calculateSEOScore();
+        refreshEditorShareUi(true);
     });
     
     // Contador de palavras do conteúdo Markdown
@@ -221,6 +227,7 @@ function initEditor() {
         const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
         document.getElementById('content-count').textContent = words;
         calculateSEOScore();
+        refreshEditorShareUi(true);
     });
     
     // Detectar Markdown ao colar no editor HTML
@@ -263,7 +270,12 @@ function initEditor() {
     }
     
     // Atualizar preview ao mudar categoria
-    document.getElementById('post-category').addEventListener('change', updatePreview);
+    document.getElementById('post-category').addEventListener('change', () => {
+        updatePreview();
+        refreshEditorShareUi(true);
+    });
+
+    initEditorShareSocial();
 }
 
 // Carregar post existente (colunas do Supabase: titulo, resumo, categoria, autor, tags, imagem_destaque, conteudo)
@@ -278,6 +290,8 @@ async function loadPost(postId) {
             .single();
         
         if (error) throw error;
+
+        currentPostStatus = data.status || (data.publicado ? 'published' : 'draft');
         
         // Preencher formulário (suporta nomes em PT e EN para compatibilidade)
         document.getElementById('post-title').value = data.titulo || data.title || '';
@@ -303,8 +317,31 @@ async function loadPost(postId) {
             document.getElementById('editor-content').innerHTML = content;
         }
         
+        const socialIn = document.getElementById('social-image-url');
+        if (socialIn && (data.imagem_social_url || data.social_image_url)) {
+            const su = String(data.imagem_social_url || data.social_image_url || '').trim();
+            if (su) {
+                socialIn.value = su;
+                const sp = document.getElementById('social-image-preview');
+                if (sp && /^https?:\/\//i.test(su)) {
+                    sp.src = su;
+                    sp.style.display = 'block';
+                }
+            }
+        }
+
+        const imgUrl = data.imagem_destaque || data.image_url || '';
+        if (imgUrl) {
+            const preview = document.getElementById('image-preview');
+            if (preview) {
+                preview.src = imgUrl;
+                preview.style.display = 'block';
+            }
+        }
+
         updatePreview();
         calculateSEOScore();
+        refreshEditorShareUi(true);
     } catch (error) {
         console.error('Erro ao carregar post:', error);
         alert('Erro ao carregar o artigo');
@@ -351,6 +388,7 @@ function applyFeaturedImageDataUrl(dataUrl) {
         preview.style.display = 'block';
     }
     calculateSEOScore();
+    refreshEditorShareUi(true);
 }
 
 // Upload de imagem no corpo do artigo (toolbar)
@@ -840,7 +878,9 @@ async function savePost(status) {
             console.warn('Colunas ausentes no schema atual, removidas automaticamente:', removedColumns.join(', '));
         }
         if (!currentPostId && result.data && result.data[0]) currentPostId = result.data[0].id;
-        
+        currentPostStatus = status;
+
+        refreshEditorShareUi(true);
         alert(status === 'published' ? '✅ Artigo publicado com sucesso!' : '💾 Rascunho salvo!');
         if (status === 'published') {
             setTimeout(() => {
@@ -851,4 +891,239 @@ async function savePost(status) {
         console.error('Erro ao salvar post:', error);
         alert('Erro ao salvar o artigo: ' + (error.message || 'Erro desconhecido') + '. Verifique o console.');
     }
+}
+
+function getEditorCategoryLabel() {
+    const sel = document.getElementById('post-category');
+    if (!sel || sel.selectedIndex < 0) return '';
+    const opt = sel.options[sel.selectedIndex];
+    return opt ? String(opt.textContent || opt.label || '').trim() : '';
+}
+
+function slugFromTitle(title) {
+    return String(title || '')
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
+function getEditorArticleSlug() {
+    const slugEl = document.getElementById('preview-slug');
+    const fromPreview = slugEl ? String(slugEl.textContent || '').trim() : '';
+    if (fromPreview && fromPreview !== 'slug-do-artigo') return fromPreview;
+    const title = document.getElementById('post-title') && document.getElementById('post-title').value.trim();
+    return slugFromTitle(title) || '';
+}
+
+function getEditorShareUrlDefault() {
+    const slug = getEditorArticleSlug();
+    const base = (window.Vida360ShareMessage && window.Vida360ShareMessage.DEFAULT_SITE) || 'https://www.blogvida360.com.br/';
+    const root = base.replace(/\/$/, '');
+    if (slug) return `${root}/post.html?post=${encodeURIComponent(slug)}`;
+    try {
+        const saved = localStorage.getItem(EDITOR_STORAGE_SHARE_URL);
+        if (saved && saved.trim()) return saved.trim();
+    } catch (_) { /* ignore */ }
+    return base;
+}
+
+function persistEditorShareUrl(url) {
+    try {
+        localStorage.setItem(EDITOR_STORAGE_SHARE_URL, String(url || '').trim());
+    } catch (_) { /* ignore */ }
+}
+
+function getEditorShareUrlValue() {
+    const el = document.getElementById('editor-share-url');
+    const v = el && String(el.value || '').trim();
+    return v || getEditorShareUrlDefault();
+}
+
+function getEditorShareSourceText() {
+    const title = document.getElementById('post-title') && document.getElementById('post-title').value.trim();
+    const excerpt = document.getElementById('post-excerpt') && document.getElementById('post-excerpt').value.trim();
+    let body = '';
+    if (editorMode === 'markdown') {
+        body = document.getElementById('markdown-editor') && document.getElementById('markdown-editor').value.trim();
+    } else {
+        body = document.getElementById('editor-content') && document.getElementById('editor-content').innerText.trim();
+    }
+    const parts = [];
+    if (title) parts.push(title);
+    if (excerpt) parts.push(excerpt);
+    if (body) parts.push(body.slice(0, 900));
+    return parts.join('\n\n');
+}
+
+function buildShareMessageFromEditor() {
+    const src = getEditorShareSourceText();
+    if (!window.Vida360ShareMessage || typeof window.Vida360ShareMessage.buildShareMessage !== 'function') {
+        const link = getEditorShareUrlValue();
+        return src ? `${src}\n\n👉 SAIBA MAIS:\n${link}` : '';
+    }
+    return window.Vida360ShareMessage.buildShareMessage({
+        text: src,
+        shareUrl: getEditorShareUrlValue(),
+        category: getEditorCategoryLabel(),
+    });
+}
+
+function editorHasShareableContent() {
+    const title = document.getElementById('post-title') && document.getElementById('post-title').value.trim();
+    const excerpt = document.getElementById('post-excerpt') && document.getElementById('post-excerpt').value.trim();
+    return Boolean(title || excerpt);
+}
+
+function refreshEditorShareUi(regenerate) {
+    const card = document.getElementById('editor-share-social-card');
+    const msgEl = document.getElementById('editor-share-message');
+    const urlEl = document.getElementById('editor-share-url');
+    const draftNote = document.getElementById('editor-share-draft-note');
+    const btnDl = document.getElementById('btn-editor-download-cover');
+    if (!card || !msgEl) return;
+
+    const visible = editorHasShareableContent();
+    card.style.display = visible ? 'block' : 'none';
+    if (!visible) {
+        msgEl.value = '';
+        return;
+    }
+
+    if (draftNote) {
+        draftNote.style.display = currentPostStatus !== 'published' ? 'block' : 'none';
+    }
+
+    if (urlEl) {
+        const cur = String(urlEl.value || '').trim();
+        const auto = getEditorShareUrlDefault();
+        if (!cur) {
+            urlEl.value = auto;
+        } else if (regenerate === true && getEditorArticleSlug() && auto.includes('post.html?post=')) {
+            urlEl.value = auto;
+        }
+    }
+
+    if (regenerate !== false || !String(msgEl.value || '').trim()) {
+        msgEl.value = buildShareMessageFromEditor();
+    }
+
+    const coverUrl = document.getElementById('image-url') && document.getElementById('image-url').value.trim();
+    const hasLocalCover = /^data:image\//i.test(coverUrl);
+    if (btnDl) btnDl.style.display = hasLocalCover ? 'inline-block' : 'none';
+}
+
+async function copyEditorShareMessage() {
+    const msgEl = document.getElementById('editor-share-message');
+    const text = (msgEl && String(msgEl.value || '').trim()) || buildShareMessageFromEditor();
+    if (!text) {
+        alert('Preencha título ou resumo antes de compartilhar.');
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(text);
+        alert('Texto copiado. Cole no WhatsApp, Instagram ou Facebook.');
+    } catch (_) {
+        if (msgEl) {
+            msgEl.focus();
+            msgEl.select();
+        }
+        alert('Não foi possível copiar automaticamente. Selecione o texto e use Ctrl+C.');
+    }
+}
+
+function shareEditorWhatsApp() {
+    const text = (document.getElementById('editor-share-message') && document.getElementById('editor-share-message').value.trim())
+        || buildShareMessageFromEditor();
+    if (!text) {
+        alert('Preencha título ou resumo antes de compartilhar.');
+        return;
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+}
+
+function shareEditorTelegram() {
+    const text = (document.getElementById('editor-share-message') && document.getElementById('editor-share-message').value.trim())
+        || buildShareMessageFromEditor();
+    const url = getEditorShareUrlValue();
+    const short = text.split('\n\n👉')[0] || text.slice(0, 500);
+    window.open(
+        `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(short)}`,
+        '_blank',
+        'noopener,noreferrer'
+    );
+}
+
+function shareEditorFacebook() {
+    const socialUrl = document.getElementById('social-image-url') && document.getElementById('social-image-url').value.trim();
+    const featured = document.getElementById('image-url') && document.getElementById('image-url').value.trim();
+    const sharePageUrl = getEditorShareUrlValue();
+    if (!sharePageUrl) {
+        alert('Informe o link do artigo.');
+        return;
+    }
+    if (currentPostStatus !== 'published' && !isPublicHttpImageUrl(socialUrl) && !isPublicHttpImageUrl(featured)) {
+        alert(
+            'Para o Facebook mostrar a capa no link, publique o artigo ou preencha «Imagem para redes sociais» com uma URL https pública.\n\n' +
+            'A partilha do link será aberta mesmo assim.'
+        );
+    }
+    window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePageUrl)}`,
+        '_blank',
+        'noopener,noreferrer,width=600,height=400'
+    );
+}
+
+function downloadEditorCoverForShare() {
+    const coverUrl = document.getElementById('image-url') && document.getElementById('image-url').value.trim();
+    if (!coverUrl || !/^data:image\//i.test(coverUrl)) {
+        alert('Carregue uma capa no campo «Imagem de destaque» primeiro.');
+        return;
+    }
+    const slug = getEditorArticleSlug() || 'capa';
+    const a = document.createElement('a');
+    a.href = coverUrl;
+    a.download = `vida360-${slug}-${Date.now()}.png`;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+function initEditorShareSocial() {
+    const urlEl = document.getElementById('editor-share-url');
+    if (urlEl && !String(urlEl.value || '').trim()) {
+        urlEl.value = getEditorShareUrlDefault();
+    }
+    if (urlEl) {
+        urlEl.addEventListener('change', () => {
+            persistEditorShareUrl(urlEl.value);
+            refreshEditorShareUi(true);
+        });
+        urlEl.addEventListener('blur', () => persistEditorShareUrl(urlEl.value));
+    }
+    const imgUrl = document.getElementById('image-url');
+    if (imgUrl) {
+        imgUrl.addEventListener('input', () => refreshEditorShareUi(false));
+    }
+    const socialImg = document.getElementById('social-image-url');
+    if (socialImg) {
+        socialImg.addEventListener('input', () => refreshEditorShareUi(false));
+    }
+
+    const btnWa = document.getElementById('btn-editor-share-whatsapp');
+    if (btnWa) btnWa.addEventListener('click', shareEditorWhatsApp);
+    const btnCp = document.getElementById('btn-editor-share-copy');
+    if (btnCp) btnCp.addEventListener('click', () => void copyEditorShareMessage());
+    const btnTg = document.getElementById('btn-editor-share-telegram');
+    if (btnTg) btnTg.addEventListener('click', shareEditorTelegram);
+    const btnFb = document.getElementById('btn-editor-share-facebook');
+    if (btnFb) btnFb.addEventListener('click', shareEditorFacebook);
+    const btnRf = document.getElementById('btn-editor-share-refresh');
+    if (btnRf) btnRf.addEventListener('click', () => refreshEditorShareUi(true));
+    const btnDl = document.getElementById('btn-editor-download-cover');
+    if (btnDl) btnDl.addEventListener('click', downloadEditorCoverForShare);
+
+    refreshEditorShareUi(true);
 }

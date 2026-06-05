@@ -79,6 +79,25 @@
         .seo-score-wrap p { font-size: 12px; color: #7F8C8D; }
         
         #image-preview, #social-image-preview { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 8px; display: none; }
+        .share-social-card {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            border: 1px solid #e8d8f2;
+            border-radius: 8px;
+            background: #faf7fc;
+        }
+        .share-social-card h2 { font-size: 1rem; color: #6d2d86; margin-bottom: 0.5rem; }
+        .share-social-card .share-hint { font-size: 12px; color: #5D6D7E; line-height: 1.45; margin-bottom: 0.75rem; }
+        .share-social-card textarea {
+            width: 100%; min-height: 140px; padding: 10px 12px; border: 1px solid #E0E0E0;
+            border-radius: 6px; font-size: 14px; line-height: 1.5; resize: vertical;
+        }
+        .share-btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .share-btn-row .btn-secondary, .share-btn-row .btn-primary { padding: 8px 14px; font-size: 13px; }
+        .share-draft-note {
+            font-size: 12px; color: #6d2d86; background: #eef8ff; border: 1px solid #bae6fd;
+            border-radius: 6px; padding: 8px 10px; margin-bottom: 0.75rem; line-height: 1.4;
+        }
         /* admin-global-footer */
     .admin-global-footer {
         background: #7f3f98;
@@ -183,6 +202,26 @@
                     <button type="button" class="btn-primary" onclick="publishPost()">🚀 Publicar</button>
                     <a href="admin-dashboard.html" class="btn-link">Cancelar</a>
                 </div>
+
+                <div id="editor-share-social-card" class="share-social-card" style="display:none" aria-live="polite">
+                    <h2>Compartilhar nas redes</h2>
+                    <p class="share-hint">Resumo com emoji, CTA e hashtags — a partir do título, resumo e conteúdo deste artigo. Use depois de carregar a capa ou editar o rascunho.</p>
+                    <div id="editor-share-draft-note" class="share-draft-note" style="display:none">
+                        <strong>Rascunho:</strong> o link do artigo só abre para todos após publicar. No WhatsApp, cole o texto abaixo e <strong>anexe a capa</strong> manualmente (ou use «Descarregar capa»). Para preview automático no Facebook, publique e/ou preencha «Imagem para redes» com URL https.
+                    </div>
+                    <label for="editor-share-url" style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;color:#6d2d86;">Link do artigo</label>
+                    <input type="url" id="editor-share-url" placeholder="https://www.blogvida360.com.br/post.html?post=…" style="width:100%;padding:10px 12px;border:1px solid #E0E0E0;border-radius:6px;font-size:14px;margin-bottom:0.75rem;" />
+                    <label for="editor-share-message" style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;color:#6d2d86;">Texto para compartilhar</label>
+                    <textarea id="editor-share-message" rows="8" aria-label="Texto para compartilhar nas redes"></textarea>
+                    <div class="share-btn-row">
+                        <button type="button" class="btn-primary" id="btn-editor-share-whatsapp">💬 WhatsApp</button>
+                        <button type="button" class="btn-secondary" id="btn-editor-share-copy">📋 Copiar texto</button>
+                        <button type="button" class="btn-secondary" id="btn-editor-share-telegram">✈️ Telegram</button>
+                        <button type="button" class="btn-secondary" id="btn-editor-share-facebook">Facebook</button>
+                        <button type="button" class="btn-secondary" id="btn-editor-share-refresh" title="Regera a partir do artigo">↻ Atualizar</button>
+                        <button type="button" class="btn-secondary" id="btn-editor-download-cover" style="display:none" title="Guarda a capa no computador para anexar no WhatsApp">⬇️ Descarregar capa</button>
+                    </div>
+                </div>
             </div>
             
             <aside class="sidebar">
@@ -281,7 +320,8 @@
         }
     </script>
     <script src="assets/js/sanitize-article-html.js?v=6"></script>
-    <script src="assets/js/editor-artigo.js?v=20260605-ready-cover"></script>
+    <script src="assets/js/vida360-share-message.js?v=20260605-share"></script>
+    <script src="assets/js/editor-artigo.js?v=20260605-editor-share"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">
