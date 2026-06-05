@@ -40,6 +40,9 @@
   let lastCompositeDataUrl = '';
   let lastSuggestedHeadline = '';
   let lastSuggestedCategory = '';
+  /** Rascunho aberto no editor (query ?post_id=) — imagem/texto voltam para o mesmo artigo */
+  let targetPostId = '';
+  let targetPostTitle = '';
 
   function $(id) {
     return document.getElementById(id);
@@ -1263,11 +1266,66 @@
     const rowDl = $('row-download-variants');
     const btnNo = $('btn-download-without-text');
     const btnYes = $('btn-download-with-text');
+    const btnImgDraft = $('btn-to-editor-image');
     if (applyBtn) applyBtn.disabled = !hasBase;
     if (clearBtn) clearBtn.disabled = !lastCompositeDataUrl;
     if (rowDl) rowDl.style.display = hasBase ? 'flex' : 'none';
     if (btnNo) btnNo.disabled = !hasBase;
     if (btnYes) btnYes.disabled = !lastCompositeDataUrl;
+    if (btnImgDraft) {
+      btnImgDraft.style.display = hasBase ? 'inline-flex' : 'none';
+      btnImgDraft.disabled = !hasBase;
+      const label = targetPostId
+        ? '🖼️ Adicionar capa ao rascunho'
+        : '🖼️ Enviar imagem ao editor';
+      if (btnImgDraft.textContent !== label) btnImgDraft.textContent = label;
+    }
+  }
+
+  function readTargetPostFromUrl() {
+    try {
+      const qs = new URLSearchParams(window.location.search || '');
+      const id = (qs.get('post_id') || qs.get('id') || '').trim();
+      if (!id) return;
+      targetPostId = id;
+      updateDraftContextBanner();
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  async function loadTargetPostTitle() {
+    if (!targetPostId) return;
+    const session = await requireAuth();
+    if (!session || !window.supabaseClient) return;
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('blog360_posts')
+        .select('titulo, title')
+        .eq('id', targetPostId)
+        .maybeSingle();
+      if (error || !data) return;
+      targetPostTitle = String(data.titulo || data.title || '').trim();
+      updateDraftContextBanner();
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function updateDraftContextBanner() {
+    const el = $('studio-draft-context');
+    if (!el) return;
+    if (!targetPostId) {
+      el.style.display = 'none';
+      el.textContent = '';
+      return;
+    }
+    const titleBit = targetPostTitle ? ` «${targetPostTitle}»` : '';
+    el.style.display = 'block';
+    el.innerHTML =
+      `<strong>Rascunho em edição</strong> — a imagem (e o texto, se usar «Usar no editor») será aplicada ao artigo${escapeHtml(titleBit)}. ` +
+      `<a href="admin-editor-artigo.html?id=${encodeURIComponent(targetPostId)}">Voltar ao editor</a>`;
+    refreshStudioImageUi();
   }
 
   function clearOverlayComposite() {
@@ -1772,12 +1830,53 @@
     a.remove();
   }
 
-  function useInEditor() {
-    const body = ($('studio-output') && $('studio-output').value) || '';
-    if (!body.trim()) {
-      showError('Gere ou cole um texto no resultado antes.');
+  function buildEditorRedirectUrl() {
+    if (targetPostId) {
+      return `admin-editor-artigo.html?id=${encodeURIComponent(targetPostId)}`;
+    }
+    return 'admin-editor-artigo.html';
+  }
+
+  function sendToEditor(payload) {
+    try {
+      sessionStorage.setItem('blog360_estudio_payload', JSON.stringify(payload));
+    } catch (e) {
+      showError('Armazenamento cheio. Copie o texto ou descarregue a imagem manualmente.');
+      return false;
+    }
+    window.location.href = buildEditorRedirectUrl();
+    return true;
+  }
+
+  function useImageInEditor() {
+    const imageDataUrl = lastCompositeDataUrl || lastImageDataUrl || '';
+    if (!imageDataUrl) {
+      showError('Gere ou carregue uma imagem antes.');
       return;
     }
+    const socialUrl = ($('studio-social-image-url') && $('studio-social-image-url').value.trim()) || '';
+    sendToEditor({
+      postId: targetPostId || undefined,
+      imageOnly: true,
+      imageDataUrl,
+      socialImageUrl: socialUrl,
+    });
+  }
+
+  function useInEditor() {
+    const body = ($('studio-output') && $('studio-output').value) || '';
+    const imageDataUrl = lastCompositeDataUrl || lastImageDataUrl || '';
+    if (!body.trim() && !imageDataUrl) {
+      showError('Gere texto no resultado ou uma imagem antes de enviar ao editor.');
+      return;
+    }
+    const socialUrl = ($('studio-social-image-url') && $('studio-social-image-url').value.trim()) || '';
+
+    if (!body.trim() && imageDataUrl) {
+      useImageInEditor();
+      return;
+    }
+
     const plain = body.replace(/\n{3,}/g, '\n\n').trim();
     let title = '';
     const m = plain.match(/^#\s+(.+)$/m);
@@ -1792,21 +1891,15 @@
       .trim()
       .slice(0, 180);
 
-    const socialUrl = ($('studio-social-image-url') && $('studio-social-image-url').value.trim()) || '';
-    const payload = {
+    sendToEditor({
+      postId: targetPostId || undefined,
+      imageOnly: false,
       title: title || 'Novo artigo',
       excerpt: excerpt || '',
       body: plain,
-      imageDataUrl: lastCompositeDataUrl || lastImageDataUrl || '',
+      imageDataUrl,
       socialImageUrl: socialUrl,
-    };
-    try {
-      sessionStorage.setItem('blog360_estudio_payload', JSON.stringify(payload));
-    } catch (e) {
-      showError('Armazenamento cheio. Copie o texto manualmente.');
-      return;
-    }
-    window.location.href = 'admin-editor-artigo.html';
+    });
   }
 
   /* ---- Assistente ---- */
@@ -2070,6 +2163,8 @@
     const btnOvClear = $('btn-overlay-clear');
     if (btnOvClear) btnOvClear.addEventListener('click', clearOverlayComposite);
     $('btn-to-editor').addEventListener('click', useInEditor);
+    const btnToEditorImg = $('btn-to-editor-image');
+    if (btnToEditorImg) btnToEditorImg.addEventListener('click', useImageInEditor);
 
     $('btn-coach').addEventListener('click', openCoach);
     $('modal-coach-close').addEventListener('click', closeCoach);
@@ -2090,6 +2185,8 @@
     setTabDescription();
     setGenerateButtonLabel();
     initOverlayPalette();
+    readTargetPostFromUrl();
+    void loadTargetPostTitle();
     refreshStudioImageUi();
     updatePostDevicePreviews();
 

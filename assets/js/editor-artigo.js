@@ -45,8 +45,16 @@ async function saveWithSchemaFallback(supabaseClient, basePostData, postId) {
 document.addEventListener('DOMContentLoaded', async () => {
     await checkAuthentication();
     initEditor();
-    loadPostIfEditing();
-    applyBlog360EstudioPayload();
+    const estudioPayload = peekBlog360EstudioPayload();
+    const urlParams = new URLSearchParams(window.location.search);
+    const postIdFromUrl = urlParams.get('id');
+    if (postIdFromUrl) {
+        currentPostId = postIdFromUrl;
+        await loadPost(postIdFromUrl);
+    }
+    if (estudioPayload) {
+        applyBlog360EstudioPayload(estudioPayload);
+    }
 });
 
 // Verificar autenticação
@@ -65,42 +73,82 @@ async function checkAuthentication() {
     }
 }
 
-/** Conteúdo vindo do Estúdio de conteúdo (sessionStorage blog360_estudio_payload) */
-function applyBlog360EstudioPayload() {
+/** Lê payload do Estúdio sem remover (para carregar o rascunho antes de aplicar). */
+function peekBlog360EstudioPayload() {
     try {
         const raw = sessionStorage.getItem('blog360_estudio_payload');
-        if (!raw) return;
-        sessionStorage.removeItem('blog360_estudio_payload');
+        if (!raw) return null;
         const p = JSON.parse(raw);
-        if (!p || typeof p !== 'object') return;
+        if (!p || typeof p !== 'object') return null;
+        return p;
+    } catch (e) {
+        console.warn('peekBlog360EstudioPayload:', e);
+        return null;
+    }
+}
 
-        if (p.title) document.getElementById('post-title').value = String(p.title).slice(0, 120);
-        if (p.excerpt) document.getElementById('post-excerpt').value = String(p.excerpt).slice(0, 200);
+function consumeBlog360EstudioPayload() {
+    const p = peekBlog360EstudioPayload();
+    if (p) sessionStorage.removeItem('blog360_estudio_payload');
+    return p;
+}
 
+/** Abre o Estúdio mantendo o ID do rascunho (imagem volta para o mesmo artigo). */
+function openEstudioFromEditor() {
+    const base = 'admin-estudio-conteudo.html';
+    if (currentPostId) {
+        window.location.href = `${base}?post_id=${encodeURIComponent(currentPostId)}`;
+        return;
+    }
+    const title = (document.getElementById('post-title') && document.getElementById('post-title').value.trim()) || '';
+    if (title && !window.confirm(
+        'Este artigo ainda não foi salvo como rascunho. Salve o rascunho primeiro para a capa voltar ao mesmo artigo.\n\nAbrir o Estúdio mesmo assim?'
+    )) {
+        return;
+    }
+    window.location.href = base;
+}
+
+/** Conteúdo vindo do Estúdio de conteúdo (sessionStorage blog360_estudio_payload) */
+function applyBlog360EstudioPayload(incoming) {
+    try {
+        const p = incoming || consumeBlog360EstudioPayload();
+        if (!p) return;
+        sessionStorage.removeItem('blog360_estudio_payload');
+
+        if (p.postId) currentPostId = String(p.postId);
+
+        const imageOnly = p.imageOnly === true || (!p.body && !!p.imageDataUrl && !p.title && !p.excerpt);
         const body = p.body ? String(p.body) : '';
-        if (body) {
-            const md = document.getElementById('markdown-editor');
-            const htmlEd = document.getElementById('editor-content');
-            if (typeof isMarkdown === 'function' && isMarkdown(body)) {
-                md.value = body;
-                htmlEd.innerHTML = '';
-                if (typeof editorMode !== 'undefined' && editorMode === 'html') {
-                    toggleEditorMode();
+
+        if (!imageOnly) {
+            if (p.title) document.getElementById('post-title').value = String(p.title).slice(0, 120);
+            if (p.excerpt) document.getElementById('post-excerpt').value = String(p.excerpt).slice(0, 200);
+
+            if (body) {
+                const md = document.getElementById('markdown-editor');
+                const htmlEd = document.getElementById('editor-content');
+                if (typeof isMarkdown === 'function' && isMarkdown(body)) {
+                    md.value = body;
+                    htmlEd.innerHTML = '';
+                    if (typeof editorMode !== 'undefined' && editorMode === 'html') {
+                        toggleEditorMode();
+                    } else {
+                        md.style.display = 'block';
+                        htmlEd.style.display = 'none';
+                        editorMode = 'markdown';
+                        document.getElementById('markdown-actions').style.display = 'block';
+                        document.getElementById('markdown-hint').style.display = 'inline';
+                        document.getElementById('btn-mode-switch').textContent = '🌐 HTML';
+                        const toolbarButtons = ['btn-bold', 'btn-italic', 'btn-underline', 'btn-h2', 'btn-h3', 'btn-link', 'btn-image'];
+                        toolbarButtons.forEach(function (id) {
+                            const b = document.getElementById(id);
+                            if (b) b.disabled = true;
+                        });
+                    }
                 } else {
-                    md.style.display = 'block';
-                    htmlEd.style.display = 'none';
-                    editorMode = 'markdown';
-                    document.getElementById('markdown-actions').style.display = 'block';
-                    document.getElementById('markdown-hint').style.display = 'inline';
-                    document.getElementById('btn-mode-switch').textContent = '🌐 HTML';
-                    const toolbarButtons = ['btn-bold', 'btn-italic', 'btn-underline', 'btn-h2', 'btn-h3', 'btn-link', 'btn-image'];
-                    toolbarButtons.forEach(function (id) {
-                        const b = document.getElementById(id);
-                        if (b) b.disabled = true;
-                    });
+                    htmlEd.innerHTML = body;
                 }
-            } else {
-                htmlEd.innerHTML = body;
             }
         }
 
@@ -127,11 +175,15 @@ function applyBlog360EstudioPayload() {
         updatePreview();
         calculateSEOScore();
         const wc = document.getElementById('content-count');
-        if (wc && body) {
+        if (wc && body && !imageOnly) {
             const words = body.trim().split(/\s+/).filter(function (w) { return w.length > 0; }).length;
             wc.textContent = words;
         }
-        alert('Conteúdo do Estúdio aplicado ao artigo. Revise e publique quando estiver pronto.');
+        alert(
+            imageOnly
+                ? 'Capa do Estúdio aplicada ao artigo. O texto do rascunho foi mantido — salve o rascunho quando estiver pronto.'
+                : 'Conteúdo do Estúdio aplicado ao artigo. Revise e publique quando estiver pronto.'
+        );
     } catch (e) {
         console.warn('applyBlog360EstudioPayload:', e);
     }
@@ -212,17 +264,6 @@ function initEditor() {
     
     // Atualizar preview ao mudar categoria
     document.getElementById('post-category').addEventListener('change', updatePreview);
-}
-
-// Carregar post se estiver editando
-function loadPostIfEditing() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get('id');
-    
-    if (postId) {
-        currentPostId = postId;
-        loadPost(postId);
-    }
 }
 
 // Carregar post existente (colunas do Supabase: titulo, resumo, categoria, autor, tags, imagem_destaque, conteudo)

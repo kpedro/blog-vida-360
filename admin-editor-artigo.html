@@ -136,7 +136,8 @@
                 <div class="form-group" style="background:#E8F4FC;border:1px solid #e8d8f2;border-radius:8px;padding:12px 14px;margin-bottom:1.25rem;">
                     <strong style="color:#6d2d86;">✨ Estúdio de conteúdo</strong>
                     <p style="font-size:13px;color:#5D6D7E;margin:8px 0 10px;line-height:1.45;">Gere rascunhos, posts para redes ou textos de divulgação com IA e envie para este editor com um clique.</p>
-                    <button type="button" class="btn-primary" style="padding:10px 18px;font-size:14px;" onclick="window.location.href='admin-estudio-conteudo.html'">Abrir Estúdio de conteúdo</button>
+                    <button type="button" class="btn-primary" style="padding:10px 18px;font-size:14px;" onclick="openEstudioFromEditor()">Abrir Estúdio (gerar capa para este rascunho)</button>
+                    <p style="font-size:12px;color:#5D6D7E;margin-top:8px;line-height:1.4;">Depois de gerar a imagem no Estúdio, use <strong>Adicionar capa ao rascunho</strong> — o texto do artigo não é alterado.</p>
                 </div>
                 <div class="form-group">
                     <label for="post-title">Título do artigo *</label>
@@ -274,7 +275,7 @@
         }
     </script>
     <script src="assets/js/sanitize-article-html.js?v=6"></script>
-    <script src="assets/js/editor-artigo.js?v=20260501-3"></script>
+    <script src="assets/js/editor-artigo.js?v=20260605-draft-image"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">
