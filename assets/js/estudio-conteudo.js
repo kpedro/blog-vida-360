@@ -98,6 +98,15 @@
       return detail || 'Limite de pedidos à API. Tente daqui a pouco.';
     }
     if (status >= 500) {
+      if (/GEMINI_API:\s*404/i.test(String(detail))) {
+        return (
+          'Modelo Gemini indisponível (404). Faça redeploy de generate-blog-studio-content no Supabase — ' +
+          'a função agora tenta vários modelos (2.5-flash, 2.0-flash, etc.), OpenAI ou n8n opcional.'
+        );
+      }
+      if (/Nenhum motor de IA/i.test(String(detail))) {
+        return String(detail);
+      }
       if (/GEMINI_API/i.test(String(detail))) {
         return 'Configure o segredo GEMINI_API no Supabase (Edge Functions → Secrets) e faça redeploy das funções do Estúdio.';
       }

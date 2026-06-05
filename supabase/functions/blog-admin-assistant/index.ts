@@ -187,15 +187,18 @@ serve(async (req) => {
       throw new Error("GEMINI_API is not configured");
     }
 
-    const modelPadrao = Deno.env.get("BLOG360_ADMIN_GEMINI_MODEL_PADRAO")?.trim() || "gemini-2.0-flash";
+    const modelPadrao = Deno.env.get("BLOG360_ADMIN_GEMINI_MODEL_PADRAO")?.trim() || "gemini-2.5-flash";
     const modelDedicado = Deno.env.get("BLOG360_ADMIN_GEMINI_MODEL_DEDICADO")?.trim() || "gemini-2.5-flash";
-    const model = mode === "dedicado" ? modelDedicado : modelPadrao;
+    const primary = mode === "dedicado" ? modelDedicado : modelPadrao;
+    const fallbacks = [
+      primary,
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-1.5-flash",
+    ].filter((m, i, arr) => arr.indexOf(m) === i);
 
     const maxOut = mode === "dedicado" ? 8192 : 2048;
     const temperature = mode === "dedicado" ? 0.45 : 0.35;
-
-    const url =
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API}`;
 
     const payload = {
       contents: buildContents(messages),
@@ -206,31 +209,43 @@ serve(async (req) => {
       },
     };
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("blog-admin-assistant Gemini:", response.status, errorText);
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
-      return new Response(
-        JSON.stringify({ error: `Erro da API (${response.status}). Confirme o modelo e GEMINI_API.` }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    let reply = "";
+    let lastStatus = 0;
+    for (const model of fallbacks) {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
       );
+
+      if (!response.ok) {
+        lastStatus = response.status;
+        const errorText = await response.text();
+        console.warn("blog-admin-assistant Gemini:", model, response.status, errorText.slice(0, 300));
+        if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+        continue;
+      }
+
+      const data = await response.json();
+      reply = String(data.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
+      if (reply) break;
     }
 
-    const data = await response.json();
-    const reply = String(data.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
     if (!reply) {
-      throw new Error("Resposta vazia da IA");
+      return new Response(
+        JSON.stringify({
+          error: `Nenhum modelo Gemini respondeu${lastStatus ? ` (último HTTP ${lastStatus})` : ""}. Confirme GEMINI_API no Supabase.`,
+        }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     return new Response(JSON.stringify({ reply, mode }), {

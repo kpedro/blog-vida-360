@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { generateBlog360Text } from "../_shared/blog360TextGenerate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -70,11 +71,6 @@ serve(async (req) => {
       );
     }
 
-    const GEMINI_API = Deno.env.get("GEMINI_API");
-    if (!GEMINI_API) {
-      throw new Error("GEMINI_API não configurado");
-    }
-
     const truncated = content.length > MAX_CONTENT_CHARS
       ? content.slice(0, MAX_CONTENT_CHARS) +
         "\n\n[… texto truncado para análise …]"
@@ -83,38 +79,26 @@ serve(async (req) => {
     const userMessage =
       `Tipo de conteúdo no Estúdio (referência): ${contentType}\n\n---\n\nTEXTO:\n${truncated}`;
 
-    const model = "gemini-2.0-flash";
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: userMessage }] }],
-          systemInstruction: { parts: [{ text: SYSTEM }] },
-          generationConfig: {
-            temperature: 0.35,
-            maxOutputTokens: 2048,
-          },
-        }),
-      },
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Gemini overlay suggest:", response.status, errorText);
-      if (response.status === 429) {
+    let rawText: string;
+    try {
+      const gen = await generateBlog360Text({
+        systemPrompt: SYSTEM,
+        userText: userMessage,
+        temperature: 0.35,
+        maxOutputTokens: 2048,
+        contentType: "overlay_suggest",
+      });
+      rawText = gen.text;
+    } catch (e) {
+      if (e instanceof Error && e.message === "RATE_LIMIT") {
         return new Response(
           JSON.stringify({ error: "Limite de requisições. Tente em alguns minutos." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      throw new Error(`Gemini API: ${response.status}`);
+      throw e;
     }
 
-    const data = await response.json();
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawText || typeof rawText !== "string") {
       throw new Error("Resposta vazia do modelo");
     }

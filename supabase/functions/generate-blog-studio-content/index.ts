@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { generateBlog360Text } from "../_shared/blog360TextGenerate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -114,58 +115,36 @@ serve(async (req) => {
       );
     }
 
-    const GEMINI_API = Deno.env.get("GEMINI_API");
-    if (!GEMINI_API) {
-      throw new Error("GEMINI_API não configurado");
-    }
-
-    const systemPrompt = getSystemPrompt(type);
-    const model = "gemini-2.0-flash";
-
     const temp = typeof tempIn === "number" && tempIn >= 0 && tempIn <= 2 ? tempIn : 0.8;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt.trim() }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          generationConfig: {
-            temperature: temp,
-            maxOutputTokens: 8192,
-          },
-        }),
-      },
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Gemini API error:", response.status, errorText);
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Limite de requisições. Tente em alguns minutos." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
-      throw new Error(`Gemini API: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!content) {
-      throw new Error("Nenhum conteúdo gerado pela IA");
-    }
+    const result = await generateBlog360Text({
+      systemPrompt: getSystemPrompt(type),
+      userText: prompt.trim(),
+      temperature: temp,
+      maxOutputTokens: 8192,
+      contentType: type,
+    });
 
     return new Response(
-      JSON.stringify({ content, type }),
+      JSON.stringify({
+        content: result.text,
+        type,
+        provider: result.provider,
+        model: result.model,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
     console.error("generate-blog-studio-content error:", error);
+
+    if (errMsg === "RATE_LIMIT") {
+      return new Response(
+        JSON.stringify({ error: "Limite de requisições. Tente em alguns minutos." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     return new Response(
       JSON.stringify({ error: "Erro ao gerar conteúdo", details: errMsg }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

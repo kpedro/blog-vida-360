@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { generateBlog360Text } from "../_shared/blog360TextGenerate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -58,45 +59,29 @@ serve(async (req) => {
     }
     const text = textIn.slice(0, 8000);
 
-    const GEMINI_API = Deno.env.get("GEMINI_API");
-    if (!GEMINI_API) {
-      throw new Error("GEMINI_API is not configured");
-    }
-
     const userMessage =
       `Reescreva a legenda abaixo seguindo as regras do sistema. Mantenha fidelidade ao produto mencionado.\n\n---\n${text}`;
 
-    const model = "gemini-2.0-flash";
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: userMessage }] }],
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          generationConfig: {
-            temperature: 0.35,
-            maxOutputTokens: 512,
-          },
-        }),
-      },
-    );
-
-    if (!response.ok) {
-      const errT = await response.text();
-      console.error("blog-rewrite-banner-legenda Gemini:", response.status, errT);
-      if (response.status === 429) {
+    let raw: string;
+    try {
+      const gen = await generateBlog360Text({
+        systemPrompt: SYSTEM_PROMPT,
+        userText: userMessage,
+        temperature: 0.35,
+        maxOutputTokens: 512,
+        contentType: "banner_legenda",
+      });
+      raw = gen.text;
+    } catch (e) {
+      if (e instanceof Error && e.message === "RATE_LIMIT") {
         return new Response(
           JSON.stringify({ error: "Limite de requisições. Tente em alguns minutos." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      throw new Error(`Gemini API: ${response.status}`);
+      throw e;
     }
 
-    const data = await response.json();
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!raw || typeof raw !== "string") {
       throw new Error("Resposta vazia da IA");
     }
