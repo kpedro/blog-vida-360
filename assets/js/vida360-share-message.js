@@ -153,9 +153,40 @@
     return parts.join('\n').trim();
   }
 
+  /** Texto curto para WhatsApp Status (evita parágrafos longos em fundo verde). */
+  function buildStatusShareMessage(opts) {
+    const text = String((opts && opts.text) || '').trim();
+    const shareUrl = String((opts && opts.shareUrl) || DEFAULT_SITE).trim() || DEFAULT_SITE;
+    const category = opts && opts.category;
+    const summary = summaryForShare(text, (opts && opts.maxSummaryLen) || 160);
+    const emoji = openingEmoji(text, category);
+    const shortUrl = shareUrl.replace(/^https?:\/\//i, '');
+    const parts = [];
+
+    if (summary) {
+      parts.push(`${emoji} ${summary}`);
+    } else {
+      parts.push(`${emoji} Novo no Blog Vida 360º.`);
+    }
+
+    parts.push('');
+    parts.push(`👉 LEIA MAIS: ${shortUrl}`);
+
+    if (opts && opts.includeHashtags === true) {
+      const tags = hashtagsForShare(text, category).slice(0, 3);
+      if (tags.length) {
+        parts.push('');
+        parts.push(tags.join(' '));
+      }
+    }
+
+    return parts.join('\n').trim();
+  }
+
   global.Vida360ShareMessage = {
     DEFAULT_SITE,
     buildShareMessage,
+    buildStatusShareMessage,
     stripPlain,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -221,6 +221,19 @@
                         <button type="button" class="btn-secondary" id="btn-editor-share-refresh" title="Regera a partir do artigo">↻ Atualizar</button>
                         <button type="button" class="btn-secondary" id="btn-editor-download-cover" style="display:none" title="Guarda a capa no computador para anexar no WhatsApp">⬇️ Descarregar capa</button>
                     </div>
+                    <details class="share-status-guide" style="margin-top:12px;font-size:12px;color:#5D6D7E;line-height:1.5">
+                        <summary style="cursor:pointer;font-weight:600;color:#6d2d86;list-style:none;">📱 WhatsApp Status — formato correcto</summary>
+                        <ol style="margin:10px 0 0 1.15rem;padding:0;">
+                            <li style="margin-bottom:6px"><strong>Status ≠ conversa:</strong> o botão «WhatsApp» abre mensagem para um contacto. O Status publica-se à mão no app.</li>
+                            <li style="margin-bottom:6px"><strong>Melhor formato:</strong> publique a <strong>capa</strong> (imagem), não um texto longo em fundo verde — textos grandes partem mal no ecrã.</li>
+                            <li style="margin-bottom:6px"><strong>Passos:</strong> «Descarregar capa» → WhatsApp → <strong>Status</strong> → ícone de foto → escolher a capa → publicar.</li>
+                            <li style="margin-bottom:6px"><strong>Legenda opcional:</strong> use «Copiar texto curto (Status)» (2 linhas + link). Hashtags ficam na imagem ou na bio.</li>
+                            <li><strong>Vertical total:</strong> no Estúdio, gere capa em proporção <strong>9:16</strong> se quiser encher o ecrã do telemóvel.</li>
+                        </ol>
+                        <div class="share-btn-row" style="margin-top:10px">
+                            <button type="button" class="btn-secondary" id="btn-editor-share-status-copy">📋 Copiar texto curto (Status)</button>
+                        </div>
+                    </details>
                 </div>
             </div>
             
@@ -320,8 +333,8 @@
         }
     </script>
     <script src="assets/js/sanitize-article-html.js?v=6"></script>
-    <script src="assets/js/vida360-share-message.js?v=20260605-leia-mais"></script>
-    <script src="assets/js/editor-artigo.js?v=20260605-leia-mais"></script>
+    <script src="assets/js/vida360-share-message.js?v=20260605-status"></script>
+    <script src="assets/js/editor-artigo.js?v=20260605-status"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

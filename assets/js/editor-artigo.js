@@ -1002,6 +1002,23 @@ function buildShareMessageFromEditor() {
     });
 }
 
+function buildShareStatusMessageFromEditor() {
+    const src = getEditorShareSourceText();
+    const url = getEditorShareUrlValue();
+    const category = getEditorCategoryLabel();
+    if (window.Vida360ShareMessage && typeof window.Vida360ShareMessage.buildStatusShareMessage === 'function') {
+        return window.Vida360ShareMessage.buildStatusShareMessage({
+            text: src,
+            shareUrl: url,
+            category,
+            includeHashtags: true,
+        });
+    }
+    const short = src.replace(/\s+/g, ' ').trim().slice(0, 160);
+    const shortUrl = url.replace(/^https?:\/\//i, '');
+    return short ? `${short}\n\n👉 LEIA MAIS: ${shortUrl}` : '';
+}
+
 function editorHasShareableContent() {
     const title = document.getElementById('post-title') && document.getElementById('post-title').value.trim();
     const excerpt = document.getElementById('post-excerpt') && document.getElementById('post-excerpt').value.trim();
@@ -1062,6 +1079,24 @@ async function copyEditorShareMessage() {
             msgEl.select();
         }
         alert('Não foi possível copiar automaticamente. Selecione o texto e use Ctrl+C.');
+    }
+}
+
+async function copyEditorStatusShareMessage() {
+    const text = buildShareStatusMessageFromEditor();
+    if (!text) {
+        alert('Preencha título ou resumo antes.');
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(text);
+        alert(
+            'Texto curto copiado.\n\n' +
+            'Para Status: publique primeiro a CAPA (Descarregar capa → WhatsApp → Status → foto). ' +
+            'Se quiser legenda, cole este texto curto antes de publicar — evite colar o texto longo.'
+        );
+    } catch (_) {
+        alert('Não foi possível copiar. Tente de novo.');
     }
 }
 
@@ -1157,6 +1192,8 @@ function initEditorShareSocial() {
     if (btnRf) btnRf.addEventListener('click', () => refreshEditorShareUi(true));
     const btnDl = document.getElementById('btn-editor-download-cover');
     if (btnDl) btnDl.addEventListener('click', downloadEditorCoverForShare);
+    const btnStatus = document.getElementById('btn-editor-share-status-copy');
+    if (btnStatus) btnStatus.addEventListener('click', () => void copyEditorStatusShareMessage());
 
     refreshEditorShareUi(true);
 }
