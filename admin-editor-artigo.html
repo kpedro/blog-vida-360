@@ -136,8 +136,8 @@
                 <div class="form-group" style="background:#E8F4FC;border:1px solid #e8d8f2;border-radius:8px;padding:12px 14px;margin-bottom:1.25rem;">
                     <strong style="color:#6d2d86;">✨ Estúdio de conteúdo</strong>
                     <p style="font-size:13px;color:#5D6D7E;margin:8px 0 10px;line-height:1.45;">Gere rascunhos, posts para redes ou textos de divulgação com IA e envie para este editor com um clique.</p>
-                    <button type="button" class="btn-primary" style="padding:10px 18px;font-size:14px;" onclick="openEstudioFromEditor()">Abrir Estúdio (gerar capa para este rascunho)</button>
-                    <p style="font-size:12px;color:#5D6D7E;margin-top:8px;line-height:1.4;">Depois de gerar a imagem no Estúdio, use <strong>Adicionar capa ao rascunho</strong> — o texto do artigo não é alterado.</p>
+                    <p style="font-size:13px;color:#5D6D7E;margin:0 0 8px;line-height:1.45;">Já tem a capa final (com texto)? Use <strong>Carregar capa pronta</strong> na barra lateral → Imagem de destaque, e salve o rascunho. O Estúdio só é necessário para <em>gerar</em> capa nova.</p>
+                    <button type="button" class="btn-primary" style="padding:10px 18px;font-size:14px;" onclick="openEstudioFromEditor()">Abrir Estúdio (gerar capa nova)</button>
                 </div>
                 <div class="form-group">
                     <label for="post-title">Título do artigo *</label>
@@ -215,7 +215,13 @@
                 <div class="form-group">
                     <label for="image-url">🖼️ Imagem de destaque do artigo</label>
                     <input type="text" id="image-url" name="image_url" placeholder="https://… ou imagem gerada/upload (data URL)">
-                    <div class="char-count" style="margin-top:6px;">URL <strong>https</strong>, ou imagem gerada no Estúdio / upload (fica guardada como data no post). Esta imagem aparece nos cards do blog quando suportado.</div>
+                    <div class="char-count" style="margin-top:6px;">Cole uma URL <strong>https</strong> ou carregue a <strong>capa pronta</strong> (PNG/JPG, inclusive com texto já na imagem). Não precisa voltar ao Estúdio para gerar outra.</div>
+                    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+                        <label class="btn-secondary" style="display:inline-block;padding:8px 14px;font-size:13px;cursor:pointer;margin:0;">📷 Carregar capa pronta
+                            <input type="file" id="featured-image-file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" onchange="handleFeaturedImageUpload(event)" style="display:none;">
+                        </label>
+                        <button type="button" class="btn-secondary" style="padding:8px 14px;font-size:13px;" onclick="openEstudioFromEditor()">Estúdio (só se quiser gerar nova)</button>
+                    </div>
                     <img id="image-preview" alt="Preview capa" src="">
                 </div>
                 <div class="form-group" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px 14px;">
@@ -275,7 +281,7 @@
         }
     </script>
     <script src="assets/js/sanitize-article-html.js?v=6"></script>
-    <script src="assets/js/editor-artigo.js?v=20260605-draft-image"></script>
+    <script src="assets/js/editor-artigo.js?v=20260605-ready-cover"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

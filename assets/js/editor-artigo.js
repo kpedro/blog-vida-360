@@ -341,19 +341,51 @@ function insertImage() {
     }
 }
 
-// Upload de imagem
+function applyFeaturedImageDataUrl(dataUrl) {
+    if (!dataUrl || !String(dataUrl).startsWith('data:image/')) return;
+    const preview = document.getElementById('image-preview');
+    const urlInput = document.getElementById('image-url');
+    if (urlInput) urlInput.value = dataUrl;
+    if (preview) {
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+    }
+    calculateSEOScore();
+}
+
+// Upload de imagem no corpo do artigo (toolbar)
 function handleImageUpload(event) {
     const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const preview = document.getElementById('image-preview');
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-            document.getElementById('image-url').value = e.target.result;
-        };
-        reader.readAsDataURL(file);
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        applyFeaturedImageDataUrl(e.target.result);
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+}
+
+/** Capa de destaque na barra lateral — PNG/JPG já com texto na imagem */
+function handleFeaturedImageUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    if (!file.type || !file.type.startsWith('image/')) {
+        alert('Selecione um ficheiro de imagem (PNG, JPEG ou WebP).');
+        event.target.value = '';
+        return;
     }
+    if (file.size > 12 * 1024 * 1024) {
+        alert('Imagem demasiado grande (máx. 12 MB).');
+        event.target.value = '';
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        applyFeaturedImageDataUrl(e.target.result);
+    };
+    reader.onerror = () => alert('Não foi possível ler o ficheiro.');
+    reader.readAsDataURL(file);
+    event.target.value = '';
 }
 
 // Alternar entre modo HTML e Markdown

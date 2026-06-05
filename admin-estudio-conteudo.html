@@ -499,20 +499,24 @@
                 </div>
 
                 <p class="section-title">Imagem (opcional)</p>
-                <p class="hint">Gere com IA a partir da descrição, ou <strong>carregue do computador</strong> uma foto ou arte (nova ou já com manchete) para reutilizar no texto, nas pré-visualizações e no editor. Usa a sugestão automática após gerar texto, ou descreva abaixo. Para Instagram em formato retrato clássico do feed, experimente <strong>4:5</strong> na geração.</p>
+                <p class="hint" id="studio-image-hint">Já tem a <strong>capa final</strong> (PNG/JPG com texto na imagem)? Use <strong>Carregar capa pronta</strong> — não precisa gerar outra nem usar a secção «Texto sobre a imagem» abaixo. Para criar capa nova com IA, use a descrição e «Gerar imagem».</p>
                 <div class="image-row">
-                    <select id="image-format" class="fmt" title="Proporção">
+                    <button type="button" class="btn btn-primary" id="btn-upload-image" title="PNG, JPEG, WebP ou GIF (máx. 12 MB) — capa já finalizada com texto">📷 Carregar capa pronta…</button>
+                    <button type="button" class="btn" id="btn-gen-image">🖼️ Gerar imagem com IA</button>
+                    <select id="image-format" class="fmt" title="Proporção (só para geração IA)">
                         <option value="4:5">4:5 (Instagram feed)</option>
                         <option value="1:1">1:1 (feed quadrado)</option>
                         <option value="9:16">9:16 (Stories / Reels)</option>
                         <option value="16:9">16:9 (wide)</option>
                     </select>
-                    <button type="button" class="btn btn-primary" id="btn-gen-image">🖼️ Gerar imagem</button>
-                    <button type="button" class="btn" id="btn-upload-image" title="PNG, JPEG, WebP ou GIF (máx. 12 MB)">📷 Carregar imagem…</button>
                     <input type="file" id="studio-upload-image-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" hidden aria-hidden="true" />
                 </div>
-                <textarea id="studio-image-prompt" class="input-lg" style="min-height:72px;margin-top:0.5rem" placeholder="Descrição para a imagem (preenchida automaticamente quando houver sugestão)"></textarea>
+                <textarea id="studio-image-prompt" class="input-lg" style="min-height:72px;margin-top:0.5rem" placeholder="Só se for gerar com IA: descreva a cena (preenchida automaticamente quando houver sugestão)"></textarea>
                 <img id="studio-image-preview" alt="Pré-visualização" />
+                <div class="toolbar-bottom" id="row-apply-cover-draft" style="display:none;margin-top:0.5rem;flex-wrap:wrap;gap:0.5rem">
+                    <button type="button" class="btn btn-primary" id="btn-to-editor-image-top" disabled title="Usa o ficheiro carregado ou a pré-visualização com texto — sem gerar de novo">🖼️ Usar esta capa no rascunho</button>
+                </div>
+                <p class="hint" id="studio-cover-ready-hint" style="display:none;margin-top:0.35rem">Capa carregada. Clique em <strong>Usar esta capa no rascunho</strong> — o texto do artigo no editor não será alterado. A secção «Texto sobre a imagem» só serve se quiser <em>criar</em> texto novo em cima de uma foto sem manchete.</p>
                 <label class="lbl" style="margin-top:0.75rem">Link público da imagem para WhatsApp / Facebook (opcional)</label>
                 <p class="hint">Se você gerou a imagem acima (data URL), redes sociais não mostram preview. Envie o arquivo para um local público (ex.: Storage do Supabase) e cole aqui o link <strong>https</strong> direto do arquivo. Também pode usar só este link e manter a geração apenas como referência visual.</p>
                 <input type="url" id="studio-social-image-url" placeholder="https://…/minha-capa.png" style="width:100%;padding:0.5rem 0.75rem;margin-top:0.35rem;border-radius:8px;border:1px solid #d7c2e6;background:#ffffff;color:#2d1f3d;font-size:0.9rem;" />
@@ -520,8 +524,8 @@
                     <button type="button" class="btn" id="btn-copy-image-url" style="display:none">📋 Copiar data URL da imagem</button>
                 </div>
 
-                <p class="section-title">Texto sobre a imagem (capa estilo notícia)</p>
-                <p class="hint">Depois de <strong>gerar ou carregar</strong> a imagem acima, use campos semelhantes ao Estúdio PedagoFlow: <strong>categoria</strong> com faixa amarela, <strong>manchete</strong> em destaque e <strong>rodapé</strong> (marca ou URL). O fundo escurece para a leitura. Gere a pré-visualização e descarregue a <strong>capa final</strong> para Instagram ou WhatsApp.</p>
+                <p class="section-title">Texto sobre a imagem (capa estilo notícia) — opcional</p>
+                <p class="hint"><strong>Ignore esta secção</strong> se a capa que carregou já traz manchete e texto. Só use se tiver uma foto <em>sem</em> texto e quiser desenhar categoria/manchete aqui (estilo PedagoFlow): <strong>categoria</strong> com faixa amarela, <strong>manchete</strong> em destaque e <strong>rodapé</strong> (marca ou URL). O fundo escurece para a leitura. Gere a pré-visualização e descarregue a <strong>capa final</strong> para Instagram ou WhatsApp.</p>
                 <div class="toolbar-bottom" style="margin-top:0.35rem;flex-wrap:wrap">
                     <button type="button" class="btn" id="btn-overlay-suggest-from-copy" title="Analisa o texto no seu navegador, sem chamada à API">💡 Sugestão rápida (local)</button>
                     <button type="button" class="btn btn-primary" id="btn-overlay-suggest-ai" title="Requer deploy da função blog-studio-overlay-suggest e segredo GEMINI_API">✨ Sugerir com IA (Gemini)</button>
@@ -694,7 +698,7 @@
         }
     </script>
     <script src="assets/js/vida360-share-message.js?v=20260605-share"></script>
-    <script src="assets/js/estudio-conteudo.js?v=20260605-draft-image"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260605-ready-cover"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

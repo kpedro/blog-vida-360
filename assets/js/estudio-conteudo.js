@@ -1267,19 +1267,25 @@
     const btnNo = $('btn-download-without-text');
     const btnYes = $('btn-download-with-text');
     const btnImgDraft = $('btn-to-editor-image');
+    const btnImgDraftTop = $('btn-to-editor-image-top');
+    const rowApplyCover = $('row-apply-cover-draft');
+    const coverReadyHint = $('studio-cover-ready-hint');
     if (applyBtn) applyBtn.disabled = !hasBase;
     if (clearBtn) clearBtn.disabled = !lastCompositeDataUrl;
     if (rowDl) rowDl.style.display = hasBase ? 'flex' : 'none';
     if (btnNo) btnNo.disabled = !hasBase;
     if (btnYes) btnYes.disabled = !lastCompositeDataUrl;
-    if (btnImgDraft) {
-      btnImgDraft.style.display = hasBase ? 'inline-flex' : 'none';
-      btnImgDraft.disabled = !hasBase;
-      const label = targetPostId
-        ? '🖼️ Adicionar capa ao rascunho'
-        : '🖼️ Enviar imagem ao editor';
-      if (btnImgDraft.textContent !== label) btnImgDraft.textContent = label;
-    }
+    const coverLabel = targetPostId
+      ? '🖼️ Usar esta capa no rascunho'
+      : '🖼️ Enviar esta capa ao editor';
+    [btnImgDraft, btnImgDraftTop].forEach((btn) => {
+      if (!btn) return;
+      btn.style.display = hasBase ? 'inline-flex' : 'none';
+      btn.disabled = !hasBase;
+      if (btn.textContent !== coverLabel) btn.textContent = coverLabel;
+    });
+    if (rowApplyCover) rowApplyCover.style.display = hasBase ? 'flex' : 'none';
+    if (coverReadyHint) coverReadyHint.style.display = hasBase ? 'block' : 'none';
   }
 
   function readTargetPostFromUrl() {
@@ -1323,7 +1329,8 @@
     const titleBit = targetPostTitle ? ` «${targetPostTitle}»` : '';
     el.style.display = 'block';
     el.innerHTML =
-      `<strong>Rascunho em edição</strong> — a imagem (e o texto, se usar «Usar no editor») será aplicada ao artigo${escapeHtml(titleBit)}. ` +
+      `<strong>Rascunho em edição</strong>${escapeHtml(titleBit)} — carregue a capa pronta (com texto já na imagem) e clique em <strong>Usar esta capa no rascunho</strong>. ` +
+      `Não precisa gerar outra nem usar «Texto sobre a imagem». ` +
       `<a href="admin-editor-artigo.html?id=${encodeURIComponent(targetPostId)}">Voltar ao editor</a>`;
     refreshStudioImageUi();
   }
@@ -1849,9 +1856,10 @@
   }
 
   function useImageInEditor() {
+    /** Preferir capa com texto desenhado no Estúdio; senão o ficheiro carregado (já com texto na imagem). */
     const imageDataUrl = lastCompositeDataUrl || lastImageDataUrl || '';
     if (!imageDataUrl) {
-      showError('Gere ou carregue uma imagem antes.');
+      showError('Carregue a capa pronta ou gere uma imagem antes.');
       return;
     }
     const socialUrl = ($('studio-social-image-url') && $('studio-social-image-url').value.trim()) || '';
@@ -2165,6 +2173,8 @@
     $('btn-to-editor').addEventListener('click', useInEditor);
     const btnToEditorImg = $('btn-to-editor-image');
     if (btnToEditorImg) btnToEditorImg.addEventListener('click', useImageInEditor);
+    const btnToEditorImgTop = $('btn-to-editor-image-top');
+    if (btnToEditorImgTop) btnToEditorImgTop.addEventListener('click', useImageInEditor);
 
     $('btn-coach').addEventListener('click', openCoach);
     $('modal-coach-close').addEventListener('click', closeCoach);
