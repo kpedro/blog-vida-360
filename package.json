@@ -6,6 +6,7 @@
     "dev": "http-server . -c-1 -p 5174",
     "dev:8080": "http-server . -c-1 -p 8080",
     "generate-og-png": "node scripts/generate-og-png.js",
+    "pwa:icons": "node scripts/generate-pwa-icons.js",
     "build": "node scripts/copy-post-template.js"
   },
   "devDependencies": {
