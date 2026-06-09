@@ -67,6 +67,7 @@
     <div class="wrap">
         <p class="lead">
             Assistente focado em <strong>copy comercial</strong>: faixa do topo do site, WhatsApp, convites (Zoom/Meet), legendas, CTAs.
+            Quando o tema for oportunidade ou sistema, priorize o <strong>Sistema Forja Campeã</strong> (o blog indica o método — não substitui a plataforma).
             O Estúdio de conteúdo continua dedicado a <strong>prompts para artigos</strong> do blog.
         </p>
         <p class="lead" style="font-size:0.85rem;">
@@ -76,7 +77,9 @@
         <div id="mk-error" class="error-banner"></div>
 
         <div class="card">
-            <p class="section-title mk-section">Modelos rápidos (clique para colar no campo)</p>
+            <p class="section-title mk-section">Modelos rápidos — Sistema Forja</p>
+            <div class="presets" id="mk-forja-presets"></div>
+            <p class="section-title mk-section" style="margin-top:1rem;">Outros modelos</p>
             <div class="presets">
                 <button type="button" class="preset" data-mk-preset="Preciso de uma frase curta para a faixa no topo do site: convite a uma reunião de oportunidade de negócio em [DATA/HORA], tom acolhedor. Quem tiver interesse fala comigo no WhatsApp [número ou link]. Máximo ~140 caracteres na faixa. Sugira também texto curto para o botão.">Faixa + botão</button>
                 <button type="button" class="preset" data-mk-preset="Mensagem para WhatsApp convidando para apresentação online sobre oportunidade de parceria com produtos de bem-estar; incluir link da reunião [COLE O LINK]; tom profissional e amigável; sem prometer ganhos.">WhatsApp convite</button>
@@ -133,6 +136,7 @@
             if (typeof initSupabase === 'function') window.supabaseClient = initSupabase();
         });
     </script>
+    <script src="assets/js/blog-forja-prompts.js"></script>
     <script src="assets/js/marketing-studio.js"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">

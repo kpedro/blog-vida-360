@@ -1,21 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { generateBlog360Text } from "../_shared/blog360TextGenerate.ts";
+import {
+  BLOG360_FORJA_CATEGORIES,
+  blog360FullContext,
+} from "../_shared/blog360ForjaContext.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const BLOG_VIDA360_CONTEXT = `O Blog Vida 360º é um blog brasileiro sobre saúde integral, bem-estar, saúde mental, produtividade com equilíbrio e hábitos saudáveis.
-
-Público: leitores que buscam conteúdo acessível, acolhedor e baseado em boas práticas, sem sensacionalismo.
-Temas: saúde mental, autocuidado, rotina, sono, alimentação consciente, relacionamentos, equilíbrio entre trabalho e vida pessoal, mentalidade e crescimento.
-Tom: acolhedor, claro, respeitoso; português brasileiro correto; evitar promessas milagrosas ou linguagem médica que substitua profissional de saúde.`;
-
 function getSystemPrompt(type: string): string {
   const base = `Você é um redator especializado em conteúdo para o blog Vida 360º. Crie textos em português brasileiro para artigos, redes sociais e materiais de divulgação do blog.
 
-${BLOG_VIDA360_CONTEXT}
+${blog360FullContext()}
+
+${BLOG360_FORJA_CATEGORIES}
 
 Diretrizes gerais:
 - Linguagem clara, acolhedora e profissional
@@ -69,6 +69,20 @@ SUGESTÃO DE IMAGEM
 Descrição: [cena visual ideal para o post — sem texto longo na arte]
 Dimensões sugeridas: 1080x1350 (4:5 feed IG), 1080x1080 (1:1) ou 1080x1920 (9:16 Stories/Reels)
 Onde usar: imagem principal do post ou story`
+      );
+    case "forja_bridge":
+      return (
+        base +
+        `
+Para ARTIGOS PONTE — série Sistema Forja Campeã no blog:
+- Tom editorial Vida 360º; o texto explica e qualifica, não substitui a plataforma Forja.
+- Temas: Plano 72h, duplicação (7 passos), liderança em camadas, disciplina/rotina para rede.
+- Estrutura Markdown: # título, introdução, 3–4 ## subtítulos, listas práticas, conclusão.
+- No final: CTA honesto para conhecer o Sistema Forja (página ponte do blog ou como-funciona na Forja) — sem inventar URL com token de convite.
+- Não prometa renda; não venda marca de produto específica como foco principal.
+- Sugira categoria editorial: sistema-forja, plano-72h, duplicacao ou lideranca conforme o ângulo.
+
+Opcional no final: --- e SUGESTÃO DE IMAGEM com descrição para capa (estilo profissional, âmbar/lilás suave).`
       );
     case "article_copy":
       return (

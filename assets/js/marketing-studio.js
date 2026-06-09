@@ -361,8 +361,26 @@
       const tip = document.createElement('div');
       tip.className = 'mk-msg mk-msg-tip';
       tip.innerHTML =
-        '<div class="mk-msg-body">Este assistente é só para <strong>divulgação e marketing</strong> (faixa do site, WhatsApp, convites, CTAs). Descreva o que precisa ou use um modelo abaixo.</div>';
+        '<div class="mk-msg-body">Este assistente é só para <strong>divulgação e marketing</strong> (faixa do site, WhatsApp, convites, CTAs). Para oportunidade/sistema, priorize o <strong>Sistema Forja Campeã</strong>. Descreva o que precisa ou use um modelo abaixo.</div>';
       chat.appendChild(tip);
+    }
+
+    const forjaRow = $('mk-forja-presets');
+    if (forjaRow && window.BLOG360_FORJA_PROMPTS && Array.isArray(window.BLOG360_FORJA_PROMPTS.marketingPresets)) {
+      const presets = window.BLOG360_FORJA_PROMPTS.marketingPresets;
+      forjaRow.innerHTML = presets
+        .map(
+          (p, i) =>
+            `<button type="button" class="preset preset-forja" data-mk-forja-idx="${i}">${p.label}</button>`,
+        )
+        .join('');
+      forjaRow.querySelectorAll('[data-mk-forja-idx]').forEach((btn) => {
+        btn.addEventListener('click', function () {
+          const ix = parseInt(btn.getAttribute('data-mk-forja-idx') || '', 10);
+          const item = presets[ix];
+          if (item && item.text) applyPreset(item.text);
+        });
+      });
     }
 
     document.querySelectorAll('[data-mk-preset]').forEach((btn) => {

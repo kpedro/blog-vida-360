@@ -7,13 +7,18 @@
   const STORAGE_OVERLAY_ACCENT = 'blog360_overlay_accent_v1';
   const STORAGE_SHARE_URL = 'blog360_studio_share_url_v1';
   const CONTENT_TYPES = {
-    landing: { label: 'Landing Page', desc: 'Headlines, benefícios e CTA para rotina, aromaterapia e bem-estar', gen: 'Gerar Landing Page' },
+    landing: { label: 'Landing Page', desc: 'Headlines, benefícios e CTA para rotina, aromaterapia, bem-estar ou ponte Sistema Forja', gen: 'Gerar Landing Page' },
     social_post: {
       label: 'Posts para redes',
-      desc: 'Legenda estilo Instagram (gancho, corpo, CTA, hashtags) + variante; foco em sono, ansiedade leve e aromaterapia',
+      desc: 'Legenda estilo Instagram (gancho, corpo, CTA, hashtags) — bem-estar ou série Forja',
       gen: 'Gerar posts para redes',
     },
-    article_copy: { label: 'Artigos e copy', desc: 'Rascunhos de artigo, e-mail ou copy longa sobre aromaterapia prática', gen: 'Gerar artigo / copy' },
+    article_copy: { label: 'Artigos e copy', desc: 'Rascunhos de artigo, e-mail ou copy longa (bem-estar ou editorial geral)', gen: 'Gerar artigo / copy' },
+    forja_bridge: {
+      label: 'Série Forja',
+      desc: 'Artigos ponte Sistema Forja Campeã (72h, duplicação, liderança) — tom editorial do blog, CTA para produtos.html',
+      gen: 'Gerar artigo ponte Forja',
+    },
   };
 
   const DEFAULT_SNIPPETS = [
@@ -1982,10 +1987,14 @@
     $('coach-send').disabled = true;
 
     try {
+      const coachBody = { messages: coachMessages };
+      if (contentType === 'forja_bridge') {
+        coachBody.scope = 'forja_bridge';
+      }
       const res = await fetch(`${getSupabaseUrl()}/functions/v1/blog-prompt-coach`, {
         method: 'POST',
         headers: fnHeaders(session),
-        body: JSON.stringify({ messages: coachMessages }),
+        body: JSON.stringify(coachBody),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || data.details || 'Erro no assistente');
@@ -2055,9 +2064,58 @@
   function loadSnippets() {
     try {
       const raw = localStorage.getItem(STORAGE_SNIPPETS);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (window.BLOG360_FORJA_PROMPTS && typeof window.BLOG360_FORJA_PROMPTS.mergeStudioSnippets === 'function') {
+          return window.BLOG360_FORJA_PROMPTS.mergeStudioSnippets(parsed);
+        }
+        return parsed;
+      }
     } catch (e) {}
-    return DEFAULT_SNIPPETS.slice();
+    const base = DEFAULT_SNIPPETS.slice();
+    if (window.BLOG360_FORJA_PROMPTS && typeof window.BLOG360_FORJA_PROMPTS.mergeStudioSnippets === 'function') {
+      return window.BLOG360_FORJA_PROMPTS.mergeStudioSnippets(base);
+    }
+    return base;
+  }
+
+  function initForjaPresetChips() {
+    const row = $('studio-forja-presets');
+    if (!row || !window.BLOG360_FORJA_PROMPTS) return;
+    const snippets = window.BLOG360_FORJA_PROMPTS.studioSnippets || [];
+    row.innerHTML = snippets
+      .slice(0, 4)
+      .map(
+        (s) =>
+          `<button type="button" class="btn forja-preset-chip" data-forja-preset="${escapeHtml(s.title)}" title="Colar no comando">${escapeHtml(s.title)}</button>`
+      )
+      .join('');
+    const byTitle = {};
+    snippets.forEach((s) => {
+      byTitle[s.title] = s.content;
+    });
+    row.querySelectorAll('[data-forja-preset]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-forja-preset');
+        const text = byTitle[key] || '';
+        const sp = $('studio-prompt');
+        if (!sp || !text) return;
+        if (contentType !== 'forja_bridge' && CONTENT_TYPES.forja_bridge) {
+          switchTab('forja_bridge');
+        }
+        sp.value = text;
+        sp.focus();
+      });
+    });
+  }
+
+  function initForjaHandoffLink() {
+    const a = $('btn-forja-briefing');
+    if (!a || !window.BLOG360_FORJA_PROMPTS) return;
+    const url =
+      (window.BLOG360_FORJA_PROMPTS.urls && window.BLOG360_FORJA_PROMPTS.urls.estudioHandoff()) ||
+      'https://forjacampea.com.br/como-funciona?utm_source=blog_vida360';
+    a.href = url;
   }
 
   function saveSnippets(list) {
@@ -2202,5 +2260,7 @@
 
     initShareSocialUi();
     consumeCoachSeedFromPanel();
+    initForjaPresetChips();
+    initForjaHandoffLink();
   });
 })();

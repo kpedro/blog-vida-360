@@ -8,6 +8,9 @@ Três Edge Functions no **mesmo projeto Supabase do blog** (não usa o PedagoFlo
 | `generate-blog-studio-image` | Gera imagem a partir de descrição |
 | `blog-prompt-coach` | Assistente em conversa para montar o prompt |
 | `blog-studio-overlay-suggest` | Sugere manchete + categoria para capa (texto sobre imagem) via Gemini |
+| `blog-admin-assistant` | Assistente do painel (modo rápido / dedicado) |
+
+**Fase 3 (Sistema Forja):** as funções acima e `blog-admin-assistant` usam o contexto partilhado em `supabase/functions/_shared/blog360ForjaContext.ts`. O Estúdio aceita também `type: "forja_bridge"` para artigos ponte da série Forja.
 
 ## Pré-requisitos
 
@@ -25,7 +28,10 @@ supabase functions deploy generate-blog-studio-content
 supabase functions deploy generate-blog-studio-image
 supabase functions deploy blog-prompt-coach
 supabase functions deploy blog-studio-overlay-suggest
+supabase functions deploy blog-admin-assistant
 ```
+
+Após a Fase 3, **redeploy obrigatório** de todas as funções listadas (o ficheiro `_shared/blog360ForjaContext.ts` entra no bundle de cada uma).
 
 O painel envia o JWT do utilizador em `Authorization: Bearer …`. Confirme nas definições da função (Dashboard Supabase) se a verificação JWT está alinhada com o vosso fluxo; em caso de 401, veja [JWT no Edge Functions](https://supabase.com/docs/guides/functions/auth).
 

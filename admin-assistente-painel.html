@@ -163,7 +163,7 @@
 
     <div class="wrap">
         <p class="intro">
-            Tire dúvidas sobre <strong>sequência de posts</strong>, categorias, calendário e coerência da marca.
+            Tire dúvidas sobre <strong>sequência de posts</strong>, categorias (bem-estar + série <strong>Sistema Forja</strong>), calendário e coerência da marca.
             <strong>IA padrão</strong> — respostas mais curtas e rápidas (modelo configurável por secret
             <code style="font-size:0.8rem">BLOG360_ADMIN_GEMINI_MODEL_PADRAO</code>, padrão <code style="font-size:0.8rem">gemini-2.0-flash</code>).
             <strong>IA dedicada</strong> — orientação mais profunda (secret
@@ -199,6 +199,8 @@
             <ul id="assist-history-list"></ul>
             <p class="hint" style="margin-top:0.5rem;">«Abrir» substitui a conversa actual. «Estúdio» envia essa conversa ao assistente de prompt do Estúdio. «Apagar» remove só esta entrada local.</p>
         </div>
+
+        <div id="assist-forja-quick" class="intro" style="padding:0.75rem 1rem;margin-bottom:0.75rem;display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;"></div>
 
         <div class="card">
             <div id="assist-chat" aria-live="polite"></div>
@@ -246,6 +248,7 @@
         window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
     </script>
     <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/blog-forja-prompts.js"></script>
     <script src="assets/js/admin-assistente-painel.js"></script>
 
     <footer class="admin-global-footer" role="contentinfo">

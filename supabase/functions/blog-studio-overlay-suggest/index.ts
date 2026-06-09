@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { generateBlog360Text } from "../_shared/blog360TextGenerate.ts";
+import { BLOG360_FORJA_CATEGORIES } from "../_shared/blog360ForjaContext.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,7 +31,9 @@ function parseSuggestPayload(text: string): { category: string; headline: string
   }
 }
 
-const SYSTEM = `Você sugere texto para CAPA de imagem estilo notícia/redes sociais do Blog Vida 360º (bem-estar integral, aromaterapia responsável, hábitos, sono, ansiedade leve, produtividade com equilíbrio).
+const SYSTEM = `Você sugere texto para CAPA de imagem estilo notícia/redes sociais do Blog Vida 360º (bem-estar integral, aromaterapia responsável, hábitos, sono, ansiedade leve, produtividade com equilíbrio, e série ponte Sistema Forja Campeã).
+
+${BLOG360_FORJA_CATEGORIES}
 
 O usuário envia o TEXTO JÁ GERADO (artigo em Markdown, legenda para Instagram, ou copy de landing).
 
@@ -38,7 +41,8 @@ Responda APENAS com um único objeto JSON válido em UTF-8 (sem markdown, sem te
 {"category":"...","headline":"..."}
 
 Regras:
-- category: selo curto em MAIÚSCULAS, 1 a 4 palavras (ex.: BEM-ESTAR, REDES, ROTINA, DICAS). Sem ponto final.
+- category: selo curto em MAIÚSCULAS, 1 a 4 palavras (ex.: BEM-ESTAR, ROTINA, SISTEMA FORJA, PLANO 72H, DUPLICAÇÃO, LIDERANÇA). Sem ponto final.
+- Se o texto for da série Forja/rede, prefira selos como SISTEMA FORJA, PLANO 72H, DUPLICAÇÃO ou LIDERANÇA.
 - headline: manchete para ler na imagem; use "\\n" dentro da string JSON para separar 2 a 5 linhas curtas com impacto. Português brasileiro. Sem hashtags, sem URLs. Evite ** e markdown na manchete.
 - CRÍTICO: cada linha deve ser frases COMPLETAS (sujeito + predicado). Não termine uma linha no meio de uma frase, nem em preposições ou artigos soltos (ex.: nunca termine em «pela», «para», «no», «de» sem completar o pensamento). Se usar «no cheiro do café pela manhã», inclua «manhã».
 - Baseie-se só no conteúdo enviado; não invente dados médicos nem promessas de cura.

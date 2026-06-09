@@ -228,7 +228,7 @@
 
     <main class="container">
         <section class="intro">
-            Esta área reúne vídeos para manter sua constância: estudo de produtos, desenvolvimento do negócio e motivação de execução.
+            Esta área reúne vídeos para manter sua constância: estudo de produtos, desenvolvimento do negócio, motivação de execução e recursos do <strong>Sistema Forja Campeã</strong>.
             Você pode usar as trilhas prontas e também salvar sua própria biblioteca de vídeos.
         </section>
         <section class="intro" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.7rem;">
@@ -244,6 +244,7 @@
 
         <div class="tab-row" id="tab-row">
             <button class="tab-btn active" data-tab="trilha-produtos">🧴 Produtos e uso</button>
+            <button class="tab-btn" data-tab="trilha-forja">⚙️ Sistema Forja</button>
             <button class="tab-btn" data-tab="trilha-oportunidade">🚀 Oportunidade e negócio</button>
             <button class="tab-btn" data-tab="trilha-motivacao">🔥 Motivação e rotina</button>
             <button class="tab-btn" data-tab="minha-biblioteca">📚 Minha biblioteca</button>
@@ -251,6 +252,11 @@
 
         <section id="trilha-produtos" class="panel active">
             <div class="grid" id="grid-produtos"></div>
+        </section>
+
+        <section id="trilha-forja" class="panel">
+            <p class="hint" style="margin-bottom:0.75rem;">Recursos oficiais do sistema + artigos ponte no blog. O blog indica a Forja — não substitui a plataforma.</p>
+            <div class="grid" id="grid-forja"></div>
         </section>
 
         <section id="trilha-oportunidade" class="panel">
@@ -301,11 +307,19 @@
 
             const SEARCH_CONFIG = {
                 produtos: 'aromaterapia óleos essenciais uso seguro rotina',
-                oportunidade: 'doterra marketing de relacionamento negocio bem-estar',
+                forja: 'marketing de rede duplicação liderança plano 72 horas',
+                oportunidade: 'marketing de relacionamento negocio bem-estar rede',
                 motivacao: 'disciplina produtividade constancia empreendedorismo'
             };
 
             const trilhas = {
+                forja: [
+                    { title: 'Como funciona — Sistema Forja Campeã', url: 'https://forjacampea.com.br/como-funciona?utm_source=blog_vida360&utm_medium=referral&utm_campaign=centro_aprendizado', desc: 'Visão geral do sistema: Plano 72h, 7 passos e ferramentas.', external: true },
+                    { title: 'Para líderes de equipe', url: 'https://forjacampea.com.br/para-lideres?utm_source=blog_vida360&utm_medium=referral&utm_campaign=centro_aprendizado', desc: 'Página para quem já lidera rede e quer método replicável.', external: true },
+                    { title: 'Artigos ponte no blog (série Forja)', url: 'artigos.html?categoria=sistema-forja', desc: 'Conteúdos editoriais que conectam o blog ao sistema.', external: true },
+                    { title: 'Página ponte no blog — produtos.html', url: 'produtos.html', desc: 'Resumo dos pilares Forja com CTAs a partir do Vida 360º.', external: true },
+                    { title: 'Duplicação em marketing de rede', url: 'https://www.youtube.com/watch?v=QH2-TGUlwu4', desc: 'Vídeo de referência sobre execução e plano semanal (YouTube).', external: false }
+                ],
                 produtos: [
                     { title: 'Introdução aos óleos essenciais', url: 'https://www.youtube.com/watch?v=2hyozuN7wYY', desc: 'Fundamentos para começar com segurança no dia a dia.' },
                     { title: 'Guia rápido de uso seguro', url: 'https://www.youtube.com/watch?v=LG3T2BlyJ6E', desc: 'Boas práticas para uso tópico, aromático e rotina familiar.' },
@@ -420,10 +434,13 @@
 
             function cardTemplate(item, extraActions) {
                 const videoId = getYoutubeId(item.url);
+                const isExternal = item.external || !videoId;
+                const linkTarget = isExternal && !String(item.url).startsWith('http') ? '' : ' target="_blank" rel="noopener"';
                 const thumb = videoId ? ('https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg') : '';
                 const media = videoId
-                    ? `<a class="video-thumb" href="${item.url}" target="_blank" rel="noopener"><img src="${thumb}" alt="${item.title || 'Vídeo'}"></a>`
-                    : `<a class="video-thumb" href="${item.url}" target="_blank" rel="noopener" style="color:#fff;font-weight:700;">Abrir vídeo no YouTube</a>`;
+                    ? `<a class="video-thumb" href="${item.url}"${linkTarget}><img src="${thumb}" alt="${item.title || 'Vídeo'}"></a>`
+                    : `<a class="video-thumb" href="${item.url}"${linkTarget} style="color:#fff;font-weight:700;background:#d97706;">${isExternal ? 'Abrir recurso' : 'Abrir no YouTube'}</a>`;
+                const linkLabel = videoId ? 'Abrir no YouTube' : (isExternal ? 'Abrir recurso' : 'Abrir link');
                 return `
                     <article class="video-card">
                         <h3>${item.title || 'Sem título'}</h3>
@@ -432,7 +449,7 @@
                         <div class="video-meta">
                             <span class="badge">${item.track || 'Trilha'}</span>
                             <div>
-                                <a href="${item.url}" target="_blank" rel="noopener">Abrir no YouTube</a>
+                                <a href="${item.url}"${linkTarget}>${linkLabel}</a>
                                 ${extraActions || ''}
                             </div>
                         </div>
@@ -441,6 +458,7 @@
             }
 
             function renderStatic() {
+                $('grid-forja').innerHTML = trilhas.forja.map(v => cardTemplate({ ...v, track: 'Sistema Forja' })).join('');
                 $('grid-produtos').innerHTML = trilhas.produtos.map(v => cardTemplate({ ...v, track: 'Produtos e uso' })).join('');
                 $('grid-oportunidade').innerHTML = trilhas.oportunidade.map(v => cardTemplate({ ...v, track: 'Oportunidade e negócio' })).join('');
                 $('grid-motivacao').innerHTML = trilhas.motivacao.map(v => cardTemplate({ ...v, track: 'Motivação e rotina' })).join('');

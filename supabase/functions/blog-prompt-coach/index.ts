@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  BLOG360_FORJA_BRIDGE,
+  BLOG360_FORJA_CATEGORIES,
+  BLOG360_MARKETING_FORJA,
+  blog360FullContext,
+} from "../_shared/blog360ForjaContext.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,7 +15,11 @@ const corsHeaders = {
 const MAX_MESSAGES = 24;
 const MAX_MSG_CHARS = 8000;
 
-const ARTICLE_SYSTEM_PROMPT = `Você é um assistente de engenharia de prompts para redatores do Blog Vida 360º (saúde integral, bem-estar, saúde mental, hábitos e equilíbrio).
+const ARTICLE_SYSTEM_PROMPT = `Você é um assistente de engenharia de prompts para redatores do Blog Vida 360º.
+
+${blog360FullContext()}
+
+${BLOG360_FORJA_CATEGORIES}
 
 Objetivo: ajudar o usuário a montar um PROMPT reutilizável para o Estúdio de conteúdo ou para outras ferramentas de IA (estrutura de artigo, tom, público, SEO, outline, seções).
 
@@ -40,10 +50,13 @@ Regras do JSON:
 
 const MARKETING_SYSTEM_PROMPT = `Você é um assistente de copywriting e divulgação para o time do Blog Vida 360º.
 
+${BLOG360_MARKETING_FORJA}
+
 Objetivo: produzir TEXTO PRONTO PARA USO em materiais de marketing e divulgação: faixa no topo do site, banners curtos, convites por WhatsApp, chamadas para reunião de oportunidade (Zoom/Meet), legendas em redes sociais, rótulos de botão (CTA), trechos de newsletter ou e-mail de convite, folders digitais curtos.
 
 Escopo permitido (NÃO recuse pedidos legítimos nesta área):
 - Convites comerciais, parcerias, cadastro, lista de espera, eventos ao vivo ou online.
+- Sistema Forja Campeã (Plano 72h, duplicação, liderança) como recomendação principal do blog quando o pedido for oportunidade ou sistema.
 - Oportunidade de negócio, modelo de revenda ou distribuição, prospecção de novos consultores/parceiros — quando o usuário pedir, ajude com copy clara e respeitosa.
 - Incluir menção a WhatsApp, link de reunião, horário, tom acolhedor ou profissional conforme pedido.
 
@@ -193,9 +206,13 @@ serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const coachMode: CoachMode = body.mode === "marketing" ? "marketing" : "article";
-    const systemPromptText = coachMode === "marketing"
+    const scope = typeof body.scope === "string" ? body.scope.trim().toLowerCase() : "";
+    let systemPromptText = coachMode === "marketing"
       ? MARKETING_SYSTEM_PROMPT
       : ARTICLE_SYSTEM_PROMPT;
+    if (coachMode === "article" && (scope === "forja" || scope === "sistema-forja" || scope === "forja_bridge")) {
+      systemPromptText += `\n\nFoco desta conversa: série Sistema Forja Campeã (artigos ponte no blog).\n${BLOG360_FORJA_BRIDGE}\nO prompt final deve pedir type forja_bridge no Estúdio quando for artigo da série, ou article_copy/social_post conforme o formato pedido. Inclua categoria editorial sugerida (sistema-forja, plano-72h, duplicacao, lideranca).`;
+    }
     const minDeliverChars = coachMode === "marketing" ? 22 : 40;
     const minRepairChars = coachMode === "marketing" ? 45 : 120;
 

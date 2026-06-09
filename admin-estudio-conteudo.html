@@ -66,6 +66,22 @@
             border-color: #9b59b6;
             color: #fff;
         }
+        .tab.forja-tab { border-color: #e8c48a; color: #92400e; }
+        .tab.forja-tab.active { background: #d97706; border-color: #d97706; color: #fff; }
+        .forja-preset-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .forja-preset-chip {
+            border-color: #f0dcc0 !important;
+            background: #fffbeb !important;
+            color: #92400e !important;
+            font-size: 0.78rem !important;
+            padding: 0.3rem 0.55rem !important;
+        }
+        .forja-preset-chip:hover { background: #fef3c7 !important; }
         .tab-desc { font-size: 0.8rem; color: #6f6280; margin-bottom: 1rem; min-height: 1.25rem; }
         label.lbl { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9rem; color: #2d1f3d; }
         .row-head {
@@ -431,7 +447,7 @@
 
     <div class="wrap">
         <p class="lead">
-            Gere textos para landing, <strong>redes (com foco em legenda para Instagram)</strong> e artigos, alinhados ao tom do blog.
+            Gere textos para landing, <strong>redes (com foco em legenda para Instagram)</strong>, artigos de bem-estar e a <strong>série ponte Sistema Forja Campeã</strong>, alinhados ao tom do blog.
             <strong>Teste local:</strong> na pasta do projeto rode <code style="font-size:0.8rem">npm run dev</code> (porta <strong>5174</strong>; se precisar da 8080 use <code style="font-size:0.8rem">npm run dev:8080</code>) e abra <code style="font-size:0.8rem">http://localhost:5174/admin-estudio-conteudo.html</code> — abrir o HTML direto como <code style="font-size:0.8rem">file://</code> impede o navegador de chamar o Supabase.
             Proporção <strong>4:5</strong> e descarregar a imagem são <strong>experimentais</strong>. Após alterar o backend, faça <strong>deploy</strong> das funções <code style="font-size:0.8rem">generate-blog-studio-content</code> e <code style="font-size:0.8rem">generate-blog-studio-image</code> no Supabase.
         </p>
@@ -444,6 +460,7 @@
                 <button type="button" class="tab active" data-type="landing">Landing Page</button>
                 <button type="button" class="tab" data-type="social_post">Posts para redes</button>
                 <button type="button" class="tab" data-type="article_copy">Artigos e copy</button>
+                <button type="button" class="tab forja-tab" data-type="forja_bridge">Série Forja</button>
                 <button type="button" class="tab" data-type="history">Histórico</button>
             </div>
             <p class="tab-desc" id="tab-desc">Headlines, benefícios e CTA para página de divulgação</p>
@@ -456,8 +473,9 @@
                         <button type="button" class="btn" id="btn-prompts" title="Modelos salvos">📚 Prompts</button>
                     </div>
                 </div>
-                <p class="hint">Use Montar com assistente para conversar, ou Prompts para colar modelos. A copy gerada aparece abaixo — o comando não some ao gerar.</p>
-                <textarea id="studio-prompt" class="input-lg" placeholder="Ex.: Artigo sobre aromaterapia segura para ansiedade leve no fim do dia; tom acolhedor; público adulto com rotina corrida."></textarea>
+                <p class="hint">Use Montar com assistente para conversar, ou Prompts para colar modelos. A copy gerada aparece abaixo — o comando não some ao gerar. Na aba <strong>Série Forja</strong>, o texto é artigo ponte — o blog indica o sistema, não o substitui.</p>
+                <div id="studio-forja-presets" class="forja-preset-row" aria-label="Modelos rápidos Sistema Forja"></div>
+                <textarea id="studio-prompt" class="input-lg" placeholder="Ex.: Artigo sobre aromaterapia segura para ansiedade leve no fim do dia; tom acolhedor; público adulto com rotina corrida. Na aba Série Forja: artigo ponte sobre Plano 72h ou duplicação."></textarea>
 
                 <div class="toolbar-bottom">
                     <button type="button" class="btn btn-primary" id="btn-generate">✨ <span id="btn-generate-label">Gerar Landing Page</span></button>
@@ -478,6 +496,7 @@
                         </div>
                     </details>
                     <button type="button" class="btn btn-primary" id="btn-to-editor">📝 Usar no editor de artigo</button>
+                    <a class="btn" id="btn-forja-briefing" href="https://forjacampea.com.br/como-funciona" target="_blank" rel="noopener noreferrer" title="Abre o sistema Forja com UTM do blog">↗ Briefing na Forja</a>
                 </div>
                 <p class="hint" style="margin-top:0.35rem">«Usar no editor» envia texto e imagem (se existir). Com um <strong>rascunho aberto</strong> no editor, abra o Estúdio pelo botão lá — assim a capa volta para o mesmo artigo. Só imagem? Use o botão na secção Descarregar abaixo.</p>
                 <p class="hint" style="margin-top:0.35rem"><strong>Google (isolado do PedagoFlow):</strong> os tokens ficam na tabela <code style="font-size:0.75rem">blog360_google_workspace_tokens</code> no Supabase. Com a conta ligada («Conectar conta Google»), «Google Docs» cria o documento pela API e abre-o. Sem ligação, copia-se o texto sem Markdown e abre-se <code style="font-size:0.75rem">docs.new</code>. Deploy: ver <code style="font-size:0.75rem">supabase/BLOG360_GOOGLE_WORKSPACE_DEPLOY.md</code>. Gmail usa composição web; textos longos podem ser encurtados.</p>
@@ -697,8 +716,10 @@
             initStudioSupabase();
         }
     </script>
+    <script src="assets/js/forja-links.js"></script>
+    <script src="assets/js/blog-forja-prompts.js"></script>
     <script src="assets/js/vida360-share-message.js?v=20260605-leia-mais"></script>
-    <script src="assets/js/estudio-conteudo.js?v=20260605-leia-mais"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260606-forja"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">

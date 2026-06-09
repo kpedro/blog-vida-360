@@ -27,11 +27,11 @@
     '<span class="who">Assistente</span>' +
     '<button type="button" class="msg-copy" title="Copiar texto de boas-vindas">Copiar</button>' +
     "</div>" +
-    '<div class="bubble">Olá. Pergunte sobre sequência de posts, categorias, o que publicar a seguir ou dúvidas do painel. Escolha <strong>IA padrão</strong> para respostas rápidas ou <strong>IA dedicada</strong> para plano e narrativa mais profundos.</div>' +
+    '<div class="bubble">Olá. Pergunte sobre sequência de posts, categorias (bem-estar + série <strong>Sistema Forja</strong>), o que publicar a seguir ou dúvidas do painel. Escolha <strong>IA padrão</strong> para respostas rápidas ou <strong>IA dedicada</strong> para plano e narrativa mais profundos.</div>' +
     "</div>";
 
   var WELCOME_PLAIN =
-    "Olá. Pergunte sobre sequência de posts, categorias, o que publicar a seguir ou dúvidas do painel. Escolha IA padrão para respostas rápidas ou IA dedicada para plano e narrativa mais profundos.";
+    "Olá. Pergunte sobre sequência de posts, categorias (bem-estar e série Sistema Forja), o que publicar a seguir ou dúvidas do painel. Escolha IA padrão para respostas rápidas ou IA dedicada para plano e narrativa mais profundos.";
 
   var currentSessionId = "";
 
@@ -1009,9 +1009,41 @@
     }
   }
 
+  function initAssistForjaQuick() {
+    var row = $("assist-forja-quick");
+    if (!row || !window.BLOG360_FORJA_PROMPTS) return;
+    var items = window.BLOG360_FORJA_PROMPTS.assistQuick || [];
+    if (!items.length) {
+      row.style.display = "none";
+      return;
+    }
+    row.innerHTML =
+      '<span style="font-size:0.82rem;font-weight:600;color:#6d2d86;margin-right:0.25rem;">Forja:</span>' +
+      items
+        .map(function (q) {
+          return (
+            '<button type="button" class="btn-ghost btn-tiny assist-forja-chip" data-q="' +
+            String(q).replace(/"/g, "&quot;") +
+            '">' +
+            (q.length > 48 ? q.slice(0, 45) + "…" : q) +
+            "</button>"
+          );
+        })
+        .join("");
+    row.querySelectorAll(".assist-forja-chip").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var inp = $("assist-input");
+        if (!inp) return;
+        inp.value = btn.getAttribute("data-q") || "";
+        inp.focus();
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", async function () {
     await requireAuth();
     if (typeof window.initSupabase === "function") window.initSupabase();
+    initAssistForjaQuick();
 
     try {
       currentSessionId = sessionStorage.getItem(SESS_STORAGE_KEY) || "";
