@@ -4,9 +4,9 @@
  */
 (function () {
     var FALLBACK_STRIP = {
-        text: 'Empreenda com propósito: leve os óleos essenciais da doTERRA para mais pessoas com educação e bem-estar.',
-        cta: 'Conhecer a doTERRA',
-        link: 'oportunidades.html',
+        text: 'Construa sua rede com método: conheça o Sistema Forja Campeã — duplicação, treinamento e ferramentas com IA.',
+        cta: 'Conhecer o Sistema',
+        link: 'produtos.html',
     };
 
     function normalizeOpportunityBranding(text) {
