@@ -606,7 +606,8 @@
             return /^ol[aá]!/.test(t) && (
                 /\bcomo posso ajudar\b/.test(t) ||
                 /\bsou o assistente\b/.test(t) ||
-                /\buse os bot[oõ]es\b/.test(t)
+                /\buse os bot[oõ]es\b/.test(t) ||
+                /\buse os atalhos\b/.test(t)
             );
         }
 
@@ -883,7 +884,7 @@
             "  mode: 'window',",
             "  showWelcomeScreen: false,",
             "  initialMessages: [",
-            "    'Olá! Sou o assistente do Vida 360º. Como posso ajudar você hoje? Use os botões abaixo ou escreva sua dúvida.'",
+            "    'Olá! Sou o assistente do Vida 360º. Como posso ajudar você hoje? Use os atalhos acima ou escreva sua dúvida.'",
             "  ],",
             "  i18n: {",
             "    en: {",
