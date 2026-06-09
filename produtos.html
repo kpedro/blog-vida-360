@@ -173,6 +173,7 @@
             <h2 id="forja-interesse" style="margin-top:0;color:var(--blue-primary);font-size:1.15rem;">Quer ser avisado quando abrirmos novas vagas?</h2>
             <p style="color:var(--gray-600);margin-bottom:0.75rem;">Deixe seu e-mail. Entraremos em contato com orientação sobre convite e próximos passos no Sistema Forja.</p>
             <form class="newsletter-form" data-origem="form_forja_sistema">
+                <input type="text" name="nome" placeholder="Seu nome (opcional)" aria-label="Nome" autocomplete="name">
                 <input type="email" name="email" placeholder="Seu melhor e-mail" required aria-label="E-mail">
                 <button type="submit">Quero saber mais</button>
             </form>
@@ -188,7 +189,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/blog-forja-attribution.js"></script>
     <script src="assets/js/forja-links.js"></script>
+    <script src="assets/js/blog-forja-tracking.js"></script>
     <script>
         (function () {
             if (!window.BLOG360_FORJA) return;

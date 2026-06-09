@@ -8,10 +8,14 @@
   function buildForjaUrl(path, campaign, content) {
     var url = SITE + (path.charAt(0) === '/' ? path : '/' + path);
     var params = new URLSearchParams();
-    params.set('utm_source', 'blog_vida360');
-    params.set('utm_medium', 'referral');
-    if (campaign) params.set('utm_campaign', campaign);
+    var attr = global.BLOG360_ATTRIBUTION && global.BLOG360_ATTRIBUTION.getAttribution
+      ? global.BLOG360_ATTRIBUTION.getAttribution()
+      : null;
+    params.set('utm_source', (attr && attr.utm_source) || 'blog_vida360');
+    params.set('utm_medium', (attr && attr.utm_medium) || 'referral');
+    params.set('utm_campaign', campaign || (attr && attr.utm_campaign) || 'blog_bridge');
     if (content) params.set('utm_content', content);
+    else if (attr && attr.utm_content) params.set('utm_content', attr.utm_content);
     return url + '?' + params.toString();
   }
 

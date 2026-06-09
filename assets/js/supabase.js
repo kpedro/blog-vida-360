@@ -38,25 +38,35 @@ class SupabaseClient {
   /**
    * Criar novo lead
    */
-  async createLead(email, nome = null, interesses = [], origem = 'website') {
+  async createLead(email, nome = null, interesses = [], origem = 'website', attribution = {}) {
     try {
       if (!this.client) {
         console.error('❌ Supabase client não disponível');
         return { success: false, error: 'Cliente Supabase não inicializado' };
       }
 
-      console.log('📤 Enviando INSERT para blog360_leads:', { email, nome, origem });
-      
+      const attr = attribution && typeof attribution === 'object' ? attribution : {};
+      console.log('📤 Enviando INSERT para blog360_leads:', { email, nome, origem, attr });
+
+      const row = {
+        email,
+        nome,
+        interesses,
+        origem,
+        score: 0,
+        ativo: true,
+      };
+      if (attr.utm_source) row.utm_source = attr.utm_source;
+      if (attr.utm_medium) row.utm_medium = attr.utm_medium;
+      if (attr.utm_campaign) row.utm_campaign = attr.utm_campaign;
+      if (attr.utm_content) row.utm_content = attr.utm_content;
+      if (origem === 'form_forja_sistema' || origem === 'form_forja_interesse') {
+        row.fc_sync_status = 'pending';
+      }
+
       const { data, error } = await this.client
         .from('blog360_leads')
-        .insert({
-          email,
-          nome,
-          interesses,
-          origem,
-          score: 0,
-          ativo: true
-        })
+        .insert(row)
         .select()
         .single();
 
@@ -303,6 +313,36 @@ class SupabaseClient {
   /**
    * Registrar evento de analytics
    */
+  /**
+   * Sincroniza lead Forja → fc_contato_leads (Edge Function com service role).
+   */
+  async syncForjaLead(payload) {
+    try {
+      const url = (window.VITE_SUPABASE_URL || '').trim();
+      const anon = window.VITE_SUPABASE_ANON_KEY || '';
+      if (!url || !anon) {
+        return { success: false, error: 'Supabase não configurado' };
+      }
+      const res = await fetch(`${url}/functions/v1/blog360-sync-forja-lead`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${anon}`,
+          apikey: anon,
+        },
+        body: JSON.stringify(payload || {}),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        return { success: false, error: data.error || data.message || `HTTP ${res.status}`, data };
+      }
+      return { success: true, data };
+    } catch (error) {
+      console.warn('syncForjaLead:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
   async trackEvent(evento, pagina = null, metadata = {}) {
     try {
       const sessionId = this.getSessionId();

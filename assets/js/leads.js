@@ -62,6 +62,9 @@ class LeadCapture {
     const email = formData.get('email') || form.querySelector('input[type="email"]')?.value;
     const nome = formData.get('nome') || form.querySelector('input[name="nome"]')?.value || null;
     const origem = form.dataset.origem || 'form';
+    const attribution = (window.BLOG360_ATTRIBUTION && window.BLOG360_ATTRIBUTION.getAttribution())
+      ? window.BLOG360_ATTRIBUTION.getAttribution()
+      : { utm_source: 'blog_vida360', utm_medium: 'referral' };
 
     // Validação
     if (!this.validateEmail(email)) {
@@ -103,7 +106,7 @@ class LeadCapture {
         console.log('➕ Criando novo lead...', { email, nome, origem });
         
         // Criar novo lead
-        const result = await this.supabase.createLead(email, nome, [], origem);
+        const result = await this.supabase.createLead(email, nome, [], origem, attribution);
         console.log('📊 Resultado createLead:', result);
         
         if (!result.success) {
@@ -138,6 +141,30 @@ class LeadCapture {
         console.log('📈 Evento registrado');
       } catch (err) {
         console.warn('⚠️ Erro ao registrar evento (não crítico):', err);
+      }
+
+      // Sincronizar CRM Forja (formulário de interesse no sistema)
+      if (
+        (origem === 'form_forja_sistema' || origem === 'form_forja_interesse') &&
+        leadId
+      ) {
+        try {
+          const syncRes = await this.supabase.syncForjaLead({
+            lead_id: leadId,
+            email,
+            nome,
+            origem,
+            utm_source: attribution.utm_source,
+            utm_medium: attribution.utm_medium,
+            utm_campaign: attribution.utm_campaign,
+            utm_content: attribution.utm_content,
+            utm_term: attribution.utm_term,
+            landing_path: attribution.landing_path || window.location.pathname,
+          });
+          console.log('🔗 Sync Forja CRM:', syncRes);
+        } catch (syncErr) {
+          console.warn('⚠️ Sync Forja CRM (não crítico):', syncErr);
+        }
       }
 
       // Enviar email de boas-vindas (via API) - SEMPRE, mesmo se lead já existe

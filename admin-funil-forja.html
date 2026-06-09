@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funil Blog → Forja — Vida 360º</title>
+    <link rel="icon" type="image/png" href="assets/images/avatar-vida360.png">
+    <link rel="stylesheet" href="assets/css/admin-theme.css">
+    <style>
+        body { background: #faf5ff; color: #312e81; font-family: system-ui, sans-serif; margin: 0; }
+        .top {
+            background: linear-gradient(135deg, #6d2d86, #9b59b6);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .top a { color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,0.35); padding: 0.35rem 0.7rem; border-radius: 6px; font-size: 0.88rem; }
+        .wrap { max-width: 960px; margin: 0 auto; padding: 1.25rem; }
+        .intro { background: #fff; border: 1px solid #e8d8f2; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; line-height: 1.55; font-size: 0.92rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+        .card { background: #fff; border: 1px solid #e8d8f2; border-radius: 10px; padding: 1rem; }
+        .card h3 { margin: 0 0 0.35rem; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: #7f8c8d; }
+        .card .num { font-size: 1.85rem; font-weight: 700; color: #d97706; }
+        .card .sub { font-size: 0.8rem; color: #6f6280; margin-top: 0.25rem; }
+        .funnel { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 1rem 0; }
+        .funnel-step { background: #fff8eb; border: 1px solid #f0dcc0; border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.88rem; }
+        .funnel-arrow { color: #d97706; font-weight: 700; }
+        .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+        .btn { background: #7f3f98; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.9rem; }
+        .btn.outline { background: #fff; color: #6d2d86; border: 1px solid #d7c2e6; }
+        #funnel-error { color: #c0392b; font-size: 0.9rem; margin: 0.5rem 0; }
+        #funnel-warn { background: #fff8eb; border: 1px solid #f0dcc0; padding: 0.75rem; border-radius: 8px; font-size: 0.88rem; margin-top: 0.75rem; }
+    </style>
+</head>
+<body>
+    <header class="top">
+        <h1 style="margin:0;font-size:1.1rem;">📈 Funil Blog → Sistema Forja</h1>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <a href="admin-dashboard.html">Painel</a>
+            <a href="produtos.html">Ponte produtos</a>
+            <a href="index.html">Ver blog</a>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <p class="intro">
+            Métricas do caminho editorial → conversão: <strong>cliques</strong> em CTAs Forja,
+            <strong>visitas</strong> à página ponte (<code>produtos.html</code>),
+            <strong>leads</strong> do formulário Forja no blog e espelho no CRM
+            <code>fc_contato_leads</code> (utm_source=<code>blog_vida360</code>).
+            Requer SQL <code>BLOG360_FORJA_FUNNEL.sql</code> e deploy das Edge Functions
+            <code>blog360-forja-funnel</code> + <code>blog360-sync-forja-lead</code>.
+        </p>
+
+        <div id="funnel-error"></div>
+        <div id="funnel-warn" style="display:none;"></div>
+
+        <div class="funnel" aria-label="Etapas do funil">
+            <span class="funnel-step">1. Clique CTA Forja</span>
+            <span class="funnel-arrow">→</span>
+            <span class="funnel-step">2. Página ponte</span>
+            <span class="funnel-arrow">→</span>
+            <span class="funnel-step">3. Lead blog</span>
+            <span class="funnel-arrow">→</span>
+            <span class="funnel-step">4. CRM Forja</span>
+        </div>
+
+        <h2 style="font-size:1rem;color:#6d2d86;margin:1rem 0 0.5rem;">Últimos 7 dias (blog)</h2>
+        <div class="grid" id="funnel-grid-blog"></div>
+
+        <h2 style="font-size:1rem;color:#6d2d86;margin:1.25rem 0 0.5rem;">CRM Forja (utm blog_vida360)</h2>
+        <div class="grid" id="funnel-grid-crm"></div>
+
+        <div class="actions">
+            <button type="button" class="btn" id="btn-refresh">Atualizar</button>
+            <a class="btn outline" href="https://forjacampea.com.br/sistema/admin/leads" target="_blank" rel="noopener">Abrir leads na Forja</a>
+            <a class="btn outline" href="analytics.html">Analytics geral</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.VITE_SUPABASE_URL = window.VITE_SUPABASE_URL || 'https://qrjmvqedoypxmnvfdetg.supabase.co';
+        window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
+    </script>
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/admin-funil-forja.js"></script>
+</body>
+</html>
