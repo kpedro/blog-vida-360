@@ -48,6 +48,8 @@
   /** Rascunho aberto no editor (query ?post_id=) — imagem/texto voltam para o mesmo artigo */
   let targetPostId = '';
   let targetPostTitle = '';
+  let studioImageStyleId = 'vida_editorial';
+  let studioImageExtraStyle = '';
 
   function $(id) {
     return document.getElementById(id);
@@ -1541,6 +1543,67 @@
     return out.slice(0, 4000);
   }
 
+  function getStudioImageStylesApi() {
+    return window.BLOG360_STUDIO_IMAGE_STYLES || null;
+  }
+
+  function refreshStudioImageStyleUi() {
+    const api = getStudioImageStylesApi();
+    const hintEl = $('studio-image-style-hint');
+    const dnaPre = $('studio-image-style-dna-pre');
+    if (!api) return;
+    const preset = api.getPreset(studioImageStyleId);
+    if (hintEl) hintEl.textContent = preset.hint || '';
+    if (dnaPre) {
+      dnaPre.textContent = preset.styleBlock || 'Sem bloco fixo — só a descrição da cena abaixo.';
+    }
+  }
+
+  function initStudioImageStyleUi() {
+    const api = getStudioImageStylesApi();
+    const sel = $('studio-image-style-preset');
+    const extra = $('studio-image-style-extra');
+    const btnDna = $('btn-studio-style-dna');
+    const panel = $('studio-image-style-dna-panel');
+    if (!api || !sel) return;
+
+    studioImageStyleId = api.loadStyleId();
+    studioImageExtraStyle = api.loadExtraBlock();
+
+    sel.innerHTML = api.PRESETS.map(
+      (p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.label)}</option>`
+    ).join('');
+    sel.value = studioImageStyleId;
+    if (extra) extra.value = studioImageExtraStyle;
+
+    sel.addEventListener('change', () => {
+      studioImageStyleId = sel.value;
+      api.saveStyleId(studioImageStyleId);
+      refreshStudioImageStyleUi();
+    });
+
+    if (extra) {
+      extra.addEventListener('change', () => {
+        studioImageExtraStyle = String(extra.value || '').trim();
+        api.saveExtraBlock(studioImageExtraStyle);
+      });
+      extra.addEventListener('blur', () => {
+        studioImageExtraStyle = String(extra.value || '').trim();
+        api.saveExtraBlock(studioImageExtraStyle);
+      });
+    }
+
+    if (btnDna && panel) {
+      btnDna.addEventListener('click', () => {
+        const open = panel.classList.toggle('open');
+        btnDna.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btnDna.textContent = open ? 'Ocultar detalhes' : 'Ver DNA do estilo';
+      });
+    }
+
+    refreshStudioImageStyleUi();
+  }
+
   async function generateImage() {
     const session = await requireAuth();
     if (!session) return;
@@ -1562,6 +1625,18 @@
     }
 
     const fmt = ($('image-format') && $('image-format').value) || '1:1';
+    const extraEl = $('studio-image-style-extra');
+    if (extraEl) {
+      studioImageExtraStyle = String(extraEl.value || '').trim();
+      const api = getStudioImageStylesApi();
+      if (api) api.saveExtraBlock(studioImageExtraStyle);
+    }
+    const styleSel = $('studio-image-style-preset');
+    if (styleSel) {
+      studioImageStyleId = styleSel.value || studioImageStyleId;
+      const api = getStudioImageStylesApi();
+      if (api) api.saveStyleId(studioImageStyleId);
+    }
     const btn = $('btn-gen-image');
     if (btn) btn.disabled = true;
 
@@ -1583,7 +1658,12 @@
       const res = await fetch(`${getSupabaseUrl()}/functions/v1/generate-blog-studio-image`, {
         method: 'POST',
         headers: fnHeaders(session),
-        body: JSON.stringify({ prompt: desc, format: fmt }),
+        body: JSON.stringify({
+          prompt: desc,
+          format: fmt,
+          styleId: studioImageStyleId,
+          extraStyleBlock: studioImageExtraStyle,
+        }),
       });
       const { raw: bodyRaw, data } = await readEdgeFunctionBody(res);
 
@@ -2264,5 +2344,6 @@
     consumeCoachSeedFromPanel();
     initForjaPresetChips();
     initForjaHandoffLink();
+    initStudioImageStyleUi();
   });
 })();

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { resolveStudioImageStyleBlock } from "../_shared/studioImageStyles.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,7 +23,7 @@ serve(async (req) => {
     }
 
     const bodyJson = await req.json();
-    const { prompt, format: formatParam } = bodyJson;
+    const { prompt, format: formatParam, styleId, extraStyleBlock } = bodyJson;
     const formatKey = typeof formatParam === "string" && formatParam.trim()
       ? formatParam.trim()
       : "1:1";
@@ -100,7 +101,7 @@ serve(async (req) => {
       );
     }
 
-    const systemInstruction = `Você gera imagens para o blog Vida 360º (saúde, bem-estar, vida equilibrada no Brasil).
+    const baseSystemInstruction = `Você gera imagens para o blog Vida 360º (saúde, bem-estar, vida equilibrada no Brasil).
 
 REGRAS OBRIGATÓRIAS — SEM TEXTO NA ARTE:
 - Gere uma fotografia ou ilustração limpa. PROIBIDO desenhar na imagem: hashtags (#), símbolo #, linhas de rodapé com tags, texto cinza semi-transparente, marcas d’água, UI de rede social, legendas, stickers com palavras.
@@ -108,9 +109,22 @@ REGRAS OBRIGATÓRIAS — SEM TEXTO NA ARTE:
 - NÃO inclua parágrafos nem frases longas (modelos erram ortografia em português).
 - Cena: acolhedora, luminosa; cores suaves; temas: natureza, autocuidado, pessoas em momentos de calma, hábitos saudáveis, bem-estar mental (sem violência ou conteúdo sensível).`;
 
+    const resolvedStyle = resolveStudioImageStyleBlock(
+      typeof styleId === "string" && styleId.trim() ? styleId.trim() : "vida_editorial",
+      typeof extraStyleBlock === "string" ? extraStyleBlock : "",
+    );
+    const systemInstruction = resolvedStyle.styleBlock
+      ? `${baseSystemInstruction}\n\n${resolvedStyle.styleBlock}`
+      : baseSystemInstruction;
+
+    const styleLine =
+      resolvedStyle.preset.id !== "none"
+        ? `\nPreset de estilo: ${resolvedStyle.preset.label}.`
+        : "";
+
     const userPrompt = `Gere APENAS uma cena visual (foto/ilustração) sem texto impresso, sem # e sem hashtags.
 
-${formatHint}
+${formatHint}${styleLine}
 
 Tema visual (ignore hashtags ou lista de tags se aparecerem no texto): ${promptClean}`;
 
@@ -120,7 +134,7 @@ Tema visual (ignore hashtags ou lista de tags se aparecerem no texto): ${promptC
       contents: [{ role: "user", parts: [{ text: userPrompt }] }],
       systemInstruction: { parts: [{ text: systemInstruction }] },
       generationConfig: {
-        temperature: 0.9,
+        temperature: resolvedStyle.temperature,
         maxOutputTokens: 8192,
         responseModalities: ["TEXT", "IMAGE"],
         imageConfig: { aspectRatio },

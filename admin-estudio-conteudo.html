@@ -391,6 +391,52 @@
             display: block;
             vertical-align: top;
         }
+        .studio-style-card {
+            margin-top: 0.75rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #d7c2e6;
+            background: #faf6fc;
+        }
+        .studio-style-head {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .studio-style-dna {
+            font-size: 0.72rem;
+            color: #6f6280;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            padding: 0;
+        }
+        .studio-style-dna:hover { color: #6d2d86; }
+        .studio-style-hint { font-size: 0.75rem; color: #6f6280; line-height: 1.45; margin-top: 0.35rem; }
+        .studio-style-dna-panel {
+            margin-top: 0.65rem;
+            display: none;
+        }
+        .studio-style-dna-panel.open { display: block; }
+        .studio-style-dna-pre {
+            font-size: 0.68rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 160px;
+            overflow-y: auto;
+            padding: 0.6rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #e8d8f2;
+            background: #fff;
+            color: #5d4b70;
+            margin-bottom: 0.5rem;
+        }
         /* admin-global-footer */
     .admin-global-footer {
         background: #7f3f98;
@@ -517,8 +563,22 @@
                     </div>
                 </div>
 
-                <p class="section-title">Imagem (opcional)</p>
-                <p class="hint" id="studio-image-hint">Já tem a <strong>capa final</strong> (PNG/JPG com texto na imagem)? Use <strong>Carregar capa pronta</strong> — não precisa gerar outra nem usar a secção «Texto sobre a imagem» abaixo. Para criar capa nova com IA, use a descrição e «Gerar imagem».</p>
+                <p class="section-title">Imagem IA + overlay</p>
+                <p class="hint" id="studio-image-hint">Escolha um <strong>estilo visual fixo</strong> antes de gerar — garante consistência (editorial Vida 360º, geek, fantasy, cyber ou foto). Gere a cena sem texto e componha manchete no rodapé. Já tem capa pronta? Use <strong>Carregar capa pronta</strong>.</p>
+                <div class="studio-style-card" id="studio-image-style-card">
+                    <div class="studio-style-head">
+                        <label class="lbl" style="margin:0" for="studio-image-style-preset">Estilo visual (marca)</label>
+                        <button type="button" class="studio-style-dna" id="btn-studio-style-dna" aria-expanded="false">Ver DNA do estilo</button>
+                    </div>
+                    <label class="lbl" for="studio-image-style-preset" style="font-size:0.8rem;font-weight:500;color:#6f6280">Preset</label>
+                    <select id="studio-image-style-preset" class="fmt" style="width:100%;margin-top:0.25rem;padding:0.5rem 0.65rem"></select>
+                    <p class="studio-style-hint" id="studio-image-style-hint"></p>
+                    <div class="studio-style-dna-panel" id="studio-image-style-dna-panel">
+                        <pre class="studio-style-dna-pre" id="studio-image-style-dna-pre"></pre>
+                        <label class="lbl" for="studio-image-style-extra" style="font-size:0.8rem;font-weight:500;color:#6f6280">Extra de estilo (opcional, guardado neste navegador)</label>
+                        <textarea id="studio-image-style-extra" class="input-lg" style="min-height:56px;margin-top:0.35rem;font-size:0.85rem" placeholder="Ex.: sempre luz natural de manhã; pessoas diversas em ambiente acolhedor…"></textarea>
+                    </div>
+                </div>
                 <div class="image-row">
                     <button type="button" class="btn btn-primary" id="btn-upload-image" title="PNG, JPEG, WebP ou GIF (máx. 12 MB) — capa já finalizada com texto">📷 Carregar capa pronta…</button>
                     <button type="button" class="btn" id="btn-gen-image">🖼️ Gerar imagem com IA</button>
@@ -719,7 +779,8 @@
     <script src="assets/js/forja-links.js"></script>
     <script src="assets/js/blog-forja-prompts.js"></script>
     <script src="assets/js/vida360-share-message.js?v=20260605-leia-mais"></script>
-    <script src="assets/js/estudio-conteudo.js?v=20260606-forja"></script>
+    <script src="assets/js/studio-image-styles.js?v=20260609-style"></script>
+    <script src="assets/js/estudio-conteudo.js?v=20260609-style"></script>
 <!-- admin-global-footer -->
 <footer class="admin-global-footer" role="contentinfo">
     <div class="container">
