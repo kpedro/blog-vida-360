@@ -109,6 +109,63 @@
             padding: 1.25rem;
             margin-top: var(--spacing-lg);
         }
+        .forja-rede-section {
+            background: linear-gradient(135deg, #fff8eb 0%, #f7effb 100%);
+            border: 1px solid #f0dcc0;
+            border-radius: var(--radius-lg);
+            padding: clamp(1.15rem, 2.5vw, 1.5rem);
+            margin-top: var(--spacing-lg);
+        }
+        .forja-rede-section h2 {
+            color: var(--blue-primary);
+            font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+            margin: 0 0 0.5rem;
+        }
+        .forja-rede-section > p {
+            color: var(--gray-600);
+            line-height: 1.55;
+            margin: 0 0 1rem;
+            max-width: 72ch;
+        }
+        .forja-rede-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 0 0 1.25rem;
+        }
+        .forja-rede-card {
+            background: #fff;
+            border: 1px solid #f0dcc0;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        .forja-rede-card h3 {
+            margin: 0 0 0.4rem;
+            font-size: 1rem;
+            color: #92400e;
+        }
+        .forja-rede-card p {
+            margin: 0 0 0.75rem;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            line-height: 1.45;
+        }
+        .forja-rede-card a {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #b45309;
+            text-decoration: none;
+        }
+        .forja-rede-card a:hover,
+        .forja-rede-card a:focus {
+            text-decoration: underline;
+        }
+        .forja-rede-ctas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -166,7 +223,40 @@
             <p class="forja-note">
                 Sem promessa de renda: o foco é <strong>método, organização e duplicação</strong>.
                 Produtos de consumo (como óleos essenciais) continuam em conteúdos específicos do blog — o sistema Forja é a camada de negócio.
+                O blog recomenda; a operação e as ferramentas ficam em
+                <a id="forja-cta-operacao" href="https://forjacampea.com.br/como-funciona" rel="noopener noreferrer">forjacampea.com.br</a>.
             </p>
+        </section>
+
+        <section class="forja-rede-section" aria-labelledby="forja-serie-editorial">
+            <h2 id="forja-serie-editorial">Leia a série editorial</h2>
+            <p>Antes de conhecer o sistema completo, você pode ler os artigos ponte do blog — conteúdo editorial que conecta bem-estar e rede com método, sem substituir a plataforma Forja.</p>
+            <div class="forja-rede-grid">
+                <article class="forja-rede-card">
+                    <h3>Sistema Forja</h3>
+                    <p>O que é a Forja, por que o blog indica e como se encaixa na sua rede.</p>
+                    <a href="artigos.html?categoria=sistema-forja">Ver artigos da série →</a>
+                </article>
+                <article class="forja-rede-card">
+                    <h3>Plano 72h</h3>
+                    <p>Ativação prática nos primeiros dias — processo, não só motivação.</p>
+                    <a href="artigos.html?categoria=plano-72h">Artigos Plano 72h →</a>
+                </article>
+                <article class="forja-rede-card">
+                    <h3>Duplicação</h3>
+                    <p>Equipe parada, 7 passos e rotina replicável para a rede crescer.</p>
+                    <a href="artigos.html?categoria=duplicacao">Artigos duplicação →</a>
+                </article>
+                <article class="forja-rede-card">
+                    <h3>Liderança</h3>
+                    <p>Liderança em camadas, acompanhamento e trilhas para quem já lidera.</p>
+                    <a href="artigos.html?categoria=lideranca">Artigos liderança →</a>
+                </article>
+            </div>
+            <div class="forja-rede-ctas">
+                <a href="artigos.html?categoria=sistema-forja" class="btn-secondary">Todos os artigos Forja</a>
+                <a id="forja-cta-apos-leitura" class="btn-forja-primary" href="https://forjacampea.com.br/como-funciona" rel="noopener noreferrer">Conhecer o sistema na Forja</a>
+            </div>
         </section>
 
         <section class="forja-lead-box" aria-labelledby="forja-interesse">
@@ -182,7 +272,7 @@
 
     <footer role="contentinfo">
         <div class="container">
-            <p>&copy; 2025 Vida 360º. Todos os direitos reservados.</p>
+            <p>&copy; 2026 Vida 360º. Todos os direitos reservados.</p>
             <p><a href="index.html">Voltar ao blog</a> · <a href="politica.html">Política de privacidade</a></p>
         </div>
     </footer>
@@ -197,8 +287,12 @@
             if (!window.BLOG360_FORJA) return;
             var c1 = document.getElementById('forja-cta-como-funciona');
             var c2 = document.getElementById('forja-cta-lideres');
+            var c3 = document.getElementById('forja-cta-operacao');
+            var c4 = document.getElementById('forja-cta-apos-leitura');
             if (c1) c1.href = window.BLOG360_FORJA.urls.comoFunciona('produtos_hero');
             if (c2) c2.href = window.BLOG360_FORJA.urls.paraLideres('produtos_hero');
+            if (c3) c3.href = window.BLOG360_FORJA.urls.comoFunciona('produtos_nota');
+            if (c4) c4.href = window.BLOG360_FORJA.urls.comoFunciona('produtos_serie_editorial');
         })();
     </script>
     <script src="assets/js/opportunity-strip.js"></script>

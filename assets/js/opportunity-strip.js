@@ -9,15 +9,28 @@
         link: 'produtos.html',
     };
 
-    function normalizeOpportunityBranding(text) {
-        var t = String(text || '');
-        // Migração suave de copy legada: evita exibir marca antiga.
-        t = t.replace(/\bamway\b/gi, 'doTERRA');
-        t = t.replace(
-            /renda extra,\s*tempo livre,\s*seguran[çc]a financeira\.\s*sua oportunidade doTERRA!?/gi,
-            'Empreenda com propósito: leve os óleos essenciais da doTERRA para mais pessoas com educação e bem-estar.'
+    function isLegacyOpportunityCopy(text) {
+        return /amway|renda extra,\s*tempo livre|sua oportunidade|óleos essenciais da doTERRA|empreenda com propósito:\s*leve os óleos/i.test(
+            String(text || '')
         );
+    }
+
+    function normalizeOpportunityBranding(text) {
+        var t = String(text || '').trim();
+        if (isLegacyOpportunityCopy(t)) return FALLBACK_STRIP.text;
         return t;
+    }
+
+    function normalizeOpportunityCta(cta) {
+        var c = String(cta || '').trim();
+        if (!c || /descubra agora|conhecer a doTERRA/i.test(c)) return FALLBACK_STRIP.cta;
+        return c;
+    }
+
+    function normalizeOpportunityLink(link) {
+        var l = String(link || '').trim();
+        if (!l || /^https?:\/\/wa\.me\//i.test(l)) return FALLBACK_STRIP.link;
+        return l;
     }
 
     function escHtml(s) {
@@ -82,9 +95,8 @@
             return;
         }
 
-        var link = (s.faixa_oportunidade_link || '').trim();
-        var cta = normalizeOpportunityBranding((s.faixa_oportunidade_cta || '').trim()) || 'Saiba mais';
-        cta = cta.replace(/descubra agora/gi, 'Conhecer a doTERRA');
+        var link = normalizeOpportunityLink(s.faixa_oportunidade_link);
+        var cta = normalizeOpportunityCta(s.faixa_oportunidade_cta) || 'Saiba mais';
 
         renderStrip(root, text, cta, link || FALLBACK_STRIP.link);
     }
