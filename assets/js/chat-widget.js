@@ -877,7 +877,7 @@
             "  i18n: {",
             "    en: {",
             "      title: " + JSON.stringify(cfg.agentName || 'Assistente Vida 360º') + ",",
-            "      subtitle: 'Bem-estar editorial e Sistema Forja Campeã'",
+            "      subtitle: 'Bem-estar editorial e Sistema Forja Campeã',",
             "      footer: '',",
             "      getStarted: 'Iniciar conversa',",
             "      inputPlaceholder: 'Digite sua mensagem...',",
