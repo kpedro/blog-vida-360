@@ -97,4 +97,4 @@ Saúde e conformidade:
 
 - Se mudares o texto ou número do WhatsApp, atualiza `chat-widget.js` e o URL codificado neste documento.
 
-- RAG: indexar conteúdos sobre **Sistema Forja** e artigos ponte; ver `docs/N8N_RAG_SUPABASE_ORIENTACAO.md`.
+- RAG: indexar **`docs/DOSSIE_MESTRE_RAG_ASSISTENTE_VIDA360.md`** (blocos Forja + editorial + links); ver `docs/N8N_RAG_SUPABASE_ORIENTACAO.md`. **Não** reindexar o antigo dossiê doTERRA como fonte comercial.

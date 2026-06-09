@@ -109,6 +109,10 @@ Se no fluxo copiado existia uma tool tipo **“Base Athena / RAG1”**:
 
 ## 4. Ingestão de conhecimento (popular a tabela)
 
+**Documento mestre (2026):** `docs/DOSSIE_MESTRE_RAG_ASSISTENTE_VIDA360.md` — substitui o antigo *Dossiê Mestre doTERRA*. Indexar por blocos (secção «Blocos prontos para chunking») com `metadata.eixo` = `editorial`, `forja`, `links` ou `regras`.
+
+**Desactivar legado doTERRA na base:** executar `supabase/BLOG360_RAG_DESATIVAR_DOTERRA.sql` depois de ingestão da base nova.
+
 Opções comuns:
 
 1. **SQL manual** — `INSERT INTO blog360_rag_chunks (source_title, chunk_index, content, embedding, metadata) VALUES (...)`  
@@ -142,7 +146,9 @@ Se usares modelo com **outro tamanho** (ex. 3072):
 
 ## 7. Referências no repo
 
+- **Dossiê RAG (fonte principal):** `docs/DOSSIE_MESTRE_RAG_ASSISTENTE_VIDA360.md`
 - Prompt do chat: `docs/PROMPT_SISTEMA_AGENTE_CHAT_VIDA360.md`
+- Desactivar chunks doTERRA: `supabase/BLOG360_RAG_DESATIVAR_DOTERRA.sql`
 - Inspiração de agente / ferramentas (outro produto): `mini-portal-ia/docs/n8n-cerebro-mini-portal-prompt.md` (conceitos **RAG1 / Base Athena** — aqui a implementação Supabase é **`blog360_rag_chunks`** + **`blog360_match_rag_chunks`**).
 
 ---
