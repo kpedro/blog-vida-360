@@ -116,6 +116,48 @@
             background: #fef3c7;
             color: #78350f;
         }
+        .forja-rede-section {
+            background: linear-gradient(135deg, #fff8eb 0%, #f7effb 100%);
+            border: 1px solid #f0dcc0;
+        }
+        .forja-rede-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0 1.25rem;
+        }
+        .forja-rede-card {
+            background: #fff;
+            border: 1px solid #f0dcc0;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        .forja-rede-card h3 {
+            margin: 0 0 0.4rem;
+            font-size: 1rem;
+            color: #92400e;
+        }
+        .forja-rede-card p {
+            margin: 0 0 0.75rem;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            line-height: 1.45;
+        }
+        .forja-rede-card a {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #b45309;
+            text-decoration: none;
+        }
+        .forja-rede-card a:hover {
+            text-decoration: underline;
+        }
+        .forja-rede-ctas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
         .topics-grid,
         .audience-grid,
         .footer-grid {
@@ -396,6 +438,37 @@
                         <strong>Conteúdos sobre professor, ansiedade, estresse e sono</strong>
                         Materiais pensados para quem vive sobrecarga e precisa de um plano simples para recuperar equilíbrio.
                     </div>
+                </div>
+            </section>
+
+            <section class="home-section forja-rede-section" aria-labelledby="rede-com-metodo">
+                <h2 id="rede-com-metodo">Rede com método</h2>
+                <p>Conteúdos editoriais que conectam o blog ao <strong>Sistema Forja Campeã</strong> — sem substituir a plataforma. Leia a série e, quando fizer sentido, conheça o sistema completo.</p>
+                <div class="forja-rede-grid">
+                    <article class="forja-rede-card">
+                        <h3>Sistema Forja</h3>
+                        <p>O que é a Forja, por que o blog indica e como se encaixa na sua rede.</p>
+                        <a href="artigos.html?categoria=sistema-forja">Ver artigos da série →</a>
+                    </article>
+                    <article class="forja-rede-card">
+                        <h3>Plano 72h</h3>
+                        <p>Ativação prática nos primeiros dias — processo, não só motivação.</p>
+                        <a href="artigos.html?categoria=plano-72h">Artigos Plano 72h →</a>
+                    </article>
+                    <article class="forja-rede-card">
+                        <h3>Duplicação</h3>
+                        <p>Equipe parada, 7 passos e rotina replicável para a rede crescer.</p>
+                        <a href="artigos.html?categoria=duplicacao">Artigos duplicação →</a>
+                    </article>
+                    <article class="forja-rede-card">
+                        <h3>Liderança</h3>
+                        <p>Liderança em camadas, acompanhamento e trilhas para quem já lidera.</p>
+                        <a href="artigos.html?categoria=lideranca">Artigos liderança →</a>
+                    </article>
+                </div>
+                <div class="forja-rede-ctas">
+                    <a href="produtos.html" class="btn-secondary btn-forja-cta">Conhecer o Sistema Forja</a>
+                    <a href="artigos.html?categoria=sistema-forja" class="btn-secondary">Todos os artigos Forja</a>
                 </div>
             </section>
 

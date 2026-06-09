@@ -18,7 +18,8 @@
     
     <!-- Open Graph -->
     <meta property="og:title" content="Todos os Artigos - Vida 360º">
-    <meta property="og:description" content="Explore artigos sobre sono, ansiedade leve, aromaterapia prática, produtividade e bem-estar.">
+    <meta property="og:description" content="Artigos sobre bem-estar e rotina, e conteúdos ponte sobre Sistema Forja Campeã — duplicação, Plano 72h e liderança em rede.">
+    <meta name="description" content="Artigos Vida 360º: bem-estar, produtividade e série Sistema Forja Campeã para quem constrói marketing de rede com método.">
     <meta property="og:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png?v=20260502-lilas">
     <meta property="og:url" content="https://www.blogvida360.com.br/artigos.html">
     <meta property="og:type" content="website">
@@ -68,6 +69,34 @@
         .filter-btn.active {
             background: var(--blue-secondary);
             color: white;
+        }
+
+        .filter-btn.forja-filter {
+            border-color: #d97706;
+            color: #92400e;
+        }
+
+        .filter-btn.forja-filter:hover,
+        .filter-btn.forja-filter.active {
+            background: #d97706;
+            color: #fff;
+            border-color: #d97706;
+        }
+
+        .forja-hub-banner {
+            background: linear-gradient(135deg, #fff8eb 0%, #f7effb 100%);
+            border: 1px solid #f0dcc0;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: #4a3d5c;
+        }
+
+        .forja-hub-banner a {
+            color: #b45309;
+            font-weight: 600;
         }
 
         .posts-grid {
@@ -223,12 +252,22 @@
     <main class="container">
         <div class="page-header">
             <h1>📚 Todos os Artigos</h1>
-            <p>Explore conteúdos sobre sono, ansiedade leve, aromaterapia, óleos essenciais e foco com equilíbrio</p>
+            <p>Conteúdos de bem-estar e rotina — e a série <strong>Sistema Forja Campeã</strong> para quem constrói rede com método.</p>
+        </div>
+
+        <div class="forja-hub-banner" role="note">
+            <strong>Série Forja:</strong> artigos ponte entre o blog e o
+            <a href="produtos.html">Sistema Forja Campeã</a> (Plano 72h, duplicação, liderança).
+            O blog não substitui a plataforma — indica o sistema quando o tema é <em>negócio em rede</em>.
         </div>
 
         <!-- Filtros por Categoria -->
         <div class="filters" id="filters">
             <button class="filter-btn active" data-categoria="">Todos</button>
+            <button class="filter-btn forja-filter" data-categoria="sistema-forja">Sistema Forja</button>
+            <button class="filter-btn forja-filter" data-categoria="plano-72h">Plano 72h</button>
+            <button class="filter-btn forja-filter" data-categoria="duplicacao">Duplicação</button>
+            <button class="filter-btn forja-filter" data-categoria="lideranca">Liderança</button>
             <button class="filter-btn" data-categoria="saude">Saúde</button>
             <button class="filter-btn" data-categoria="bem-estar">Bem-estar</button>
             <button class="filter-btn" data-categoria="sono">Sono</button>
@@ -297,6 +336,7 @@
         window.VITE_SUPABASE_ANON_KEY = window.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyam12cWVkb3lweG1udmZkZXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2NDc3MjYsImV4cCI6MjA3OTIyMzcyNn0.QjhD8GQsNiNX58EvVUJvf9seNYGR6ruLvpF1lHpSX8E';
     </script>
     <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/blog-categories.js"></script>
     <script>
         (function() {
             var postsPerPage = 12;
@@ -388,6 +428,24 @@
                         filterPosts();
                     });
                 });
+
+                var urlCat = new URLSearchParams(window.location.search).get('categoria');
+                if (urlCat) {
+                    var normalizedUrl = String(urlCat).toLowerCase().trim();
+                    currentCategoria = normalizedUrl;
+                    filterBtns.forEach(function(b) {
+                        b.classList.toggle('active', b.getAttribute('data-categoria') === normalizedUrl);
+                    });
+                    currentPage = 1;
+                    filterPosts();
+                }
+            }
+
+            function formatCategoryLabel(slug) {
+                if (window.BLOG360_CATEGORIES && typeof window.BLOG360_CATEGORIES.label === 'function') {
+                    return window.BLOG360_CATEGORIES.label(slug);
+                }
+                return String(slug || '').replace(/-/g, ' ');
             }
 
             function filterPosts() {
@@ -417,7 +475,8 @@
                     filteredPosts = allPosts;
                 } else {
                     var selectedCategory = normalizeCategory(currentCategoria);
-                    var categoryAliases = {
+                    var categoryAliases = (window.BLOG360_CATEGORIES && window.BLOG360_CATEGORIES.aliases) || {
+                        'sistema-forja': ['sistema-forja', 'forja-campea', 'plano-72h', 'duplicacao', 'lideranca', 'forja'],
                         'foco-produtividade': ['foco-produtividade', 'produtividade', 'foco'],
                         'oleos-essenciais': ['oleos-essenciais', 'oleo-essencial', 'aromaterapia'],
                         'ansiedade-leve': ['ansiedade-leve', 'ansiedade', 'saude-mental']
@@ -483,7 +542,7 @@
                     html += '<img src="' + img + '" alt="' + titulo.replace(/"/g, '&quot;') + '" class="post-image" loading="lazy" onerror="this.src=\'assets/images/equilibrio-vida.jpg\'">';
                     html += '<div class="post-content">';
                     if (categoria) {
-                        html += '<div class="post-meta">\uD83D\uDCC1 ' + categoria + (dateStr ? ' \u2022 ' + dateStr : '') + '</div>';
+                        html += '<div class="post-meta">\uD83D\uDCC1 ' + formatCategoryLabel(categoria) + (dateStr ? ' \u2022 ' + dateStr : '') + '</div>';
                     } else if (dateStr) {
                         html += '<div class="post-meta">\uD83D\uDCC5 ' + dateStr + '</div>';
                     }
