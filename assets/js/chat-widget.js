@@ -9,8 +9,12 @@
     }
 
     var CONFIG_CACHE_KEY = 'blog360_specialist_chat_config';
-    var DEFAULT_LINK_COMPRA = 'https://doterra.me/ITKQz';
-    var DEFAULT_LINK_CADASTRO = 'https://doterra.me/pntJ4H';
+    var DEFAULT_LINK_FORJA_BLOG = 'https://www.blogvida360.com.br/produtos.html';
+    var DEFAULT_LINK_FORJA_PLATFORM =
+        'https://forjacampea.com.br/como-funciona?utm_source=blog_vida360&utm_medium=referral&utm_campaign=chat_widget';
+    /** Mantidos por compatibilidade com blog360_site_settings (agente_chat_link_compra / _cadastro). */
+    var DEFAULT_LINK_COMPRA = DEFAULT_LINK_FORJA_BLOG;
+    var DEFAULT_LINK_CADASTRO = DEFAULT_LINK_FORJA_PLATFORM;
     var DEFAULT_WHATSAPP_NUMBER = '5592994314016';
     /** Mensagem inicial no campo de texto do WhatsApp (ajuda a abrir a conversa com contexto). */
     var DEFAULT_WHATSAPP_PREFILL =
@@ -21,8 +25,23 @@
         webhookUrl: '',
         linkCompra: DEFAULT_LINK_COMPRA,
         linkCadastro: DEFAULT_LINK_CADASTRO,
-        agentName: 'Especialista Vida 360º'
+        agentName: 'Assistente Vida 360º'
     };
+
+    function isLegacyDoterraChatLink(url) {
+        return /doterra\.me/i.test(String(url || ''));
+    }
+
+    function normalizeChatLink(url, fallback) {
+        var u = String(url || '').trim();
+        if (!u || isLegacyDoterraChatLink(u)) return fallback;
+        return u;
+    }
+
+    function applyNormalizedChatLinks() {
+        cfg.linkCompra = normalizeChatLink(cfg.linkCompra, DEFAULT_LINK_FORJA_BLOG);
+        cfg.linkCadastro = normalizeChatLink(cfg.linkCadastro, DEFAULT_LINK_FORJA_PLATFORM);
+    }
 
     function saveLocalConfig() {
         try { localStorage.setItem(CONFIG_CACHE_KEY, JSON.stringify(cfg)); } catch (e) {}
@@ -60,6 +79,7 @@
             cfg.linkCompra = row.agente_chat_link_compra || cfg.linkCompra;
             cfg.linkCadastro = row.agente_chat_link_cadastro || cfg.linkCadastro;
             cfg.agentName = row.agente_chat_nome || cfg.agentName;
+            applyNormalizedChatLinks();
             saveLocalConfig();
         } catch (e) {}
     }
@@ -561,11 +581,14 @@
             try {
                 var parsed = new URL(packUrl);
                 var host = (parsed.hostname || '').replace(/^www\./i, '').toLowerCase();
-                if (host === 'doterra.me') {
-                    var slug = ((parsed.pathname || '/').replace(/^\//, '').split('/') || []).filter(Boolean)[0] || '';
-                    if (!slug) return false;
-                    var esc = slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    return new RegExp('https://doterra\\.me/' + esc + '(?:\\?[^\\s]*)?(?:#\\S*)?', 'i').test(text);
+                if (host === 'forjacampea.com.br') {
+                    var path = (parsed.pathname || '/') + (parsed.search || '');
+                    if (!path || path === '/') return false;
+                    var escPath = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    return new RegExp('https://forjacampea\\.com\\.br' + escPath, 'i').test(text);
+                }
+                if (host === 'blogvida360.com.br' || host === 'www.blogvida360.com.br') {
+                    return /https:\/\/(?:www\.)?blogvida360\.com\.br\/[^\s]+/i.test(text);
                 }
                 if (host === 'wa.me') {
                     var head = ((parsed.pathname || '').replace(/^\//, '').split('/') || []).filter(Boolean)[0] || '';
@@ -588,18 +611,18 @@
             }
 
             var lc = out.toLowerCase();
-            var wantsPc =
-                /\b(cliente\s+preferencial|preferred\s+customer)\b/i.test(lc) ||
-                /\bcadastro\s+como\s+cliente\s+preferencial\b/i.test(lc);
-            var wantsConsultor =
-                /\b(cadastro|cadastrar-me|cadastrar|ser)\b[^\n]{0,80}\bconsultor/i.test(lc) ||
-                /\bconsultor[^\n]{0,40}\b(bem\s*-?\s*estar|doterra|oportunidade|cadastro)/i.test(lc);
+            var wantsForjaBlog =
+                /\b(sistema\s+forja|forja\s+campe[aã]|produtos\.html)\b/i.test(lc) ||
+                /\b(quero\s+entrar|cadastro|avisar|vagas)\b[^\n]{0,60}\bforja\b/i.test(lc);
+            var wantsForjaPlatform =
+                /\b(amway|marketing\s+de\s+rede|duplica[cç][aã]o|plano\s+72h|como\s+funciona)\b/i.test(lc) ||
+                /\b(lideran[cç]a|rede\s+com\s+m[eé]todo|oportunidade\s+de\s+neg[oó]cio)\b/i.test(lc);
             var wantsWa =
                 /\bwhatsapp\b|\bwa\s*\.?\s*me\b|\bzap\b/i.test(lc) ||
                 (/\bkadson\b/i.test(lc) && /\b(contato|falar|mensagem)\b/i.test(lc));
 
-            if (wantsPc && pack.linkCompra) appendBlock(['Link (cliente preferencial doTERRA):'], pack.linkCompra);
-            if (wantsConsultor && pack.linkCadastro) appendBlock(['Link (cadastro consultor(a) de bem-estar):'], pack.linkCadastro);
+            if (wantsForjaBlog && pack.linkCompra) appendBlock(['Página Sistema Forja no blog:'], pack.linkCompra);
+            if (wantsForjaPlatform && pack.linkCadastro) appendBlock(['Sistema Forja — como funciona:'], pack.linkCadastro);
             if (wantsWa && pack.linkWhatsapp) appendBlock(['WhatsApp do Kadson (mensagem já sugerida):'], pack.linkWhatsapp);
 
             out = dedupeExactDuplicateHttpsLines(out.replace(/\n{3,}/g, '\n\n').trim());
@@ -636,10 +659,11 @@
                 var parsed = new URL(raw);
                 if (parsed.protocol !== 'https:') return '';
                 var host = (parsed.hostname || '').replace(/^www\./i, '').toLowerCase();
-                if (host === 'doterra.me') {
-                    var firstSeg = ((parsed.pathname || '/').replace(/^\//, '').split('/') || []).filter(Boolean)[0] || '';
-                    if (!/^[A-Za-z0-9]+$/.test(firstSeg)) return '';
-                    return parsed.origin + '/' + firstSeg + (parsed.search || '') + (parsed.hash || '');
+                if (host === 'forjacampea.com.br') {
+                    return parsed.origin + (parsed.pathname || '/') + (parsed.search || '') + (parsed.hash || '');
+                }
+                if (host === 'blogvida360.com.br' || host === 'www.blogvida360.com.br') {
+                    return parsed.origin + (parsed.pathname || '/') + (parsed.search || '') + (parsed.hash || '');
                 }
                 if (host === 'wa.me') {
                     var head = ((parsed.pathname || '').replace(/^\//, '').split('/') || []).filter(Boolean)[0] || '';
@@ -800,8 +824,8 @@
             wrap.innerHTML = [
                 '<p class="blog360-chat-quick-title">Escolha uma opção ou digite sua mensagem no campo de texto.</p>',
                 '<div class="blog360-chat-quick-grid">',
-                '  <button type="button" class="primary" data-link="' + linkCompra + '">Cliente preferencial</button>',
-                '  <button type="button" data-link="' + linkCadastro + '">Cadastro consultor</button>',
+                '  <button type="button" class="primary" data-link="' + linkCompra + '">Sistema Forja</button>',
+                '  <button type="button" data-link="' + linkCadastro + '">Como funciona na Forja</button>',
                 '  <button type="button" class="whatsapp" data-link="' + linkWhatsapp + '">Falar no WhatsApp</button>',
                 '</div>'
             ].join('');
@@ -848,12 +872,12 @@
             "  mode: 'window',",
             "  showWelcomeScreen: false,",
             "  initialMessages: [",
-            "    'Olá! Sou o assistente Vida 360º. Use os botões acima para atalhos rápidos ou digite sua dúvida no campo de texto.'",
+            "    'Olá! Sou o assistente Vida 360º. Bem-estar no blog; rede com método no Sistema Forja Campeã (Amway). Use os botões ou digite sua dúvida.'",
             "  ],",
             "  i18n: {",
             "    en: {",
-            "      title: " + JSON.stringify(cfg.agentName || 'Especialista Vida 360º') + ",",
-            "      subtitle: 'Tire duvidas sobre bem-estar e doTERRA',",
+            "      title: " + JSON.stringify(cfg.agentName || 'Assistente Vida 360º') + ",",
+            "      subtitle: 'Bem-estar editorial e Sistema Forja Campeã'",
             "      footer: '',",
             "      getStarted: 'Iniciar conversa',",
             "      inputPlaceholder: 'Digite sua mensagem...',",
@@ -873,6 +897,7 @@
     }
 
     loadLocalConfig();
+    applyNormalizedChatLinks();
     repairBrokenPtBrText();
     loadRemoteConfig().finally(function () {
         if (cfg.webhookUrl && /^https?:\/\//i.test(cfg.webhookUrl)) {
