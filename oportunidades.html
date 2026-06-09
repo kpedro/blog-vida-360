@@ -27,7 +27,7 @@
     <meta name="twitter:description" content="Conteúdo no blog Vida 360º; método e operação na Sistema Forja Campeã.">
     <meta name="twitter:image" content="https://www.blogvida360.com.br/assets/images/og-banner.png?v=20260502-lilas">
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/opportunity-strip.css">
+    <link rel="stylesheet" href="assets/css/opportunity-strip.css?v=20260609-forja">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -201,6 +201,39 @@
             padding: 15px 0;
             margin-top: 2rem;
         }
+        @media (max-width: 768px) {
+            .opp-paths {
+                grid-template-columns: 1fr;
+            }
+            .opp-panel {
+                padding: 1.15rem 1rem;
+            }
+            .opp-tabs button {
+                flex: 1 1 calc(50% - 0.25rem);
+                min-width: 0;
+            }
+        }
+        @media (max-width: 480px) {
+            .opp-tabs {
+                flex-direction: column;
+                align-items: stretch;
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+            .opp-tabs button {
+                width: 100%;
+                border-radius: 8px;
+            }
+            .btn-wa {
+                width: 100%;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+            .opp-links {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
@@ -290,6 +323,7 @@
                 <h3>Navegação</h3>
                 <a href="index.html">Início</a><br>
                 <a href="artigos.html">Artigos</a><br>
+                <a href="produtos.html">Sistema Forja</a><br>
                 <a href="sobre.html">Sobre</a><br>
                 <a href="contato.html">Contato</a>
             </div>
@@ -385,7 +419,7 @@
             if (link) link.href = window.BLOG360_FORJA.urls.comoFunciona('oportunidades_aba_forja');
         })();
     </script>
-    <script src="assets/js/chat-widget.js?v=20260609-chat3"></script>
+    <script src="assets/js/chat-widget.js?v=20260609-chat4"></script>
     <script src="assets/js/opportunity-strip.js"></script>
     <script src="assets/js/pwa.js" defer></script>
 </body>

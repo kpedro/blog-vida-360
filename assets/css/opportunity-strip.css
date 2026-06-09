@@ -122,3 +122,23 @@
         animation: none !important;
     }
 }
+
+@media (max-width: 480px) {
+    .site-opportunity-strip__inner {
+        padding: 0.5rem 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .site-opportunity-strip__text {
+        font-size: 0.82rem;
+        flex-basis: 100%;
+    }
+
+    .site-opportunity-strip__cta {
+        white-space: normal;
+        text-align: center;
+        width: 100%;
+        max-width: 20rem;
+        box-sizing: border-box;
+    }
+}

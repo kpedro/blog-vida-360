@@ -16,157 +16,11 @@
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#7f3f98">
     <link rel="stylesheet" href="assets/css/style.css?v=20260502-attn">
-    <link rel="stylesheet" href="assets/css/opportunity-strip.css?v=20260502-attn">
+    <link rel="stylesheet" href="assets/css/opportunity-strip.css?v=20260609-forja">
     <link rel="stylesheet" href="assets/css/leads.css?v=20260502b">
+    <link rel="stylesheet" href="assets/css/forja-bridge.css?v=20260609">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        .forja-bridge-hero {
-            background: linear-gradient(135deg, #fff8eb 0%, #f7effb 55%, #ffffff 100%);
-            border: 1px solid #f0dcc0;
-            border-radius: var(--radius-lg);
-            padding: clamp(1.25rem, 3vw, 2rem);
-            margin-bottom: var(--spacing-lg);
-        }
-        .forja-bridge-hero h1 {
-            color: var(--blue-primary);
-            font-size: clamp(1.5rem, 3.2vw, 2.1rem);
-            line-height: 1.25;
-            margin: 0 0 0.75rem;
-        }
-        .forja-badge {
-            display: inline-block;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: #92400e;
-            background: #fef3c7;
-            border: 1px solid #fcd34d;
-            border-radius: 999px;
-            padding: 0.25rem 0.65rem;
-            margin-bottom: 0.75rem;
-        }
-        .forja-bridge-hero p {
-            color: var(--gray-900);
-            line-height: 1.65;
-            max-width: 68ch;
-        }
-        .forja-pillars {
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            margin: 1.25rem 0;
-        }
-        .forja-pillar {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-        }
-        .forja-pillar strong {
-            display: block;
-            color: var(--blue-primary);
-            margin-bottom: 0.35rem;
-        }
-        .forja-pillar p {
-            margin: 0;
-            font-size: 0.92rem;
-            color: var(--gray-600);
-        }
-        .forja-ctas {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-top: 1.25rem;
-        }
-        .btn-forja-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #d97706;
-            color: #fff;
-            text-decoration: none;
-            border-radius: var(--radius);
-            padding: 0.75rem 1.15rem;
-            font-weight: 600;
-        }
-        .btn-forja-primary:hover,
-        .btn-forja-primary:focus {
-            background: #b45309;
-            color: #fff;
-        }
-        .forja-note {
-            font-size: 0.88rem;
-            color: var(--gray-600);
-            margin-top: 1rem;
-            max-width: 70ch;
-        }
-        .forja-lead-box {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            margin-top: var(--spacing-lg);
-        }
-        .forja-rede-section {
-            background: linear-gradient(135deg, #fff8eb 0%, #f7effb 100%);
-            border: 1px solid #f0dcc0;
-            border-radius: var(--radius-lg);
-            padding: clamp(1.15rem, 2.5vw, 1.5rem);
-            margin-top: var(--spacing-lg);
-        }
-        .forja-rede-section h2 {
-            color: var(--blue-primary);
-            font-size: clamp(1.1rem, 2.5vw, 1.35rem);
-            margin: 0 0 0.5rem;
-        }
-        .forja-rede-section > p {
-            color: var(--gray-600);
-            line-height: 1.55;
-            margin: 0 0 1rem;
-            max-width: 72ch;
-        }
-        .forja-rede-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 0 0 1.25rem;
-        }
-        .forja-rede-card {
-            background: #fff;
-            border: 1px solid #f0dcc0;
-            border-radius: var(--radius-md);
-            padding: 1rem;
-        }
-        .forja-rede-card h3 {
-            margin: 0 0 0.4rem;
-            font-size: 1rem;
-            color: #92400e;
-        }
-        .forja-rede-card p {
-            margin: 0 0 0.75rem;
-            font-size: 0.9rem;
-            color: var(--gray-600);
-            line-height: 1.45;
-        }
-        .forja-rede-card a {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #b45309;
-            text-decoration: none;
-        }
-        .forja-rede-card a:hover,
-        .forja-rede-card a:focus {
-            text-decoration: underline;
-        }
-        .forja-rede-ctas {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            align-items: center;
-        }
-    </style>
 </head>
 <body>
     <header role="banner">
@@ -188,7 +42,7 @@
 
     <div id="site-opportunity-strip" class="site-opportunity-strip is-hidden" role="region" aria-label="Oportunidade"></div>
 
-    <main class="container" style="padding-top: 1.5rem; padding-bottom: 2.5rem;">
+    <main class="container forja-page" style="padding-top: 1.5rem; padding-bottom: 2.5rem;">
         <section class="forja-bridge-hero">
             <span class="forja-badge">Recomendação do blog</span>
             <h1>Sistema Forja Campeã</h1>
@@ -260,7 +114,7 @@
         </section>
 
         <section class="forja-lead-box" aria-labelledby="forja-interesse">
-            <h2 id="forja-interesse" style="margin-top:0;color:var(--blue-primary);font-size:1.15rem;">Quer ser avisado quando abrirmos novas vagas?</h2>
+            <h2 id="forja-interesse">Quer ser avisado quando abrirmos novas vagas?</h2>
             <p style="color:var(--gray-600);margin-bottom:0.75rem;">Deixe seu e-mail. Entraremos em contato com orientação sobre convite e próximos passos no Sistema Forja.</p>
             <form class="newsletter-form" data-origem="form_forja_sistema">
                 <input type="text" name="nome" placeholder="Seu nome (opcional)" aria-label="Nome" autocomplete="name">
@@ -323,6 +177,6 @@
     </script>
     <script src="assets/js/opportunity-strip.js"></script>
     <script src="assets/js/leads.js"></script>
-    <script src="assets/js/chat-widget.js?v=20260609-chat3"></script>
+    <script src="assets/js/chat-widget.js?v=20260609-chat4"></script>
 </body>
 </html>
