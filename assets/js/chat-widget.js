@@ -600,7 +600,18 @@
             return false;
         }
 
+        function isWidgetWelcomeMessage(text) {
+            var t = String(text || '').trim().toLowerCase();
+            if (!t || t.length > 320) return false;
+            return /^ol[aá]!/.test(t) && (
+                /\bcomo posso ajudar\b/.test(t) ||
+                /\bsou o assistente\b/.test(t) ||
+                /\buse os bot[oõ]es\b/.test(t)
+            );
+        }
+
         function ensureMandatoryUrls(plainText, pack) {
+            if (isWidgetWelcomeMessage(plainText)) return String(plainText || '').trim();
             var out = dedupeExactDuplicateHttpsLines(String(plainText || ''));
 
             function appendBlock(lines, url) {
@@ -822,7 +833,7 @@
             var wrap = document.createElement('div');
             wrap.className = 'blog360-chat-quick-actions';
             wrap.innerHTML = [
-                '<p class="blog360-chat-quick-title">Escolha uma opção ou digite sua mensagem no campo de texto.</p>',
+                '<p class="blog360-chat-quick-title">Atalhos rápidos (opcional)</p>',
                 '<div class="blog360-chat-quick-grid">',
                 '  <button type="button" class="primary" data-link="' + linkCompra + '">Sistema Forja</button>',
                 '  <button type="button" data-link="' + linkCadastro + '">Como funciona na Forja</button>',
@@ -872,7 +883,7 @@
             "  mode: 'window',",
             "  showWelcomeScreen: false,",
             "  initialMessages: [",
-            "    'Olá! Sou o assistente Vida 360º. Bem-estar no blog; rede com método no Sistema Forja Campeã (Amway). Use os botões ou digite sua dúvida.'",
+            "    'Olá! Sou o assistente do Vida 360º. Como posso ajudar você hoje? Use os botões abaixo ou escreva sua dúvida.'",
             "  ],",
             "  i18n: {",
             "    en: {",
