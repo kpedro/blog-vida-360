@@ -12,7 +12,7 @@ export const BLOG360_FORJA_BRIDGE = `Modelo híbrido do blog (obrigatório quand
 - Vida 360º = conteúdo editorial, SEO e credibilidade (bem-estar + rotina).
 - Sistema Forja Campeã = plataforma recomendada para quem constrói marketing de rede com método (Plano 72h, 7 passos de duplicação, liderança em camadas, estúdio e ferramentas).
 - O blog NÃO substitui a Forja — indica o sistema quando o assunto é duplicação, equipe parada ou liderança.
-- A Forja NÃO vende marca de óleos/suplementos específica; funciona com a rede que a pessoa já escolheu (doTERRA ou outra).
+- A Forja NÃO vende marca de produtos no blog; na operação do Kadson o ecossistema trabalha com Amway e organiza como a rede replica e lidera.
 - Sem promessa de renda fixa, lucro garantido ou cura de doenças.
 - CTAs honestos: página ponte do blog (/produtos.html) ou forjacampea.com.br/como-funciona — não invente links de convite com token.`;
 
@@ -21,7 +21,7 @@ export const BLOG360_FORJA_CATEGORIES =
 
 export const BLOG360_MARKETING_FORJA = `Na copy comercial do blog, quando o pedido for oportunidade, convite ou sistema:
 - Priorize o Sistema Forja Campeã como recomendação principal do blog (método, 72h, duplicação).
-- doTERRA ou produto específico só como caminho secundário/opcional, se o utilizador pedir explicitamente.
+- Não promova doTERRA nem outras marcas como oportunidade de negócio; o caminho comercial do blog é o Sistema Forja Campeã.
 - Tom de convite profissional e acolhedor; sem hype de renda nem alegações médicas.`;
 
 export function blog360FullContext(): string {

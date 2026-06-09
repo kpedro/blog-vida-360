@@ -16,7 +16,7 @@ O **Vida 360º** continua sendo um blog de conteúdo sobre rotina, equilíbrio e
 
 ## Não é substituto do seu produto
 
-A Forja **não vende óleos, suplementos ou qualquer marca específica**. Ela organiza **como você trabalha a rede** que já escolheu — doTERRA, outra empresa ou mais de uma, se fizer sentido para você.
+A Forja **não vende produtos no blog**. Ela organiza **como você trabalha a rede** — na operação do Kadson, com foco em **Amway** e método replicável para a equipe.
 
 ## Os três pilares que você vai ouvir sempre
 

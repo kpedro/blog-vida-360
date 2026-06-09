@@ -31,7 +31,7 @@
     [/sono|dormir|insônia/i, '#Sono'],
     [/ansiedade|calma|respira/i, '#Mindfulness'],
     [/foco|produtiv/i, '#Produtividade'],
-    [/doterra/i, '#doTERRA'],
+    [/forja|amway/i, '#ForjaCampea'],
   ];
 
   function stripPlain(raw) {
